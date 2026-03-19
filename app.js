@@ -42,25 +42,28 @@ const statResults = document.getElementById("stat-results");
 const toggleCatastro = document.getElementById("toggle-catastro");
 const toggleBienes = document.getElementById("toggle-bienes");
 const categoryCards = Array.from(document.querySelectorAll(".category-card"));
-const bienesCategoryCounters = {
-  "Area Verde": document.getElementById("count-area-verde"),
-  "Bienes Municipales Urbano": document.getElementById("count-bienes-urbano"),
-  Comodato: document.getElementById("count-comodato"),
-  Subdivisiones: document.getElementById("count-subdivisiones"),
-  "Urbanizaciones Urbanas": document.getElementById("count-urbanizaciones")
-};
+const bienesCategories = [
+  { value: "Area Verde", label: "Area Verde", countId: "count-area-verde", color: "#15803d" },
+  { value: "Bienes Municipales Rurale", label: "Bienes Municipales Rurales", countId: "count-bienes-rurales", color: "#65a30d" },
+  { value: "Bienes Municipales Urbano", label: "Bienes Municipales Urbanos", countId: "count-bienes-urbanos", color: "#b45309" },
+  { value: "Comodato", label: "Comodato", countId: "count-comodato", color: "#7c3aed" },
+  { value: "Monstrencos_urbanos", label: "Monstrencos Urbanos", countId: "count-monstrencos-urbanos", color: "#ea580c" },
+  { value: "Mostrencos_Rurales", label: "Mostrencos Rurales", countId: "count-mostrencos-rurales", color: "#92400e" },
+  { value: "Subdivisiones", label: "Subdivisiones", countId: "count-subdivisiones", color: "#dc2626" },
+  { value: "Urbanizaciones Rurales", label: "Urbanizaciones Rurales", countId: "count-urbanizaciones-rurales", color: "#0f766e" },
+  { value: "Urbanizaciones Urbanas", label: "Urbanizaciones Urbanas", countId: "count-urbanizaciones-urbanas", color: "#0891b2" }
+];
+const bienesCategoryCounters = Object.fromEntries(
+  bienesCategories.map((category) => [category.value, document.getElementById(category.countId)])
+);
 
 let selectedLayer = null;
 const activeBienesCategories = new Set();
 const sourceLoadPromises = new Map();
 
-const bienesColorMap = {
-  "Area Verde": "#15803d",
-  "Bienes Municipales Urbano": "#b45309",
-  Comodato: "#7c3aed",
-  Subdivisiones: "#dc2626",
-  "Urbanizaciones Urbanas": "#0891b2"
-};
+const bienesColorMap = Object.fromEntries(
+  bienesCategories.map((category) => [category.value, category.color])
+);
 
 const bienesFallbackPalette = [
   "#0f766e",
@@ -162,7 +165,8 @@ function updateSearch() {
   if (query) {
     mapMessage.textContent = `${matches} elemento(s) coinciden con la busqueda actual.`;
   } else if (activeBienesCategories.size > 0) {
-    mapMessage.textContent = `Filtros activos: ${Array.from(activeBienesCategories).join(", ")}.`;
+    const labels = Array.from(activeBienesCategories).map((value) => getBienesCategoryLabel(value));
+    mapMessage.textContent = `Filtros activos: ${labels.join(", ")}.`;
   } else {
     mapMessage.textContent = "Capas cargadas y listas para exploracion.";
   }
@@ -220,13 +224,7 @@ function fitFilteredBienesBounds() {
 }
 
 function updateBienesCategoryCounts(features) {
-  const counts = {
-    "Area Verde": 0,
-    "Bienes Municipales Urbano": 0,
-    Comodato: 0,
-    Subdivisiones: 0,
-    "Urbanizaciones Urbanas": 0
-  };
+  const counts = Object.fromEntries(bienesCategories.map((category) => [category.value, 0]));
 
   for (const feature of features || []) {
     const category = String(feature?.properties?.clase || "").trim();
@@ -238,6 +236,10 @@ function updateBienesCategoryCounts(features) {
   for (const [category, element] of Object.entries(bienesCategoryCounters)) {
     element.textContent = String(counts[category] || 0);
   }
+}
+
+function getBienesCategoryLabel(value) {
+  return bienesCategories.find((category) => category.value === value)?.label || value;
 }
 
 function updateCategoryCardState() {
