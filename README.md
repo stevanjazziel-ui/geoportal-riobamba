@@ -10,8 +10,9 @@ Geoportal web estatico para visualizar:
 - `index.html`: interfaz principal
 - `styles.css`: estilos del geoportal
 - `app.js`: carga de capas, mapa, busqueda y ficha
-- `catastro municipal/`: shapefile del catastro
-- `BIENES MUNICIPALES/`: shapefile de bienes
+- `data/`: GeoJSON optimizado para publicacion web
+- `catastro municipal/`: fuente original del catastro
+- `BIENES MUNICIPALES/`: fuente original de bienes
 
 ## Como usar
 
@@ -65,11 +66,26 @@ La publicacion normalmente quedara en:
 https://TU-USUARIO.github.io/TU-REPO/
 ```
 
+## Actualizar datos
+
+Si cambias los shapefiles fuente, puedes regenerar los archivos web con:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\convert-to-geojson.ps1
+```
+
+Ese proceso:
+
+- reproyecta a `EPSG:4326`
+- simplifica geometria para web
+- conserva un conjunto de atributos mas ligero
+- genera los archivos en `data/`
+
 ## Funcionalidades incluidas
 
 - Mapa base OpenStreetMap
-- Carga de shapefiles directamente en el navegador
-- Reproyeccion del shapefile de bienes municipales
+- Carga de GeoJSON directamente en el navegador
+- Datos reproyectados y optimizados para web
 - Activacion y desactivacion de capas
 - Busqueda general por atributos
 - Panel lateral con ficha del elemento seleccionado

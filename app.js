@@ -1,5 +1,6 @@
 const map = L.map("map", {
-  zoomControl: false
+  zoomControl: false,
+  preferCanvas: true
 });
 
 L.control.zoom({ position: "topright" }).addTo(map);
@@ -17,24 +18,14 @@ const dataSources = [
     name: "Catastro municipal",
     color: "#1d4ed8",
     fillColor: "rgba(29, 78, 216, 0.18)",
-    paths: {
-      shp: "./catastro municipal/catastro_riobamba.shp",
-      dbf: "./catastro municipal/catastro_riobamba.dbf",
-      prj: "./catastro municipal/catastro_riobamba.prj",
-      cpg: "./catastro municipal/catastro_riobamba.cpg"
-    }
+    path: "./data/catastro_riobamba.geojson"
   },
   {
     id: "bienes",
     name: "Bienes municipales",
     color: "#b45309",
     fillColor: "rgba(180, 83, 9, 0.24)",
-    paths: {
-      shp: "./BIENES MUNICIPALES/BIENES_MUNICIPALES.shp",
-      dbf: "./BIENES MUNICIPALES/BIENES_MUNICIPALES.dbf",
-      prj: "./BIENES MUNICIPALES/BIENES_MUNICIPALES.prj",
-      cpg: "./BIENES MUNICIPALES/BIENES_MUNICIPALES.cpg"
-    }
+    path: "./data/bienes_municipales.geojson"
   }
 ];
 
@@ -50,12 +41,6 @@ const statBienes = document.getElementById("stat-bienes");
 const statResults = document.getElementById("stat-results");
 
 let selectedLayer = null;
-
-const projectionAliases = {
-  WGS84: "EPSG:4326",
-  "WGS 84": "EPSG:4326",
-  "WGS_1984_UTM_Zone_17S": "+proj=utm +zone=17 +south +datum=WGS84 +units=m +no_defs"
-};
 
 function setStatus(messages) {
   statusList.innerHTML = messages.map((message) => `<li>${message}</li>`).join("");
@@ -127,7 +112,7 @@ function updateSearch() {
     }
 
     source.layer.eachLayer((layer) => {
-      const matchesQuery = !query || getFeatureText(layer.feature.properties).includes(query);
+      const matchesQuery = !query || layer.__searchText.includes(query);
       layer.setStyle(matchesQuery ? source.defaultStyle : source.dimmedStyle);
       layer.__matchesQuery = matchesQuery;
       if (matchesQuery && query) {
@@ -159,68 +144,6 @@ function fitAllLayers() {
   map.fitBounds(merged.pad(0.08));
 }
 
-function parseProjection(prjText) {
-  if (!prjText) {
-    return "EPSG:4326";
-  }
-
-  for (const [token, projection] of Object.entries(projectionAliases)) {
-    if (prjText.includes(token)) {
-      return projection;
-    }
-  }
-
-  return "EPSG:4326";
-}
-
-async function fetchSourceParts(paths) {
-  const [shpResponse, dbfResponse, prjResponse, cpgResponse] = await Promise.all([
-    fetch(paths.shp),
-    fetch(paths.dbf),
-    fetch(paths.prj),
-    fetch(paths.cpg)
-  ]);
-
-  if (!shpResponse.ok || !dbfResponse.ok || !prjResponse.ok) {
-    throw new Error("No fue posible leer uno o mas archivos de la capa.");
-  }
-
-  return {
-    shp: await shpResponse.arrayBuffer(),
-    dbf: await dbfResponse.arrayBuffer(),
-    prj: await prjResponse.text(),
-    cpg: cpgResponse.ok ? await cpgResponse.text() : "UTF-8"
-  };
-}
-
-function reprojectGeometry(geometry, projection) {
-  if (!geometry || projection === "EPSG:4326") {
-    return geometry;
-  }
-
-  const reprojectCoordinate = ([x, y]) => {
-    const [lon, lat] = proj4(projection, "EPSG:4326", [x, y]);
-    return [lon, lat];
-  };
-
-  const walk = (coordinates) => {
-    if (!Array.isArray(coordinates)) {
-      return coordinates;
-    }
-
-    if (typeof coordinates[0] === "number") {
-      return reprojectCoordinate(coordinates);
-    }
-
-    return coordinates.map(walk);
-  };
-
-  return {
-    ...geometry,
-    coordinates: walk(geometry.coordinates)
-  };
-}
-
 function buildGeoJsonLayer(source, geojson) {
   const defaultStyle = {
     color: source.color,
@@ -248,6 +171,7 @@ function buildGeoJsonLayer(source, geojson) {
     style: defaultStyle,
     onEachFeature(feature, featureLayer) {
       featureLayer.__sourceId = source.id;
+      featureLayer.__searchText = getFeatureText(feature.properties);
       featureLayer.on("click", () => {
         if (selectedLayer && selectedLayer !== featureLayer) {
           const previousSource = layerState.get(selectedLayer.__sourceId);
@@ -274,19 +198,13 @@ function buildGeoJsonLayer(source, geojson) {
 }
 
 async function loadSource(source) {
-  const parts = await fetchSourceParts(source.paths);
-  const projection = parseProjection(parts.prj);
-  const parsed = await shp({
-    shp: parts.shp,
-    dbf: parts.dbf,
-    prj: parts.prj,
-    cpg: parts.cpg
-  });
+  const response = await fetch(source.path);
+  if (!response.ok) {
+    throw new Error(`No fue posible leer ${source.path}.`);
+  }
 
-  const features = (parsed.features || []).map((feature) => ({
-    ...feature,
-    geometry: reprojectGeometry(feature.geometry, projection)
-  }));
+  const parsed = await response.json();
+  const features = parsed.features || [];
 
   const layer = buildGeoJsonLayer(source, {
     type: "FeatureCollection",
@@ -299,9 +217,9 @@ async function loadSource(source) {
 
 async function initialize() {
   setStatus([
-    "Leyendo shapefiles locales.",
+    "Leyendo GeoJSON optimizado.",
     "Preparando simbologia para catastro y bienes.",
-    "Transformando coordenadas cuando es necesario."
+    "Cargando capas listas para web."
   ]);
 
   try {
@@ -332,7 +250,7 @@ async function initialize() {
     setStatus([
       `Catastro cargado: ${counts.catastro || 0} elementos.`,
       `Bienes municipales cargados: ${counts.bienes || 0} elementos.`,
-      "Puedes buscar, activar o desactivar capas y revisar la ficha de cada entidad."
+      "Las capas ahora se sirven como GeoJSON para una carga mas rapida."
     ]);
 
     mapMessage.textContent = "Capas cargadas y listas para exploracion.";
@@ -342,7 +260,7 @@ async function initialize() {
     setStatus([
       "No se pudieron cargar las capas desde el navegador.",
       "Abre el geoportal usando un servidor HTTP local para evitar bloqueos del navegador.",
-      "Ejemplo: `python -m http.server`, `npx serve` o la extension Live Server."
+      "Asegurate de que la carpeta data este publicada junto con index.html."
     ]);
     mapMessage.textContent = "Hubo un problema al leer los archivos geograficos.";
   }

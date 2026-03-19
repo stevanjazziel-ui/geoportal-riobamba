@@ -8,3 +8,10 @@ desktop.ini
 *.log
 *.tmp
 *.lock
+
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.qmd
