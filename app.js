@@ -239,10 +239,20 @@ function getLayerStyleKind(sourceId, layer, query) {
 function applyLayerStyle(layer, styleKind) {
   if (styleKind === "hidden") {
     layer.setStyle(layer.__hiddenStyle);
+    if (layer.closePopup) {
+      layer.closePopup();
+    }
   } else if (styleKind === "dimmed") {
     layer.setStyle(layer.__dimmedStyle);
   } else {
     layer.setStyle(layer.__baseStyle);
+    if (layer.bringToFront) {
+      layer.bringToFront();
+    }
+  }
+
+  if (layer.options) {
+    layer.options.interactive = styleKind !== "hidden";
   }
 
   resetSelectedLayerIfHidden(layer, styleKind);
@@ -311,7 +321,7 @@ function getDimmedStyle(baseStyle) {
 function getHiddenStyle(baseStyle) {
   return {
     ...baseStyle,
-    weight: 0.1,
+    weight: 0,
     fillOpacity: 0,
     opacity: 0
   };
