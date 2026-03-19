@@ -166,10 +166,23 @@ body {
   gap: 10px;
 }
 
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
 .stat-card {
   padding: 14px;
   border-radius: 16px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(243, 239, 229, 0.9));
+  border: 1px solid var(--line);
+}
+
+.category-card {
+  padding: 14px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(247, 242, 232, 0.92));
   border: 1px solid var(--line);
 }
 
@@ -178,6 +191,20 @@ body {
   margin-top: 6px;
   font-size: 1.5rem;
   color: var(--ink);
+}
+
+.category-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 1.35rem;
+  color: var(--ink);
+}
+
+.category-label {
+  display: block;
+  color: var(--muted);
+  line-height: 1.35;
+  font-size: 0.85rem;
 }
 
 .details-header {

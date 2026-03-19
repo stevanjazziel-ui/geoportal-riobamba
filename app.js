@@ -39,6 +39,13 @@ const fitAllButton = document.getElementById("fit-all");
 const statCatastro = document.getElementById("stat-catastro");
 const statBienes = document.getElementById("stat-bienes");
 const statResults = document.getElementById("stat-results");
+const bienesCategoryCounters = {
+  "Area Verde": document.getElementById("count-area-verde"),
+  "Bienes Municipales Urbano": document.getElementById("count-bienes-urbano"),
+  Comodato: document.getElementById("count-comodato"),
+  Subdivisiones: document.getElementById("count-subdivisiones"),
+  "Urbanizaciones Urbanas": document.getElementById("count-urbanizaciones")
+};
 
 let selectedLayer = null;
 
@@ -167,6 +174,27 @@ function fitAllLayers() {
   map.fitBounds(merged.pad(0.08));
 }
 
+function updateBienesCategoryCounts(features) {
+  const counts = {
+    "Area Verde": 0,
+    "Bienes Municipales Urbano": 0,
+    Comodato: 0,
+    Subdivisiones: 0,
+    "Urbanizaciones Urbanas": 0
+  };
+
+  for (const feature of features || []) {
+    const category = String(feature?.properties?.clase || "").trim();
+    if (Object.hasOwn(counts, category)) {
+      counts[category] += 1;
+    }
+  }
+
+  for (const [category, element] of Object.entries(bienesCategoryCounters)) {
+    element.textContent = String(counts[category] || 0);
+  }
+}
+
 function getBienesColor(category) {
   const normalizedCategory = String(category || "").trim();
   if (bienesColorMap[normalizedCategory]) {
@@ -278,6 +306,10 @@ async function loadSource(source) {
     type: "FeatureCollection",
     features
   });
+
+  if (source.id === "bienes") {
+    updateBienesCategoryCounts(features);
+  }
 
   layer.addTo(map);
   return { count: features.length };
