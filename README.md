@@ -25,6 +25,46 @@ Opciones comunes:
 
 Luego abre en el navegador la URL local del servidor y carga `index.html`.
 
+## Publicacion en GitHub
+
+Este proyecto ya esta preparado para publicarse con GitHub Pages.
+
+### 1. Crear el repositorio en GitHub
+
+Crea un repositorio nuevo, por ejemplo:
+
+- `geoportal-riobamba`
+
+No agregues `README`, `.gitignore` ni licencia desde GitHub para evitar conflictos innecesarios.
+
+### 2. Conectar el repositorio local con GitHub
+
+Reemplaza `TU-USUARIO` y `TU-REPO`:
+
+```powershell
+git remote add origin https://github.com/TU-USUARIO/TU-REPO.git
+git branch -M main
+git push -u origin main
+```
+
+### 3. Activar GitHub Pages
+
+En GitHub:
+
+1. Entra a `Settings`
+2. Abre `Pages`
+3. En `Source`, selecciona `GitHub Actions`
+
+El workflow `.github/workflows/deploy-pages.yml` publicara automaticamente el sitio cada vez que hagas `push` a `main`.
+
+### 4. URL esperada
+
+La publicacion normalmente quedara en:
+
+```text
+https://TU-USUARIO.github.io/TU-REPO/
+```
+
 ## Funcionalidades incluidas
 
 - Mapa base OpenStreetMap
@@ -33,6 +73,7 @@ Luego abre en el navegador la URL local del servidor y carga `index.html`.
 - Activacion y desactivacion de capas
 - Busqueda general por atributos
 - Panel lateral con ficha del elemento seleccionado
+- Despliegue automatico con GitHub Pages
 
 ## Siguientes mejoras recomendadas
 
