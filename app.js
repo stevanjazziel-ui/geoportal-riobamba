@@ -190,6 +190,35 @@ function fitAllLayers() {
   map.fitBounds(merged.pad(0.08));
 }
 
+function fitFilteredBienesBounds() {
+  const source = layerState.get("bienes");
+  if (!source?.layer || !map.hasLayer(source.layer)) {
+    return;
+  }
+
+  const query = searchInput.value.trim().toLowerCase();
+  const bounds = [];
+
+  source.layer.eachLayer((layer) => {
+    const styleKind = getLayerStyleKind("bienes", layer, query);
+    if (styleKind === "hidden") {
+      return;
+    }
+
+    const layerBounds = layer.getBounds ? layer.getBounds() : null;
+    if (layerBounds && layerBounds.isValid()) {
+      bounds.push(layerBounds);
+    }
+  });
+
+  if (!bounds.length) {
+    return;
+  }
+
+  const merged = bounds.reduce((accumulator, current) => accumulator.extend(current), bounds[0]);
+  map.fitBounds(merged.pad(0.12));
+}
+
 function updateBienesCategoryCounts(features) {
   const counts = {
     "Area Verde": 0,
@@ -490,6 +519,11 @@ function bindLayerToggles() {
       }
 
       refreshBienesFilter();
+      if (activeBienesCategory) {
+        fitFilteredBienesBounds();
+      } else {
+        fitAllLayers();
+      }
     });
   });
 }
