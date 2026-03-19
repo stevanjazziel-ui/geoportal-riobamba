@@ -39,6 +39,8 @@ const fitAllButton = document.getElementById("fit-all");
 const statCatastro = document.getElementById("stat-catastro");
 const statBienes = document.getElementById("stat-bienes");
 const statResults = document.getElementById("stat-results");
+const toggleCatastro = document.getElementById("toggle-catastro");
+const toggleBienes = document.getElementById("toggle-bienes");
 const bienesCategoryCounters = {
   "Area Verde": document.getElementById("count-area-verde"),
   "Bienes Municipales Urbano": document.getElementById("count-bienes-urbano"),
@@ -48,6 +50,7 @@ const bienesCategoryCounters = {
 };
 
 let selectedLayer = null;
+const sourceLoadPromises = new Map();
 
 const bienesColorMap = {
   "Area Verde": "#15803d",
@@ -312,35 +315,93 @@ async function loadSource(source) {
   }
 
   layer.addTo(map);
-  return { count: features.length };
+  return { count: features.length, sourceId: source.id };
 }
 
 function bindLayerToggles() {
-  document.getElementById("toggle-catastro").addEventListener("change", (event) => {
-    const source = layerState.get("catastro");
-    if (!source) {
+  toggleCatastro.addEventListener("change", async (event) => {
+    if (!event.target.checked) {
+      const source = layerState.get("catastro");
+      if (source) {
+        map.removeLayer(source.layer);
+      }
       return;
     }
 
-    if (event.target.checked) {
-      source.layer.addTo(map);
-    } else {
-      map.removeLayer(source.layer);
+    mapMessage.textContent = "Cargando catastro municipal...";
+
+    try {
+      await ensureSourceLoaded("catastro");
+      const source = layerState.get("catastro");
+      if (source) {
+        source.layer.addTo(map);
+        statCatastro.textContent = String(source.featureCount || 0);
+      }
+      mapMessage.textContent = "Capas cargadas y listas para exploracion.";
+      fitAllLayers();
+    } catch (error) {
+      console.error("catastro", error);
+      event.target.checked = false;
+      mapMessage.textContent = "No se pudo cargar el catastro municipal.";
     }
   });
 
-  document.getElementById("toggle-bienes").addEventListener("change", (event) => {
-    const source = layerState.get("bienes");
-    if (!source) {
+  toggleBienes.addEventListener("change", async (event) => {
+    if (!event.target.checked) {
+      const source = layerState.get("bienes");
+      if (source) {
+        map.removeLayer(source.layer);
+      }
       return;
     }
 
-    if (event.target.checked) {
-      source.layer.addTo(map);
-    } else {
-      map.removeLayer(source.layer);
+    mapMessage.textContent = "Cargando bienes municipales...";
+
+    try {
+      await ensureSourceLoaded("bienes");
+      const source = layerState.get("bienes");
+      if (source) {
+        source.layer.addTo(map);
+        statBienes.textContent = String(source.featureCount || 0);
+      }
+      mapMessage.textContent = "Capas cargadas y listas para exploracion.";
+      fitAllLayers();
+    } catch (error) {
+      console.error("bienes", error);
+      event.target.checked = false;
+      mapMessage.textContent = "No se pudieron cargar los bienes municipales.";
     }
   });
+}
+
+async function ensureSourceLoaded(sourceId) {
+  const existing = layerState.get(sourceId);
+  if (existing) {
+    return existing;
+  }
+
+  const inFlight = sourceLoadPromises.get(sourceId);
+  if (inFlight) {
+    return inFlight;
+  }
+
+  const source = dataSources.find((item) => item.id === sourceId);
+  const promise = loadSource(source)
+    .then((result) => {
+      const loadedSource = layerState.get(sourceId);
+      if (loadedSource) {
+        loadedSource.featureCount = result.count;
+      }
+      sourceLoadPromises.delete(sourceId);
+      return loadedSource;
+    })
+    .catch((error) => {
+      sourceLoadPromises.delete(sourceId);
+      throw error;
+    });
+
+  sourceLoadPromises.set(sourceId, promise);
+  return promise;
 }
 
 async function initialize() {
@@ -352,15 +413,29 @@ async function initialize() {
 
   bindLayerToggles();
 
-  const results = await Promise.allSettled(dataSources.map((source) => loadSource(source)));
+  const initialSourceIds = dataSources
+    .filter((source) => {
+      if (source.id === "catastro") {
+        return toggleCatastro.checked;
+      }
+
+      if (source.id === "bienes") {
+        return toggleBienes.checked;
+      }
+
+      return false;
+    })
+    .map((source) => source.id);
+
+  const results = await Promise.allSettled(initialSourceIds.map((sourceId) => ensureSourceLoaded(sourceId)));
   const counts = { catastro: 0, bienes: 0 };
   const messages = [];
 
   results.forEach((result, index) => {
-    const source = dataSources[index];
+    const source = dataSources.find((item) => item.id === initialSourceIds[index]);
     if (result.status === "fulfilled") {
-      counts[source.id] = result.value.count;
-      messages.push(`${source.name} cargado: ${result.value.count} elementos.`);
+      counts[source.id] = result.value?.featureCount || 0;
+      messages.push(`${source.name} cargado: ${counts[source.id]} elementos.`);
     } else {
       console.error(source.id, result.reason);
       messages.push(`${source.name}: no se pudo cargar correctamente.`);
@@ -383,11 +458,11 @@ async function initialize() {
     mapMessage.textContent = "Capas cargadas y listas para exploracion.";
     fitAllLayers();
   } else {
-    mapMessage.textContent = "Hubo un problema al leer los archivos geograficos.";
+    mapMessage.textContent = "Activa las capas que quieras visualizar.";
     setStatus([
-      "No se pudo cargar ninguna capa publicada.",
-      "Verifica que GitHub Pages haya terminado el despliegue mas reciente.",
-      "Si el problema continua, vuelve a publicar los archivos de data/."
+      "Bienes municipales se carga al inicio.",
+      "Catastro municipal ahora se carga solo bajo demanda.",
+      "Esto reduce el peso inicial y mejora la apertura en Chrome."
     ]);
   }
 }
