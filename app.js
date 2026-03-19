@@ -41,6 +41,7 @@ const statBienes = document.getElementById("stat-bienes");
 const statResults = document.getElementById("stat-results");
 const toggleCatastro = document.getElementById("toggle-catastro");
 const toggleBienes = document.getElementById("toggle-bienes");
+const categoryCards = Array.from(document.querySelectorAll(".category-card"));
 const bienesCategoryCounters = {
   "Area Verde": document.getElementById("count-area-verde"),
   "Bienes Municipales Urbano": document.getElementById("count-bienes-urbano"),
@@ -50,6 +51,7 @@ const bienesCategoryCounters = {
 };
 
 let selectedLayer = null;
+let activeBienesCategory = null;
 const sourceLoadPromises = new Map();
 
 const bienesColorMap = {
@@ -124,6 +126,13 @@ function clearSelection() {
   detailsContainer.innerHTML = "Selecciona un predio o bien municipal en el mapa para ver sus atributos.";
 }
 
+function resetSelectedLayerIfHidden(layer, styleKind) {
+  if (selectedLayer === layer && styleKind === "hidden") {
+    selectedLayer = null;
+    detailsContainer.innerHTML = "Selecciona un predio o bien municipal en el mapa para ver sus atributos.";
+  }
+}
+
 function getFeatureText(properties) {
   return Object.values(properties || {})
     .filter((value) => value !== null && value !== undefined)
@@ -141,18 +150,22 @@ function updateSearch() {
     }
 
     source.layer.eachLayer((layer) => {
-      const matchesQuery = !query || layer.__searchText.includes(query);
-      layer.setStyle(matchesQuery ? layer.__baseStyle : layer.__dimmedStyle);
-      if (matchesQuery && query) {
+      const styleKind = getLayerStyleKind(source.id, layer, query);
+      applyLayerStyle(layer, styleKind);
+      if (styleKind === "base" && query) {
         matches += 1;
       }
     });
   }
 
   statResults.textContent = query ? String(matches) : "0";
-  mapMessage.textContent = query
-    ? `${matches} elemento(s) coinciden con la busqueda actual.`
-    : "Capas cargadas y listas para exploracion.";
+  if (query) {
+    mapMessage.textContent = `${matches} elemento(s) coinciden con la busqueda actual.`;
+  } else if (activeBienesCategory) {
+    mapMessage.textContent = `Filtro activo: ${activeBienesCategory}.`;
+  } else {
+    mapMessage.textContent = "Capas cargadas y listas para exploracion.";
+  }
 }
 
 function fitAllLayers() {
@@ -198,6 +211,60 @@ function updateBienesCategoryCounts(features) {
   }
 }
 
+function updateCategoryCardState() {
+  categoryCards.forEach((card) => {
+    const isActive = card.dataset.category === activeBienesCategory;
+    card.classList.toggle("is-active", isActive);
+    card.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
+}
+
+function getLayerStyleKind(sourceId, layer, query) {
+  const matchesQuery = !query || layer.__searchText.includes(query);
+
+  if (sourceId === "bienes" && activeBienesCategory) {
+    const category = String(layer.feature?.properties?.clase || "").trim();
+    if (category !== activeBienesCategory) {
+      return "hidden";
+    }
+  }
+
+  if (matchesQuery) {
+    return "base";
+  }
+
+  return "dimmed";
+}
+
+function applyLayerStyle(layer, styleKind) {
+  if (styleKind === "hidden") {
+    layer.setStyle(layer.__hiddenStyle);
+  } else if (styleKind === "dimmed") {
+    layer.setStyle(layer.__dimmedStyle);
+  } else {
+    layer.setStyle(layer.__baseStyle);
+  }
+
+  resetSelectedLayerIfHidden(layer, styleKind);
+}
+
+function refreshBienesFilter() {
+  const source = layerState.get("bienes");
+  if (!source?.layer) {
+    updateCategoryCardState();
+    return;
+  }
+
+  const query = searchInput.value.trim().toLowerCase();
+  source.layer.eachLayer((layer) => {
+    const styleKind = getLayerStyleKind("bienes", layer, query);
+    applyLayerStyle(layer, styleKind);
+  });
+
+  updateCategoryCardState();
+  updateSearch();
+}
+
 function getBienesColor(category) {
   const normalizedCategory = String(category || "").trim();
   if (bienesColorMap[normalizedCategory]) {
@@ -241,6 +308,15 @@ function getDimmedStyle(baseStyle) {
   };
 }
 
+function getHiddenStyle(baseStyle) {
+  return {
+    ...baseStyle,
+    weight: 0.1,
+    fillOpacity: 0,
+    opacity: 0
+  };
+}
+
 function buildGeoJsonLayer(source, geojson) {
   const highlightStyle = {
     color: "#111827",
@@ -257,6 +333,7 @@ function buildGeoJsonLayer(source, geojson) {
       featureLayer.__searchText = getFeatureText(feature.properties);
       featureLayer.__baseStyle = baseStyle;
       featureLayer.__dimmedStyle = getDimmedStyle(baseStyle);
+      featureLayer.__hiddenStyle = getHiddenStyle(baseStyle);
       featureLayer.on("click", () => {
         if (selectedLayer && selectedLayer !== featureLayer) {
           if (selectedLayer.__baseStyle) {
@@ -315,6 +392,9 @@ async function loadSource(source) {
   }
 
   layer.addTo(map);
+  if (source.id === "bienes") {
+    refreshBienesFilter();
+  }
   return { count: features.length, sourceId: source.id };
 }
 
@@ -371,6 +451,36 @@ function bindLayerToggles() {
       event.target.checked = false;
       mapMessage.textContent = "No se pudieron cargar los bienes municipales.";
     }
+  });
+
+  categoryCards.forEach((card) => {
+    card.addEventListener("click", async () => {
+      const category = card.dataset.category;
+      activeBienesCategory = activeBienesCategory === category ? null : category;
+      updateCategoryCardState();
+
+      if (!toggleBienes.checked) {
+        toggleBienes.checked = true;
+        mapMessage.textContent = "Cargando bienes municipales...";
+        try {
+          await ensureSourceLoaded("bienes");
+          const source = layerState.get("bienes");
+          if (source) {
+            source.layer.addTo(map);
+            statBienes.textContent = String(source.featureCount || 0);
+          }
+        } catch (error) {
+          console.error("bienes", error);
+          toggleBienes.checked = false;
+          activeBienesCategory = null;
+          updateCategoryCardState();
+          mapMessage.textContent = "No se pudieron cargar los bienes municipales.";
+          return;
+        }
+      }
+
+      refreshBienesFilter();
+    });
   });
 }
 
