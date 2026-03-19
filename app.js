@@ -382,10 +382,10 @@ function getFeatureStyle(source, feature) {
   if (source.id === "catastro") {
     return {
       color: source.color,
-      weight: 1.2,
+      weight: 0.8,
       fillColor: source.fillColor,
       fillOpacity: 0,
-      opacity: 0.9
+      opacity: 0.6
     };
   }
 
