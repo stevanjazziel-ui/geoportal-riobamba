@@ -16,8 +16,8 @@ const dataSources = [
   {
     id: "catastro",
     name: "Catastro municipal",
-    color: "#1d4ed8",
-    fillColor: "rgba(29, 78, 216, 0.18)",
+    color: "#5b6770",
+    fillColor: "rgba(91, 103, 112, 0)",
     path: "./data/catastro_riobamba.geojson"
   },
   {
@@ -154,21 +154,21 @@ function buildGeoJsonLayer(source, geojson) {
     color: source.color,
     weight: 1.2,
     fillColor: source.fillColor,
-    fillOpacity: 0.65
+    fillOpacity: source.id === "catastro" ? 0 : 0.65
   };
 
   const highlightStyle = {
     color: "#111827",
     weight: 2.5,
     fillColor: source.fillColor,
-    fillOpacity: 0.9
+    fillOpacity: source.id === "catastro" ? 0 : 0.9
   };
 
   const dimmedStyle = {
     color: source.color,
     weight: 0.8,
     fillColor: source.fillColor,
-    fillOpacity: 0.08,
+    fillOpacity: 0,
     opacity: 0.2
   };
 
