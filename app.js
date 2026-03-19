@@ -42,6 +42,25 @@ const statResults = document.getElementById("stat-results");
 
 let selectedLayer = null;
 
+const bienesColorMap = {
+  "Area Verde": "#15803d",
+  "Bienes Municipales Urbano": "#b45309",
+  Comodato: "#7c3aed",
+  Subdivisiones: "#dc2626",
+  "Urbanizaciones Urbanas": "#0891b2"
+};
+
+const bienesFallbackPalette = [
+  "#0f766e",
+  "#2563eb",
+  "#c2410c",
+  "#7c2d12",
+  "#4338ca",
+  "#be185d",
+  "#4d7c0f",
+  "#0369a1"
+];
+
 function setStatus(messages) {
   statusList.innerHTML = messages.map((message) => `<li>${message}</li>`).join("");
 }
@@ -86,9 +105,8 @@ function renderDetails(feature, layerName) {
 
 function clearSelection() {
   if (selectedLayer) {
-    const source = layerState.get(selectedLayer.__sourceId);
-    if (source) {
-      selectedLayer.setStyle(source.defaultStyle);
+    if (selectedLayer.__baseStyle) {
+      selectedLayer.setStyle(selectedLayer.__baseStyle);
     }
   }
 
@@ -114,7 +132,7 @@ function updateSearch() {
 
     source.layer.eachLayer((layer) => {
       const matchesQuery = !query || layer.__searchText.includes(query);
-      layer.setStyle(matchesQuery ? source.defaultStyle : source.dimmedStyle);
+      layer.setStyle(matchesQuery ? layer.__baseStyle : layer.__dimmedStyle);
       if (matchesQuery && query) {
         matches += 1;
       }
@@ -149,44 +167,77 @@ function fitAllLayers() {
   map.fitBounds(merged.pad(0.08));
 }
 
-function buildGeoJsonLayer(source, geojson) {
-  const defaultStyle = {
-    color: source.color,
-    weight: 1.2,
-    fillColor: source.fillColor,
-    fillOpacity: source.id === "catastro" ? 0 : 0.65
-  };
+function getBienesColor(category) {
+  const normalizedCategory = String(category || "").trim();
+  if (bienesColorMap[normalizedCategory]) {
+    return bienesColorMap[normalizedCategory];
+  }
 
-  const highlightStyle = {
-    color: "#111827",
-    weight: 2.5,
-    fillColor: source.fillColor,
-    fillOpacity: source.id === "catastro" ? 0 : 0.9
-  };
+  let hash = 0;
+  for (let index = 0; index < normalizedCategory.length; index += 1) {
+    hash = (hash * 31 + normalizedCategory.charCodeAt(index)) >>> 0;
+  }
 
-  const dimmedStyle = {
-    color: source.color,
-    weight: 0.8,
-    fillColor: source.fillColor,
+  return bienesFallbackPalette[hash % bienesFallbackPalette.length];
+}
+
+function getFeatureStyle(source, feature) {
+  if (source.id === "catastro") {
+    return {
+      color: source.color,
+      weight: 1.2,
+      fillColor: source.fillColor,
+      fillOpacity: 0,
+      opacity: 0.9
+    };
+  }
+
+  const color = getBienesColor(feature?.properties?.clase);
+  return {
+    color,
+    weight: 2,
+    fillColor: color,
+    fillOpacity: 0,
+    opacity: 0.95
+  };
+}
+
+function getDimmedStyle(baseStyle) {
+  return {
+    ...baseStyle,
     fillOpacity: 0,
     opacity: 0.2
   };
+}
+
+function buildGeoJsonLayer(source, geojson) {
+  const highlightStyle = {
+    color: "#111827",
+    weight: 2.5,
+    fillOpacity: 0,
+    opacity: 1
+  };
 
   const layer = L.geoJSON(geojson, {
-    style: defaultStyle,
+    style: (feature) => getFeatureStyle(source, feature),
     onEachFeature(feature, featureLayer) {
+      const baseStyle = getFeatureStyle(source, feature);
       featureLayer.__sourceId = source.id;
       featureLayer.__searchText = getFeatureText(feature.properties);
+      featureLayer.__baseStyle = baseStyle;
+      featureLayer.__dimmedStyle = getDimmedStyle(baseStyle);
       featureLayer.on("click", () => {
         if (selectedLayer && selectedLayer !== featureLayer) {
-          const previousSource = layerState.get(selectedLayer.__sourceId);
-          if (previousSource) {
-            selectedLayer.setStyle(previousSource.defaultStyle);
+          if (selectedLayer.__baseStyle) {
+            selectedLayer.setStyle(selectedLayer.__baseStyle);
           }
         }
 
         selectedLayer = featureLayer;
-        featureLayer.setStyle(highlightStyle);
+        featureLayer.setStyle({
+          ...highlightStyle,
+          fillColor: baseStyle.fillColor
+        });
         renderDetails(feature, source.name);
       });
 
@@ -200,7 +251,7 @@ function buildGeoJsonLayer(source, geojson) {
     }
   });
 
-  layerState.set(source.id, { ...source, layer, defaultStyle, dimmedStyle });
+  layerState.set(source.id, { ...source, layer });
   return layer;
 }
 
