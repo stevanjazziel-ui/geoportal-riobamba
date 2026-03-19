@@ -51,7 +51,7 @@ const bienesCategoryCounters = {
 };
 
 let selectedLayer = null;
-let activeBienesCategory = null;
+const activeBienesCategories = new Set();
 const sourceLoadPromises = new Map();
 
 const bienesColorMap = {
@@ -161,8 +161,8 @@ function updateSearch() {
   statResults.textContent = query ? String(matches) : "0";
   if (query) {
     mapMessage.textContent = `${matches} elemento(s) coinciden con la busqueda actual.`;
-  } else if (activeBienesCategory) {
-    mapMessage.textContent = `Filtro activo: ${activeBienesCategory}.`;
+  } else if (activeBienesCategories.size > 0) {
+    mapMessage.textContent = `Filtros activos: ${Array.from(activeBienesCategories).join(", ")}.`;
   } else {
     mapMessage.textContent = "Capas cargadas y listas para exploracion.";
   }
@@ -242,7 +242,7 @@ function updateBienesCategoryCounts(features) {
 
 function updateCategoryCardState() {
   categoryCards.forEach((card) => {
-    const isActive = card.dataset.category === activeBienesCategory;
+    const isActive = activeBienesCategories.has(card.dataset.category);
     card.classList.toggle("is-active", isActive);
     card.setAttribute("aria-pressed", isActive ? "true" : "false");
   });
@@ -251,9 +251,9 @@ function updateCategoryCardState() {
 function getLayerStyleKind(sourceId, layer, query) {
   const matchesQuery = !query || layer.__searchText.includes(query);
 
-  if (sourceId === "bienes" && activeBienesCategory) {
+  if (sourceId === "bienes" && activeBienesCategories.size > 0) {
     const category = String(layer.feature?.properties?.clase || "").trim();
-    if (category !== activeBienesCategory) {
+    if (!activeBienesCategories.has(category)) {
       return "hidden";
     }
   }
@@ -495,7 +495,11 @@ function bindLayerToggles() {
   categoryCards.forEach((card) => {
     card.addEventListener("click", async () => {
       const category = card.dataset.category;
-      activeBienesCategory = activeBienesCategory === category ? null : category;
+      if (activeBienesCategories.has(category)) {
+        activeBienesCategories.delete(category);
+      } else {
+        activeBienesCategories.add(category);
+      }
       updateCategoryCardState();
 
       if (!toggleBienes.checked) {
@@ -511,7 +515,7 @@ function bindLayerToggles() {
         } catch (error) {
           console.error("bienes", error);
           toggleBienes.checked = false;
-          activeBienesCategory = null;
+          activeBienesCategories.clear();
           updateCategoryCardState();
           mapMessage.textContent = "No se pudieron cargar los bienes municipales.";
           return;
@@ -519,7 +523,7 @@ function bindLayerToggles() {
       }
 
       refreshBienesFilter();
-      if (activeBienesCategory) {
+      if (activeBienesCategories.size > 0) {
         fitFilteredBienesBounds();
       } else {
         fitAllLayers();
