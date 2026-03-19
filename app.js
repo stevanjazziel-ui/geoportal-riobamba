@@ -41,6 +41,10 @@ const statBienes = document.getElementById("stat-bienes");
 const statResults = document.getElementById("stat-results");
 const toggleCatastro = document.getElementById("toggle-catastro");
 const toggleBienes = document.getElementById("toggle-bienes");
+const sidebar = document.querySelector(".sidebar");
+const sidebarScrollUp = document.getElementById("sidebar-scroll-up");
+const sidebarScrollDown = document.getElementById("sidebar-scroll-down");
+const sidebarScrollThumb = document.getElementById("sidebar-scroll-thumb");
 const categoryCards = Array.from(document.querySelectorAll(".category-card"));
 const bienesCategories = [
   { value: "Area Verde", label: "Area Verde", countId: "count-area-verde", color: "#15803d" },
@@ -78,6 +82,7 @@ const bienesFallbackPalette = [
 
 function setStatus(messages) {
   statusList.innerHTML = messages.map((message) => `<li>${message}</li>`).join("");
+  requestAnimationFrame(updateSidebarScrollUi);
 }
 
 function escapeHtml(value) {
@@ -116,6 +121,7 @@ function renderDetails(feature, layerName) {
       ${content}
     </div>
   `;
+  requestAnimationFrame(updateSidebarScrollUi);
 }
 
 function clearSelection() {
@@ -127,6 +133,7 @@ function clearSelection() {
 
   selectedLayer = null;
   detailsContainer.innerHTML = "Selecciona un predio o bien municipal en el mapa para ver sus atributos.";
+  requestAnimationFrame(updateSidebarScrollUi);
 }
 
 function resetSelectedLayerIfHidden(layer, styleKind) {
@@ -192,6 +199,57 @@ function fitAllLayers() {
 
   const merged = bounds.reduce((accumulator, current) => accumulator.extend(current), bounds[0]);
   map.fitBounds(merged.pad(0.08));
+}
+
+function updateSidebarScrollUi() {
+  if (!sidebar || !sidebarScrollThumb || !sidebarScrollUp || !sidebarScrollDown) {
+    return;
+  }
+
+  const track = sidebarScrollThumb.parentElement;
+  const scrollRange = Math.max(0, sidebar.scrollHeight - sidebar.clientHeight);
+  const trackHeight = track.clientHeight;
+
+  if (scrollRange <= 0 || trackHeight <= 0) {
+    sidebarScrollThumb.style.height = `${trackHeight}px`;
+    sidebarScrollThumb.style.transform = "translateY(0)";
+    sidebarScrollUp.disabled = true;
+    sidebarScrollDown.disabled = true;
+    return;
+  }
+
+  const thumbHeight = Math.max(48, (sidebar.clientHeight / sidebar.scrollHeight) * trackHeight);
+  const maxThumbTravel = Math.max(0, trackHeight - thumbHeight);
+  const progress = sidebar.scrollTop / scrollRange;
+  const thumbOffset = maxThumbTravel * progress;
+
+  sidebarScrollThumb.style.height = `${thumbHeight}px`;
+  sidebarScrollThumb.style.transform = `translateY(${thumbOffset}px)`;
+  sidebarScrollUp.disabled = sidebar.scrollTop <= 0;
+  sidebarScrollDown.disabled = sidebar.scrollTop >= scrollRange - 1;
+}
+
+function scrollSidebarBy(amount) {
+  if (!sidebar) {
+    return;
+  }
+
+  sidebar.scrollBy({
+    top: amount,
+    behavior: "smooth"
+  });
+}
+
+function bindSidebarScrollUi() {
+  if (!sidebar || !sidebarScrollUp || !sidebarScrollDown) {
+    return;
+  }
+
+  sidebar.addEventListener("scroll", updateSidebarScrollUi);
+  window.addEventListener("resize", updateSidebarScrollUi);
+  sidebarScrollUp.addEventListener("click", () => scrollSidebarBy(-220));
+  sidebarScrollDown.addEventListener("click", () => scrollSidebarBy(220));
+  updateSidebarScrollUi();
 }
 
 function fitFilteredBienesBounds() {
@@ -572,6 +630,7 @@ async function initialize() {
   ]);
 
   bindLayerToggles();
+  bindSidebarScrollUi();
 
   const initialSourceIds = dataSources
     .filter((source) => {
@@ -625,6 +684,8 @@ async function initialize() {
       "Esto reduce el peso inicial y mejora la apertura en Chrome."
     ]);
   }
+
+  requestAnimationFrame(updateSidebarScrollUi);
 }
 
 searchInput.addEventListener("input", updateSearch);
