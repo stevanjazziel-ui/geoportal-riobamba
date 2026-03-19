@@ -69,14 +69,12 @@ function renderDetails(feature, layerName) {
   }
 
   const content = entries
-    .map(([key, value]) => {
-      return `
-        <div class="detail-item">
-          <dt>${escapeHtml(key)}</dt>
-          <dd>${escapeHtml(value)}</dd>
-        </div>
-      `;
-    })
+    .map(([key, value]) => `
+      <div class="detail-item">
+        <dt>${escapeHtml(key)}</dt>
+        <dd>${escapeHtml(value)}</dd>
+      </div>
+    `)
     .join("");
 
   detailsContainer.innerHTML = `
@@ -89,8 +87,11 @@ function renderDetails(feature, layerName) {
 function clearSelection() {
   if (selectedLayer) {
     const source = layerState.get(selectedLayer.__sourceId);
-    selectedLayer.setStyle(source.defaultStyle);
+    if (source) {
+      selectedLayer.setStyle(source.defaultStyle);
+    }
   }
+
   selectedLayer = null;
   detailsContainer.innerHTML = "Selecciona un predio o bien municipal en el mapa para ver sus atributos.";
 }
@@ -114,7 +115,6 @@ function updateSearch() {
     source.layer.eachLayer((layer) => {
       const matchesQuery = !query || layer.__searchText.includes(query);
       layer.setStyle(matchesQuery ? source.defaultStyle : source.dimmedStyle);
-      layer.__matchesQuery = matchesQuery;
       if (matchesQuery && query) {
         matches += 1;
       }
@@ -131,8 +131,13 @@ function fitAllLayers() {
   const bounds = [];
 
   for (const source of layerState.values()) {
-    if (source.layer && map.hasLayer(source.layer)) {
-      bounds.push(source.layer.getBounds());
+    if (!source.layer || !map.hasLayer(source.layer)) {
+      continue;
+    }
+
+    const layerBounds = source.layer.getBounds();
+    if (layerBounds.isValid()) {
+      bounds.push(layerBounds);
     }
   }
 
@@ -175,7 +180,9 @@ function buildGeoJsonLayer(source, geojson) {
       featureLayer.on("click", () => {
         if (selectedLayer && selectedLayer !== featureLayer) {
           const previousSource = layerState.get(selectedLayer.__sourceId);
-          selectedLayer.setStyle(previousSource.defaultStyle);
+          if (previousSource) {
+            selectedLayer.setStyle(previousSource.defaultStyle);
+          }
         }
 
         selectedLayer = featureLayer;
@@ -197,6 +204,17 @@ function buildGeoJsonLayer(source, geojson) {
   return layer;
 }
 
+function normalizeFeatures(features) {
+  return (features || []).filter((feature) => {
+    const geometry = feature?.geometry;
+    if (!geometry) {
+      return false;
+    }
+
+    return geometry.type === "Polygon" || geometry.type === "MultiPolygon";
+  });
+}
+
 async function loadSource(source) {
   const response = await fetch(source.path);
   if (!response.ok) {
@@ -204,15 +222,42 @@ async function loadSource(source) {
   }
 
   const parsed = await response.json();
-  const features = parsed.features || [];
-
+  const features = normalizeFeatures(parsed.features);
   const layer = buildGeoJsonLayer(source, {
     type: "FeatureCollection",
     features
   });
 
   layer.addTo(map);
-  return { count: features.length, bounds: layer.getBounds() };
+  return { count: features.length };
+}
+
+function bindLayerToggles() {
+  document.getElementById("toggle-catastro").addEventListener("change", (event) => {
+    const source = layerState.get("catastro");
+    if (!source) {
+      return;
+    }
+
+    if (event.target.checked) {
+      source.layer.addTo(map);
+    } else {
+      map.removeLayer(source.layer);
+    }
+  });
+
+  document.getElementById("toggle-bienes").addEventListener("change", (event) => {
+    const source = layerState.get("bienes");
+    if (!source) {
+      return;
+    }
+
+    if (event.target.checked) {
+      source.layer.addTo(map);
+    } else {
+      map.removeLayer(source.layer);
+    }
+  });
 }
 
 async function initialize() {
@@ -222,47 +267,45 @@ async function initialize() {
     "Cargando capas listas para web."
   ]);
 
-  try {
-    const results = await Promise.all(dataSources.map((source) => loadSource(source)));
-    const counts = Object.fromEntries(dataSources.map((source, index) => [source.id, results[index].count]));
+  bindLayerToggles();
 
-    statCatastro.textContent = String(counts.catastro || 0);
-    statBienes.textContent = String(counts.bienes || 0);
+  const results = await Promise.allSettled(dataSources.map((source) => loadSource(source)));
+  const counts = { catastro: 0, bienes: 0 };
+  const messages = [];
 
-    document.getElementById("toggle-catastro").addEventListener("change", (event) => {
-      const source = layerState.get("catastro");
-      if (event.target.checked) {
-        source.layer.addTo(map);
-      } else {
-        map.removeLayer(source.layer);
+  results.forEach((result, index) => {
+    const source = dataSources[index];
+    if (result.status === "fulfilled") {
+      counts[source.id] = result.value.count;
+      messages.push(`${source.name} cargado: ${result.value.count} elementos.`);
+    } else {
+      console.error(source.id, result.reason);
+      messages.push(`${source.name}: no se pudo cargar correctamente.`);
+      const toggle = document.getElementById(`toggle-${source.id}`);
+      if (toggle) {
+        toggle.checked = false;
       }
-    });
+    }
+  });
 
-    document.getElementById("toggle-bienes").addEventListener("change", (event) => {
-      const source = layerState.get("bienes");
-      if (event.target.checked) {
-        source.layer.addTo(map);
-      } else {
-        map.removeLayer(source.layer);
-      }
-    });
+  statCatastro.textContent = String(counts.catastro || 0);
+  statBienes.textContent = String(counts.bienes || 0);
 
-    setStatus([
-      `Catastro cargado: ${counts.catastro || 0} elementos.`,
-      `Bienes municipales cargados: ${counts.bienes || 0} elementos.`,
-      "Las capas ahora se sirven como GeoJSON para una carga mas rapida."
-    ]);
+  if (messages.length) {
+    setStatus(messages);
+  }
 
+  const loadedCount = results.filter((result) => result.status === "fulfilled").length;
+  if (loadedCount > 0) {
     mapMessage.textContent = "Capas cargadas y listas para exploracion.";
     fitAllLayers();
-  } catch (error) {
-    console.error(error);
-    setStatus([
-      "No se pudieron cargar las capas desde el navegador.",
-      "Abre el geoportal usando un servidor HTTP local para evitar bloqueos del navegador.",
-      "Asegurate de que la carpeta data este publicada junto con index.html."
-    ]);
+  } else {
     mapMessage.textContent = "Hubo un problema al leer los archivos geograficos.";
+    setStatus([
+      "No se pudo cargar ninguna capa publicada.",
+      "Verifica que GitHub Pages haya terminado el despliegue mas reciente.",
+      "Si el problema continua, vuelve a publicar los archivos de data/."
+    ]);
   }
 }
 
@@ -270,4 +313,12 @@ searchInput.addEventListener("input", updateSearch);
 clearSelectionButton.addEventListener("click", clearSelection);
 fitAllButton.addEventListener("click", fitAllLayers);
 
-initialize();
+initialize().catch((error) => {
+  console.error(error);
+  mapMessage.textContent = "Hubo un problema al iniciar el geoportal.";
+  setStatus([
+    "Ocurrio un error inesperado al iniciar la aplicacion.",
+    "Recarga la pagina dentro de unos segundos.",
+    "Si persiste, revisamos el despliegue publicado."
+  ]);
+});
