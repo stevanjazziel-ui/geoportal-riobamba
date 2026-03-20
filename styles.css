@@ -133,7 +133,7 @@ body::after {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(320px, 380px) 1fr;
+  grid-template-columns: minmax(300px, 348px) 1fr;
   height: 100vh;
 }
 
@@ -141,9 +141,9 @@ body::after {
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 34px;
-  gap: 16px;
+  gap: 14px;
   height: 100vh;
-  padding: 22px;
+  padding: 18px;
   background:
     linear-gradient(180deg, rgba(6, 20, 31, 0.94), rgba(4, 16, 26, 0.9)),
     rgba(4, 16, 26, 0.82);
@@ -173,7 +173,7 @@ body::after {
 .sidebar-content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   min-width: 0;
 }
 
@@ -258,13 +258,13 @@ body::after {
 }
 
 .brand-card {
-  padding: 26px;
+  padding: 22px;
 }
 
 .brand-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 88px;
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) 72px;
+  gap: 14px;
   align-items: start;
 }
 
@@ -272,7 +272,7 @@ body::after {
   position: relative;
   display: grid;
   place-items: center;
-  width: 88px;
+  width: 72px;
   aspect-ratio: 1;
   justify-self: end;
 }
@@ -320,15 +320,15 @@ body::after {
 .brand-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 8px;
+  margin-top: 14px;
 }
 
 .brand-ribbon {
   display: grid;
   gap: 4px;
-  margin-top: 18px;
-  padding: 12px 14px;
+  margin-top: 14px;
+  padding: 10px 12px;
   border-radius: 14px;
   border: 1px solid rgba(216, 164, 65, 0.18);
   background: linear-gradient(135deg, rgba(216, 164, 65, 0.12), rgba(6, 20, 31, 0.28));
@@ -351,12 +351,12 @@ body::after {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 12px;
+  padding: 6px 10px;
   border-radius: 999px;
   border: 1px solid rgba(216, 164, 65, 0.14);
   background: rgba(7, 19, 30, 0.62);
   color: var(--muted-strong);
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   backdrop-filter: blur(8px);
@@ -393,8 +393,9 @@ body::after {
 }
 
 .brand-card h1 {
-  font-size: clamp(2rem, 3.1vw, 3rem);
-  line-height: 0.98;
+  font-size: clamp(1.8rem, 2.45vw, 2.6rem);
+  line-height: 0.92;
+  text-wrap: balance;
 }
 
 .lede,
@@ -415,9 +416,10 @@ body::after {
 }
 
 .lede {
-  margin: 14px 0 0;
-  max-width: 32ch;
-  line-height: 1.62;
+  margin: 10px 0 0;
+  max-width: 24ch;
+  font-size: 0.98rem;
+  line-height: 1.5;
 }
 
 .panel {
@@ -1484,7 +1486,7 @@ body::after {
 
 @media (max-width: 1180px) {
   .app-shell {
-    grid-template-columns: minmax(320px, 390px) 1fr;
+    grid-template-columns: minmax(290px, 326px) 1fr;
   }
 
   .map-hero {
@@ -1539,11 +1541,13 @@ body::after {
   }
 
   .brand-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) 54px;
+    gap: 10px;
   }
 
   .brand-pulse {
-    justify-self: start;
+    width: 54px;
+    justify-self: end;
   }
 
   .map-stage {
@@ -1642,6 +1646,34 @@ body::after {
   .brand-card h1,
   .map-hero h2 {
     letter-spacing: -0.05em;
+  }
+
+  .brand-card {
+    padding: 18px;
+  }
+
+  .brand-grid {
+    grid-template-columns: minmax(0, 1fr) 54px;
+    gap: 10px;
+  }
+
+  .brand-pulse {
+    width: 54px;
+  }
+
+  .brand-card h1 {
+    font-size: clamp(1.65rem, 12vw, 2.35rem);
+    line-height: 0.94;
+  }
+
+  .lede {
+    max-width: none;
+    font-size: 0.92rem;
+    line-height: 1.42;
+  }
+
+  .brand-meta {
+    gap: 6px;
   }
 
   .stat-grid,
