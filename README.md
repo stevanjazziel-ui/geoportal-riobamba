@@ -1,4 +1,4 @@
-# Geoportal Municipal de Riobamba
+﻿# Geoportal Municipal de Riobamba
 
 Geoportal web estatico para visualizar:
 
@@ -12,7 +12,7 @@ Geoportal web estatico para visualizar:
 - `app.js`: carga de capas, mapa, busqueda y ficha
 - `data/`: GeoJSON optimizado para publicacion web
 - `catastro municipal/`: fuente original del catastro
-- `BIENES MUNICIPALES/`: fuente original de bienes
+- `Bienes municipales 3/`: fuente original actual de bienes
 
 ## Como usar
 
@@ -68,7 +68,7 @@ https://TU-USUARIO.github.io/TU-REPO/
 
 ## Actualizar datos
 
-Si cambias los shapefiles fuente, puedes regenerar los archivos web con:
+Si cambias los shapefiles fuente, puedes regenerar los archivos web con el script de conversion. El origen actual de bienes es `Bienes municipales 3\BIENES_MUNICIPALES_4.shp`:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\convert-to-geojson.ps1

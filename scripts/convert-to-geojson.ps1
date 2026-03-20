@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 
 $root = Split-Path -Parent $PSScriptRoot
 $ogr2ogr = "C:\Program Files\QGIS 3.40.10\bin\ogr2ogr.exe"
@@ -28,12 +28,12 @@ Remove-Item $bienesOutput -Force -ErrorAction SilentlyContinue
 & $ogr2ogr `
   -f GeoJSON `
   $bienesOutput `
-  (Join-Path $root "Bienes municipales 2\BIENES_MUNICIPALES_3.shp") `
+  (Join-Path $root "Bienes municipales 3\BIENES_MUNICIPALES_4.shp") `
   -t_srs EPSG:4326 `
   -lco RFC7946=YES `
   -lco COORDINATE_PRECISION=6 `
   -dialect SQLITE `
-  -sql "SELECT ST_SimplifyPreserveTopology(geometry, 0.000005) AS geometry, gid AS id, Clave_Cata AS clave_cat, Clave_Pred AS clave_pred, DESCRIPCIO AS descr, Parroquia_ AS parroquia, Barrio_Nom AS barrio, ESTADO AS estado, Clasificac AS clase, nombre AS nombre, Total_Area AS area, Area_Verif AS area_verif, Total_Aval AS avaluo, Contribuye AS contrib, Documento_ AS documento, Numero_Reg AS numero_reg, INSTITUCIO AS institucion, Fuente AS fuente, ubicacion AS ubicacion FROM BIENES_MUNICIPALES_3" `
+  -sql "SELECT ST_SimplifyPreserveTopology(geometry, 0.000005) AS geometry, gid AS id, claves AS clave_cat, Clave AS clave_pred, DESCRIPCIO AS descr, Parroquia_ AS parroquia, Barrio_Nom AS barrio, COALESCE(ESTADO_1, estado) AS estado, CASE WHEN Clasificac = 'Bienes Municipales Rurales' THEN 'Bienes Municipales Rurale' WHEN Clasificac = 'Bienes Municipales Urbanos' THEN 'Bienes Municipales Urbano' WHEN Clasificac = 'Monstrencos Urbanos' THEN 'Monstrencos_urbanos' WHEN Clasificac = 'Mostrencos Rurales' THEN 'Mostrencos_Rurales' ELSE Clasificac END AS clase, COALESCE(Nombre_Pre, nombre) AS nombre, Area_total AS area, Area_Verif AS area_verif, NULL AS avaluo, Contribuye AS contrib, Documento_ AS documento, Numero_Reg AS numero_reg, NULL AS institucion, NULL AS fuente, NULL AS ubicacion FROM BIENES_MUNICIPALES_4" `
   -skipfailures
 
 Write-Host "GeoJSON actualizados en $dataDir"

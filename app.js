@@ -1,4 +1,4 @@
-const map = L.map("map", {
+﻿const map = L.map("map", {
   zoomControl: false,
   preferCanvas: true
 });
@@ -18,14 +18,14 @@ const dataSources = [
     name: "Catastro municipal",
     color: "#5b6770",
     fillColor: "rgba(91, 103, 112, 0)",
-    path: "./data/catastro_riobamba.geojson"
+    path: "./data/catastro_riobamba.geojson?v=20260320-12"
   },
   {
     id: "bienes",
     name: "Bienes municipales",
     color: "#b45309",
     fillColor: "rgba(180, 83, 9, 0.24)",
-    path: "./data/bienes_municipales.geojson"
+    path: "./data/bienes_municipales.geojson?v=20260320-12"
   }
 ];
 
@@ -1292,3 +1292,4 @@ initialize().catch((error) => {
     "Si persiste, revisamos el despliegue publicado."
   ]);
 });
+
