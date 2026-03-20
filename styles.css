@@ -898,12 +898,17 @@ body::after {
 }
 
 .map-hero-copy {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.9fr);
+  column-gap: 16px;
+  row-gap: 8px;
+  align-items: center;
   padding: 12px 14px;
 }
 
 .map-hud {
   display: grid;
-  align-content: center;
+  align-content: start;
   gap: 4px;
   padding: 12px 14px;
 }
@@ -932,6 +937,12 @@ body::after {
   text-transform: uppercase;
 }
 
+.badge,
+.map-hero h2,
+.map-hero p {
+  grid-column: 1;
+}
+
 .hero-governance {
   display: none;
 }
@@ -952,7 +963,10 @@ body::after {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
-  margin-top: 12px;
+  margin-top: 0;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
 }
 
 .hero-metric {
@@ -1004,6 +1018,7 @@ body::after {
   max-width: 54ch;
   font-size: 0.76rem;
   line-height: 1.4;
+  align-self: start;
 }
 
 .map-message {
@@ -1016,7 +1031,9 @@ body::after {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 12px;
+  margin-top: 0;
+  grid-column: 2;
+  align-self: start;
 }
 
 .hero-action {
@@ -1514,6 +1531,25 @@ body::after {
 
   .map-hero {
     grid-template-columns: 1fr;
+  }
+
+  .map-hero-copy {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+  }
+
+  .hero-metrics,
+  .hero-actions,
+  .badge,
+  .map-hero h2,
+  .map-hero p {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .hero-metrics,
+  .hero-actions {
+    margin-top: 12px;
   }
 
   .map-overlay {
