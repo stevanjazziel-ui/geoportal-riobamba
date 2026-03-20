@@ -49,6 +49,14 @@ const categoryCards = Array.from(document.querySelectorAll(".category-card"));
 const dashboardGrid = document.getElementById("dashboard-grid");
 const dashboardNote = document.getElementById("dashboard-note");
 const dashboardExamples = document.getElementById("dashboard-examples");
+const openRegistroModalButton = document.getElementById("open-registro-modal");
+const registroModal = document.getElementById("registro-modal");
+const closeRegistroModalButton = document.getElementById("close-registro-modal");
+const registroModalCategory = document.getElementById("registro-modal-category");
+const modalCountCon = document.getElementById("modal-count-con");
+const modalCountSin = document.getElementById("modal-count-sin");
+const modalListCon = document.getElementById("modal-list-con");
+const modalListSin = document.getElementById("modal-list-sin");
 const bienesCategories = [
   { value: "Area Verde", label: "Area Verde", countId: "count-area-verde", color: "#15803d", dashKey: "area-verde" },
   { value: "Bienes Municipales Rurale", label: "Bienes Municipales Rurales", countId: "count-bienes-rurales", color: "#65a30d", dashKey: "bienes-rurales" },
@@ -65,6 +73,7 @@ const bienesCategoryCounters = Object.fromEntries(
 let selectedLayer = null;
 const activeBienesCategories = new Set();
 const sourceLoadPromises = new Map();
+let bienesSupportRecords = [];
 const numberFormatter = new Intl.NumberFormat("es-EC");
 const ignoredTramiteFields = new Set([
   "id",
@@ -218,6 +227,131 @@ function analyzeTramiteSupport(properties) {
     matchedField: excerptSource?.fieldLabel || "",
     excerpt: buildExcerpt(excerptSource?.value || "")
   };
+}
+
+function getFeatureDisplayTitle(properties) {
+  return String(
+    properties?.nombre ||
+    properties?.descr ||
+    properties?.clave_pred ||
+    properties?.clave_cat ||
+    "Bien municipal"
+  ).trim();
+}
+
+function sortRecords(records) {
+  return [...records].sort((left, right) => {
+    const categoryCompare = left.categoryLabel.localeCompare(right.categoryLabel, "es");
+    if (categoryCompare !== 0) {
+      return categoryCompare;
+    }
+
+    return left.title.localeCompare(right.title, "es");
+  });
+}
+
+function populateRegistroModalCategories() {
+  if (!registroModalCategory) {
+    return;
+  }
+
+  const selectedValue = registroModalCategory.value || "__all__";
+  registroModalCategory.innerHTML = [
+    '<option value="__all__">Todas las clasificaciones</option>',
+    ...bienesCategories.map((category) => `<option value="${escapeHtml(category.value)}">${escapeHtml(category.label)}</option>`)
+  ].join("");
+  registroModalCategory.value = bienesCategories.some((category) => category.value === selectedValue) ? selectedValue : "__all__";
+}
+
+function renderModalRecord(record, withSupport) {
+  const supportMarkup = withSupport
+    ? `
+      <div class="dashboard-tags">
+        ${record.labels.map((label) => `<span class="dashboard-tag">${escapeHtml(label)}</span>`).join("")}
+      </div>
+      <p class="modal-item-text">${escapeHtml(record.excerpt || "Sin extracto disponible.")}</p>
+      <p class="modal-item-text">Campo detectado: ${escapeHtml(record.matchedField || "Referencia documental")}</p>
+    `
+    : '<p class="modal-item-text">No se encontraron referencias de tramite, resolucion, registro o documento en los atributos revisados.</p>';
+
+  return `
+    <article class="modal-item">
+      <div class="modal-item-head">
+        <span class="modal-item-title">${escapeHtml(record.title)}</span>
+        <span class="modal-item-meta">${escapeHtml(record.categoryLabel)}</span>
+        <span class="modal-item-meta">ID ${escapeHtml(record.id || "s/d")}</span>
+      </div>
+      ${supportMarkup}
+    </article>
+  `;
+}
+
+function updateRegistroModalLists() {
+  if (!registroModalCategory || !modalCountCon || !modalCountSin || !modalListCon || !modalListSin) {
+    return;
+  }
+
+  const selectedCategory = registroModalCategory.value;
+  const filteredRecords = selectedCategory === "__all__"
+    ? bienesSupportRecords
+    : bienesSupportRecords.filter((record) => record.categoryValue === selectedCategory);
+
+  const conRecords = sortRecords(filteredRecords.filter((record) => record.hasSupport));
+  const sinRecords = sortRecords(filteredRecords.filter((record) => !record.hasSupport));
+
+  modalCountCon.textContent = formatNumber(conRecords.length);
+  modalCountSin.textContent = formatNumber(sinRecords.length);
+
+  modalListCon.innerHTML = conRecords.length
+    ? conRecords.map((record) => renderModalRecord(record, true)).join("")
+    : '<p class="dashboard-empty">No hay bienes con respaldo en esta vista.</p>';
+
+  modalListSin.innerHTML = sinRecords.length
+    ? sinRecords.map((record) => renderModalRecord(record, false)).join("")
+    : '<p class="dashboard-empty">No hay bienes sin respaldo en esta vista.</p>';
+}
+
+function openRegistroModal() {
+  if (!registroModal) {
+    return;
+  }
+
+  updateRegistroModalLists();
+  registroModal.classList.add("is-open");
+  registroModal.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+}
+
+function closeRegistroModal() {
+  if (!registroModal) {
+    return;
+  }
+
+  registroModal.classList.remove("is-open");
+  registroModal.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+}
+
+function bindRegistroModal() {
+  if (!registroModal || !openRegistroModalButton || !closeRegistroModalButton || !registroModalCategory) {
+    return;
+  }
+
+  openRegistroModalButton.addEventListener("click", openRegistroModal);
+  closeRegistroModalButton.addEventListener("click", closeRegistroModal);
+  registroModalCategory.addEventListener("change", updateRegistroModalLists);
+  registroModal.addEventListener("click", (event) => {
+    const target = event.target;
+    if (target instanceof HTMLElement && target.dataset.closeModal === "true") {
+      closeRegistroModal();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && registroModal.classList.contains("is-open")) {
+      closeRegistroModal();
+    }
+  });
 }
 
 function renderDetails(feature, layerName) {
@@ -425,6 +559,7 @@ function renderBienesDashboards(features) {
     return;
   }
 
+  bienesSupportRecords = [];
   const summary = Object.fromEntries(
     bienesCategories.map((category) => [
       category.value,
@@ -450,13 +585,7 @@ function renderBienesDashboards(features) {
       const example = {
         id: feature?.properties?.id || "",
         categoryLabel: summary[category].label,
-        title: String(
-          feature?.properties?.nombre ||
-          feature?.properties?.descr ||
-          feature?.properties?.clave_pred ||
-          feature?.properties?.clave_cat ||
-          "Bien municipal"
-        ).trim(),
+        title: getFeatureDisplayTitle(feature.properties),
         labels: tramiteAnalysis.labels,
         excerpt: tramiteAnalysis.excerpt,
         matchedField: tramiteAnalysis.matchedField
@@ -469,6 +598,17 @@ function renderBienesDashboards(features) {
     } else {
       summary[category].sin += 1;
     }
+
+    bienesSupportRecords.push({
+      id: feature?.properties?.id || "",
+      categoryValue: category,
+      categoryLabel: summary[category].label,
+      title: getFeatureDisplayTitle(feature.properties),
+      hasSupport: tramiteAnalysis.hasSupport,
+      labels: tramiteAnalysis.labels,
+      excerpt: tramiteAnalysis.excerpt,
+      matchedField: tramiteAnalysis.matchedField
+    });
   }
 
   const totalConRespaldo = bienesCategories.reduce(
@@ -564,6 +704,8 @@ function renderBienesDashboards(features) {
       <p class="dashboard-example-text">Campo detectado: ${escapeHtml(example.matchedField || "Referencia documental")}</p>
     </article>
   `).join("");
+  populateRegistroModalCategories();
+  updateRegistroModalLists();
   requestAnimationFrame(updateSidebarScrollUi);
 }
 
@@ -899,6 +1041,7 @@ async function initialize() {
 
   bindLayerToggles();
   bindSidebarScrollUi();
+  bindRegistroModal();
 
   const initialSourceIds = dataSources
     .filter((source) => {

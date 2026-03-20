@@ -100,6 +100,7 @@
           <h2>Dashboard de Tramites</h2>
           <p class="helper-text">Cada anillo compara bienes con respaldo documental frente a bienes sin respaldo.</p>
           <p id="dashboard-note" class="dashboard-note">Revisando toda la base en busca de tramites, resoluciones, registros y documentos de respaldo.</p>
+          <button id="open-registro-modal" class="button secondary dashboard-open-button" type="button">Ver ventana de registros</button>
           <div id="dashboard-grid" class="dashboard-grid">
             <p class="dashboard-empty">Calculando dashboard...</p>
           </div>
@@ -145,6 +146,51 @@
       </div>
       <div id="map" aria-label="Mapa del geoportal"></div>
     </main>
+  </div>
+
+  <div id="registro-modal" class="modal-shell" aria-hidden="true">
+    <div class="modal-backdrop" data-close-modal="true"></div>
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="registro-modal-title">
+      <div class="modal-header">
+        <div>
+          <h2 id="registro-modal-title">Ventana de Registros</h2>
+          <p class="modal-subtitle">Listado de bienes con respaldo documental y bienes sin respaldo segun la revision actual.</p>
+        </div>
+        <button id="close-registro-modal" class="button ghost modal-close" type="button">Cerrar</button>
+      </div>
+      <div class="modal-toolbar">
+        <label class="modal-filter">
+          <span>Clasificacion</span>
+          <select id="registro-modal-category" class="modal-select">
+            <option value="__all__">Todas las clasificaciones</option>
+          </select>
+        </label>
+        <div class="modal-stats">
+          <article class="modal-stat">
+            <span>Con respaldo</span>
+            <strong id="modal-count-con">0</strong>
+          </article>
+          <article class="modal-stat">
+            <span>Sin respaldo</span>
+            <strong id="modal-count-sin">0</strong>
+          </article>
+        </div>
+      </div>
+      <div class="modal-grid">
+        <section class="modal-column">
+          <h3>Con respaldo</h3>
+          <div id="modal-list-con" class="modal-list">
+            <p class="dashboard-empty">Todavia no hay datos cargados.</p>
+          </div>
+        </section>
+        <section class="modal-column">
+          <h3>Sin respaldo</h3>
+          <div id="modal-list-sin" class="modal-list">
+            <p class="dashboard-empty">Todavia no hay datos cargados.</p>
+          </div>
+        </section>
+      </div>
+    </section>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
