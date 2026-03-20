@@ -1470,6 +1470,12 @@ body::after {
   word-break: break-word;
 }
 
+.modal-item-summary {
+  display: grid;
+  gap: 2px;
+  margin-top: 8px;
+}
+
 .modal-item-tags {
   display: flex;
   flex-wrap: wrap;

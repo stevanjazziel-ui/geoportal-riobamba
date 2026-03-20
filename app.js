@@ -277,6 +277,34 @@ function getFeatureDisplayTitle(properties) {
   ).trim();
 }
 
+function getFeatureKey(properties) {
+  return String(
+    properties?.clave_pred ||
+    properties?.clave_cat ||
+    properties?.id ||
+    "s/d"
+  ).trim() || "s/d";
+}
+
+function getFeatureDescription(properties) {
+  return String(
+    properties?.descr ||
+    properties?.nombre ||
+    "Sin descripcion"
+  ).trim() || "Sin descripcion";
+}
+
+function getSupportSummary(tramiteAnalysis) {
+  if (!tramiteAnalysis?.hasSupport) {
+    return "No se detectaron referencias de registro, documentacion, tramite o resolucion.";
+  }
+
+  const labels = tramiteAnalysis.labels?.length
+    ? tramiteAnalysis.labels.join(", ")
+    : "Con respaldo detectado";
+  return `Si. Detectado en: ${labels}.`;
+}
+
 function sortRecords(records) {
   return [...records].sort((left, right) => {
     const categoryCompare = left.categoryLabel.localeCompare(right.categoryLabel, "es");
@@ -326,11 +354,24 @@ function renderModalRecord(record, withSupport) {
     : '<p class="modal-item-text">No se encontraron campos documentales detallados.</p>';
   const supportMarkup = withSupport
     ? `
+      <div class="modal-item-summary">
+        <p class="modal-item-text"><strong>Clave:</strong> ${escapeHtml(record.key)}</p>
+        <p class="modal-item-text"><strong>Descripcion:</strong> ${escapeHtml(record.description)}</p>
+        <p class="modal-item-text"><strong>Clasificacion:</strong> ${escapeHtml(record.categoryLabel)}</p>
+        <p class="modal-item-text"><strong>Estado documental:</strong> ${escapeHtml(record.supportSummary)}</p>
+      </div>
       <p class="modal-item-signals">Campos y senales detectadas</p>
       ${labelsMarkup}
       ${fieldsMarkup}
     `
-    : '<p class="modal-item-text">No se encontraron referencias de tramite, resolucion, registro o documento en los atributos revisados.</p>';
+    : `
+      <div class="modal-item-summary">
+        <p class="modal-item-text"><strong>Clave:</strong> ${escapeHtml(record.key)}</p>
+        <p class="modal-item-text"><strong>Descripcion:</strong> ${escapeHtml(record.description)}</p>
+        <p class="modal-item-text"><strong>Clasificacion:</strong> ${escapeHtml(record.categoryLabel)}</p>
+        <p class="modal-item-text"><strong>Estado documental:</strong> ${escapeHtml(record.supportSummary)}</p>
+      </div>
+    `;
 
   return `
     <article class="modal-item ${withSupport ? "modal-item-support" : "modal-item-empty"}" data-record-id="${escapeHtml(record.id || "")}">
@@ -748,12 +789,15 @@ function renderBienesDashboards(features) {
 
     bienesSupportRecords.push({
       id: feature?.properties?.id || "",
+      key: getFeatureKey(feature.properties),
+      description: getFeatureDescription(feature.properties),
       categoryValue: category,
       categoryLabel: summary[category].label,
       title: getFeatureDisplayTitle(feature.properties),
       hasSupport: tramiteAnalysis.hasSupport,
       labels: tramiteAnalysis.labels,
       fieldMatches: tramiteAnalysis.fieldMatches,
+      supportSummary: getSupportSummary(tramiteAnalysis),
       excerpt: tramiteAnalysis.excerpt,
       matchedField: tramiteAnalysis.matchedField
     });
@@ -969,6 +1013,20 @@ function buildGeoJsonLayer(source, geojson) {
       featureLayer.on("click", () => {
         selectFeatureLayer(featureLayer);
       });
+
+      if (source.id === "bienes") {
+        const tramiteAnalysis = analyzeTramiteSupport(feature.properties);
+        featureLayer.bindPopup(`
+          <div class="map-popup">
+            <strong>${escapeHtml(source.name)}</strong><br>
+            <strong>Clave:</strong> ${escapeHtml(getFeatureKey(feature.properties))}<br>
+            <strong>Descripcion:</strong> ${escapeHtml(getFeatureDescription(feature.properties))}<br>
+            <strong>Clasificacion:</strong> ${escapeHtml(String(feature.properties?.clase || "Sin clasificacion").trim() || "Sin clasificacion")}<br>
+            <strong>Estado documental:</strong> ${escapeHtml(getSupportSummary(tramiteAnalysis))}
+          </div>
+        `);
+        return;
+      }
 
       const entries = collectPropertyEntries(feature.properties);
       const preview = entries
