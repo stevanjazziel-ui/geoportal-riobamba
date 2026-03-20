@@ -18,14 +18,14 @@ const dataSources = [
     name: "Catastro municipal",
     color: "#5b6770",
     fillColor: "rgba(91, 103, 112, 0)",
-    path: "./data/catastro_riobamba.geojson?v=20260320-13"
+    path: "./data/catastro_riobamba.geojson?v=20260320-14"
   },
   {
     id: "bienes",
     name: "Bienes municipales",
     color: "#b45309",
     fillColor: "rgba(180, 83, 9, 0.24)",
-    path: "./data/bienes_municipales.geojson?v=20260320-13"
+    path: "./data/bienes_municipales.geojson?v=20260320-14"
   }
 ];
 
@@ -956,6 +956,18 @@ function getFeatureStyle(source, feature) {
   }
 
   const color = getBienesColor(feature?.properties?.clase);
+  const geometryType = feature?.geometry?.type || "";
+  if (geometryType === "Point" || geometryType === "MultiPoint") {
+    return {
+      radius: 6,
+      color,
+      weight: 2,
+      fillColor: color,
+      fillOpacity: 0.22,
+      opacity: 0.95
+    };
+  }
+
   return {
     color,
     weight: 2,
@@ -966,20 +978,33 @@ function getFeatureStyle(source, feature) {
 }
 
 function getDimmedStyle(baseStyle) {
-  return {
+  const nextStyle = {
     ...baseStyle,
     fillOpacity: 0,
     opacity: 0.2
   };
+
+  if (Object.hasOwn(baseStyle, "radius")) {
+    nextStyle.radius = Math.max(3, (baseStyle.radius || 0) - 1);
+    nextStyle.fillOpacity = 0.08;
+  }
+
+  return nextStyle;
 }
 
 function getHiddenStyle(baseStyle) {
-  return {
+  const nextStyle = {
     ...baseStyle,
     weight: 0,
     fillOpacity: 0,
     opacity: 0
   };
+
+  if (Object.hasOwn(baseStyle, "radius")) {
+    nextStyle.radius = 0.5;
+  }
+
+  return nextStyle;
 }
 
 function buildGeoJsonLayer(source, geojson) {
@@ -1061,7 +1086,7 @@ async function loadSource(source) {
   }
 
   const parsed = await response.json();
-  const features = normalizeFeatures(parsed.features);
+  const features = normalizeFeatures(source, parsed.features);
   const layer = buildGeoJsonLayer(source, {
     type: "FeatureCollection",
     features
@@ -1293,4 +1318,6 @@ initialize().catch((error) => {
     "Si persiste, revisamos el despliegue publicado."
   ]);
 });
+
+
 
