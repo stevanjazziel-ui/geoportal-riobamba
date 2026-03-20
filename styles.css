@@ -1418,6 +1418,16 @@ body::after {
   word-break: break-word;
 }
 
+.modal-item-signals {
+  display: block;
+  margin: 8px 0 0;
+  color: var(--muted-strong);
+  font-size: 0.8rem;
+  line-height: 1.45;
+  white-space: normal;
+  word-break: break-word;
+}
+
 @media (max-width: 1180px) {
   .app-shell {
     grid-template-columns: minmax(320px, 390px) 1fr;

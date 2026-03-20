@@ -269,11 +269,10 @@ function populateRegistroModalCategories() {
 }
 
 function renderModalRecord(record, withSupport) {
+  const labelsText = record.labels.length ? escapeHtml(record.labels.join(" · ")) : "Referencia documental";
   const supportMarkup = withSupport
     ? `
-      <div class="dashboard-tags">
-        ${record.labels.map((label) => `<span class="dashboard-tag">${escapeHtml(label)}</span>`).join("")}
-      </div>
+      <p class="modal-item-signals">Senales detectadas: ${labelsText}</p>
       <p class="modal-item-text">${escapeHtml(record.excerpt || "Sin extracto disponible.")}</p>
       <p class="modal-item-text">Campo detectado: ${escapeHtml(record.matchedField || "Referencia documental")}</p>
     `
