@@ -218,7 +218,8 @@ function analyzeTramiteSupport(properties) {
         field: key,
         fieldLabel,
         value,
-        matchedKeywords
+        excerpt: buildExcerpt(value),
+        matchedKeywords: Array.from(new Set(matchedKeywords))
       });
     }
   });
@@ -229,6 +230,8 @@ function analyzeTramiteSupport(properties) {
     hasSupport: labels.size > 0,
     labels: Array.from(labels),
     keywords: Array.from(keywords),
+    fieldsSummary: fieldMatches.map((match) => `${match.fieldLabel}: ${buildExcerpt(match.value)}`).join(" | "),
+    fieldMatches,
     matchedField: excerptSource?.fieldLabel || "",
     excerpt: buildExcerpt(excerptSource?.value || "")
   };
@@ -269,12 +272,33 @@ function populateRegistroModalCategories() {
 }
 
 function renderModalRecord(record, withSupport) {
-  const labelsText = record.labels.length ? escapeHtml(record.labels.join(" · ")) : "Referencia documental";
+  const labelsMarkup = record.labels.length
+    ? `
+      <div class="modal-item-tags">
+        ${record.labels.map((label) => `<span class="modal-item-tag">${escapeHtml(label)}</span>`).join("")}
+      </div>
+    `
+    : "";
+  const fieldsMarkup = record.fieldMatches?.length
+    ? `
+      <div class="modal-item-field-list">
+        ${record.fieldMatches.map((match) => `
+          <div class="modal-item-field">
+            <div class="modal-item-field-head">
+              <strong>${escapeHtml(match.fieldLabel)}</strong>
+              ${match.matchedKeywords.length ? `<span class="modal-item-field-keywords">${escapeHtml(match.matchedKeywords.join(", "))}</span>` : ""}
+            </div>
+            <p class="modal-item-text">${escapeHtml(match.excerpt || match.value || "Sin extracto disponible.")}</p>
+          </div>
+        `).join("")}
+      </div>
+    `
+    : '<p class="modal-item-text">No se encontraron campos documentales detallados.</p>';
   const supportMarkup = withSupport
     ? `
-      <p class="modal-item-signals">Senales detectadas: ${labelsText}</p>
-      <p class="modal-item-text">${escapeHtml(record.excerpt || "Sin extracto disponible.")}</p>
-      <p class="modal-item-text">Campo detectado: ${escapeHtml(record.matchedField || "Referencia documental")}</p>
+      <p class="modal-item-signals">Campos y senales detectadas</p>
+      ${labelsMarkup}
+      ${fieldsMarkup}
     `
     : '<p class="modal-item-text">No se encontraron referencias de tramite, resolucion, registro o documento en los atributos revisados.</p>';
 
@@ -697,6 +721,7 @@ function renderBienesDashboards(features) {
       title: getFeatureDisplayTitle(feature.properties),
       hasSupport: tramiteAnalysis.hasSupport,
       labels: tramiteAnalysis.labels,
+      fieldMatches: tramiteAnalysis.fieldMatches,
       excerpt: tramiteAnalysis.excerpt,
       matchedField: tramiteAnalysis.matchedField
     });

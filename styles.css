@@ -1428,6 +1428,60 @@ body::after {
   word-break: break-word;
 }
 
+.modal-item-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.modal-item-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(57, 208, 255, 0.16);
+  background: rgba(7, 19, 30, 0.62);
+  color: var(--muted-strong);
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.modal-item-field-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.modal-item-field {
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(57, 208, 255, 0.08);
+  background: rgba(4, 16, 26, 0.42);
+}
+
+.modal-item-field-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+
+.modal-item-field-head strong {
+  font-size: 0.86rem;
+  color: var(--ink);
+}
+
+.modal-item-field-keywords {
+  color: var(--accent-warm);
+  font-size: 0.78rem;
+  text-transform: capitalize;
+}
+
+.modal-item-field .modal-item-text {
+  margin-top: 6px;
+}
+
 @media (max-width: 1180px) {
   .app-shell {
     grid-template-columns: minmax(320px, 390px) 1fr;
