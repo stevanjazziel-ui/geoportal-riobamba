@@ -47,6 +47,8 @@ const sidebarScrollDown = document.getElementById("sidebar-scroll-down");
 const sidebarScrollThumb = document.getElementById("sidebar-scroll-thumb");
 const categoryCards = Array.from(document.querySelectorAll(".category-card"));
 const dashboardGrid = document.getElementById("dashboard-grid");
+const dashboardNote = document.getElementById("dashboard-note");
+const dashboardExamples = document.getElementById("dashboard-examples");
 const bienesCategories = [
   { value: "Area Verde", label: "Area Verde", countId: "count-area-verde", color: "#15803d", dashKey: "area-verde" },
   { value: "Bienes Municipales Rurale", label: "Bienes Municipales Rurales", countId: "count-bienes-rurales", color: "#65a30d", dashKey: "bienes-rurales" },
@@ -63,6 +65,45 @@ const bienesCategoryCounters = Object.fromEntries(
 let selectedLayer = null;
 const activeBienesCategories = new Set();
 const sourceLoadPromises = new Map();
+const numberFormatter = new Intl.NumberFormat("es-EC");
+const ignoredTramiteFields = new Set([
+  "id",
+  "clave_cat",
+  "clave_pred",
+  "clase",
+  "area",
+  "area_verif",
+  "avaluo"
+]);
+const documentSupportFields = new Set(["documento", "numero_reg"]);
+const tramiteKeywordPatterns = [
+  { term: "tramite", label: "tramite" },
+  { term: "resolucion", label: "resolucion" },
+  { term: "registro", label: "registro" },
+  { term: "registr", label: "registro" },
+  { term: "certificado", label: "certificado" },
+  { term: "ordenanza", label: "ordenanza" },
+  { term: "escritura", label: "escritura" },
+  { term: "inscrip", label: "inscripcion" },
+  { term: "acuerdo", label: "acuerdo" },
+  { term: "convenio", label: "convenio" },
+  { term: "minuta", label: "minuta" },
+  { term: "protocol", label: "protocolizacion" },
+  { term: "sentencia", label: "sentencia" },
+  { term: "adjudic", label: "adjudicacion" },
+  { term: "legaliz", label: "legalizacion" },
+  { term: "regulariz", label: "regularizacion" }
+];
+const propertyLabelMap = {
+  documento: "Documento",
+  numero_reg: "Numero de registro",
+  nombre: "Nombre",
+  descr: "Descripcion",
+  ubicacion: "Ubicacion",
+  institucion: "Institucion",
+  contrib: "Contribuye",
+  fuente: "Fuente"
+};
 
 const bienesColorMap = Object.fromEntries(
   bienesCategories.map((category) => [category.value, category.color])
@@ -99,10 +140,84 @@ function collectPropertyEntries(properties) {
     .slice(0, 24);
 }
 
-function hasRegistroOTramite(properties) {
-  const documento = String(properties?.documento || "").trim();
-  const numeroRegistro = String(properties?.numero_reg || "").trim();
-  return documento !== "" || numeroRegistro !== "";
+function formatNumber(value) {
+  return numberFormatter.format(value || 0);
+}
+
+function normalizeText(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+function getPropertyLabel(key) {
+  return propertyLabelMap[key] || key;
+}
+
+function buildExcerpt(value) {
+  const text = String(value || "").trim().replace(/\s+/g, " ");
+  if (!text) {
+    return "";
+  }
+
+  if (text.length <= 132) {
+    return text;
+  }
+
+  return `${text.slice(0, 129).trimEnd()}...`;
+}
+
+function analyzeTramiteSupport(properties) {
+  const labels = new Set();
+  const keywords = new Set();
+  const fieldMatches = [];
+
+  Object.entries(properties || {}).forEach(([key, rawValue]) => {
+    if (ignoredTramiteFields.has(key)) {
+      return;
+    }
+
+    const value = String(rawValue || "").trim();
+    if (!value) {
+      return;
+    }
+
+    const normalizedValue = normalizeText(value);
+    const fieldLabel = getPropertyLabel(key);
+    const matchedKeywords = [];
+
+    if (documentSupportFields.has(key)) {
+      labels.add(fieldLabel);
+    }
+
+    tramiteKeywordPatterns.forEach((pattern) => {
+      if (normalizedValue.includes(pattern.term)) {
+        matchedKeywords.push(pattern.label);
+        keywords.add(pattern.label);
+        labels.add(pattern.label);
+      }
+    });
+
+    if (documentSupportFields.has(key) || matchedKeywords.length > 0) {
+      fieldMatches.push({
+        field: key,
+        fieldLabel,
+        value,
+        matchedKeywords
+      });
+    }
+  });
+
+  const excerptSource = fieldMatches[0] || null;
+
+  return {
+    hasSupport: labels.size > 0,
+    labels: Array.from(labels),
+    keywords: Array.from(keywords),
+    matchedField: excerptSource?.fieldLabel || "",
+    excerpt: buildExcerpt(excerptSource?.value || "")
+  };
 }
 
 function renderDetails(feature, layerName) {
@@ -306,16 +421,17 @@ function getBienesCategoryLabel(value) {
 }
 
 function renderBienesDashboards(features) {
-  if (!dashboardGrid) {
+  if (!dashboardGrid || !dashboardExamples) {
     return;
   }
 
   const summary = Object.fromEntries(
     bienesCategories.map((category) => [
       category.value,
-      { label: category.label, total: 0, con: 0, sin: 0 }
+      { label: category.label, total: 0, con: 0, sin: 0, keywordCounts: {}, examples: [] }
     ])
   );
+  const supportExamples = [];
 
   for (const feature of features || []) {
     const category = String(feature?.properties?.clase || "").trim();
@@ -323,32 +439,132 @@ function renderBienesDashboards(features) {
       continue;
     }
 
+    const tramiteAnalysis = analyzeTramiteSupport(feature.properties);
     summary[category].total += 1;
-    if (hasRegistroOTramite(feature.properties)) {
+    if (tramiteAnalysis.hasSupport) {
       summary[category].con += 1;
+      tramiteAnalysis.keywords.forEach((keyword) => {
+        summary[category].keywordCounts[keyword] = (summary[category].keywordCounts[keyword] || 0) + 1;
+      });
+
+      const example = {
+        id: feature?.properties?.id || "",
+        categoryLabel: summary[category].label,
+        title: String(
+          feature?.properties?.nombre ||
+          feature?.properties?.descr ||
+          feature?.properties?.clave_pred ||
+          feature?.properties?.clave_cat ||
+          "Bien municipal"
+        ).trim(),
+        labels: tramiteAnalysis.labels,
+        excerpt: tramiteAnalysis.excerpt,
+        matchedField: tramiteAnalysis.matchedField
+      };
+
+      if (summary[category].examples.length < 1) {
+        summary[category].examples.push(example);
+      }
+      supportExamples.push(example);
     } else {
       summary[category].sin += 1;
     }
   }
 
-  bienesCategories.forEach((category) => {
+  const totalConRespaldo = bienesCategories.reduce(
+    (accumulator, category) => accumulator + summary[category.value].con,
+    0
+  );
+
+  if (dashboardNote) {
+    dashboardNote.textContent = `${formatNumber(totalConRespaldo)} bienes muestran senales documentales al revisar campos como documento, numero de registro, nombre, institucion y fuente.`;
+  }
+
+  dashboardGrid.innerHTML = bienesCategories.map((category) => {
     const item = summary[category.value];
-    const totalElement = document.getElementById(`dash-total-${category.dashKey}`);
-    const conElement = document.getElementById(`dash-con-${category.dashKey}`);
-    const sinElement = document.getElementById(`dash-sin-${category.dashKey}`);
+    const percentage = item.total ? Math.round((item.con / item.total) * 100) : 0;
+    const topSignals = Object.entries(item.keywordCounts)
+      .sort((left, right) => right[1] - left[1])
+      .slice(0, 3)
+      .map(([keyword]) => `<span class="dashboard-tag">${escapeHtml(keyword)}</span>`)
+      .join("");
 
-    if (totalElement) {
-      totalElement.textContent = String(item.total);
+    return `
+      <article class="dashboard-card">
+        <div class="dashboard-top">
+          <div
+            class="dashboard-chart"
+            style="--chart-fill: ${escapeHtml(category.color)}; --chart-angle: ${percentage * 3.6}deg;"
+            aria-label="${escapeHtml(category.label)}: ${percentage}% con respaldo"
+          >
+            <div class="dashboard-chart-center">
+              <strong>${percentage}%</strong>
+              <span>con respaldo</span>
+            </div>
+          </div>
+          <div class="dashboard-copy">
+            <span class="dashboard-title">${escapeHtml(item.label)}</span>
+            <p class="dashboard-copy-text">${formatNumber(item.con)} de ${formatNumber(item.total)} bienes muestran senales de tramite, resolucion, registro o documento de respaldo.</p>
+          </div>
+        </div>
+        <div class="dashboard-metrics">
+          <div class="dashboard-metric">
+            <span class="dashboard-metric-label">Total</span>
+            <strong>${formatNumber(item.total)}</strong>
+          </div>
+          <div class="dashboard-metric">
+            <span class="dashboard-metric-label">Con respaldo</span>
+            <strong>${formatNumber(item.con)}</strong>
+          </div>
+          <div class="dashboard-metric">
+            <span class="dashboard-metric-label">Sin respaldo</span>
+            <strong>${formatNumber(item.sin)}</strong>
+          </div>
+        </div>
+        <div class="dashboard-tags">
+          ${topSignals || '<span class="dashboard-tag is-muted">Sin palabras clave detectadas</span>'}
+        </div>
+      </article>
+    `;
+  }).join("");
+
+  const categoryExamples = bienesCategories
+    .map((category) => summary[category.value].examples[0])
+    .filter(Boolean);
+  const examplePool = [...categoryExamples];
+
+  supportExamples.forEach((example) => {
+    if (examplePool.length >= 8) {
+      return;
     }
 
-    if (conElement) {
-      conElement.textContent = String(item.con);
-    }
-
-    if (sinElement) {
-      sinElement.textContent = String(item.sin);
+    const exists = examplePool.some((current) => current.id === example.id);
+    if (!exists) {
+      examplePool.push(example);
     }
   });
+
+  if (!examplePool.length) {
+    dashboardExamples.innerHTML = '<p class="dashboard-empty">No se detectaron referencias de tramite, resolucion o registro en las clasificaciones visibles.</p>';
+    requestAnimationFrame(updateSidebarScrollUi);
+    return;
+  }
+
+  dashboardExamples.innerHTML = examplePool.map((example) => `
+    <article class="dashboard-example">
+      <div class="dashboard-example-head">
+        <span class="dashboard-example-title">${escapeHtml(example.categoryLabel)}</span>
+        <span class="dashboard-example-id">ID ${escapeHtml(example.id || "s/d")}</span>
+      </div>
+      <div class="dashboard-tags">
+        ${example.labels.map((label) => `<span class="dashboard-tag">${escapeHtml(label)}</span>`).join("")}
+      </div>
+      <p class="dashboard-example-text"><strong>${escapeHtml(example.title)}</strong></p>
+      <p class="dashboard-example-text">${escapeHtml(example.excerpt || "Sin extracto disponible.")}</p>
+      <p class="dashboard-example-text">Campo detectado: ${escapeHtml(example.matchedField || "Referencia documental")}</p>
+    </article>
+  `).join("");
+  requestAnimationFrame(updateSidebarScrollUi);
 }
 
 function updateCategoryCardState() {
