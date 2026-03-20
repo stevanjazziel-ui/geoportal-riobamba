@@ -33,7 +33,8 @@ Remove-Item $bienesOutput -Force -ErrorAction SilentlyContinue
   -lco RFC7946=YES `
   -lco COORDINATE_PRECISION=6 `
   -dialect SQLITE `
-  -sql "SELECT ST_SimplifyPreserveTopology(geometry, 0.000005) AS geometry, gid AS id, Clave_Cata AS clave_cat, Clave_Pred AS clave_pred, DESCRIPCIO AS descr, Parroquia_ AS parroquia, Barrio_Nom AS barrio, ESTADO AS estado, Clasificac AS clase, nombre AS nombre, Total_Area AS area, Area_Verif AS area_verif, Total_Aval AS avaluo, Contribuye AS contrib, INSTITUCIO AS institucion, Fuente AS fuente, ubicacion AS ubicacion FROM BIENES_MUNICIPALES_3" `
+  -sql "SELECT ST_SimplifyPreserveTopology(geometry, 0.000005) AS geometry, gid AS id, Clave_Cata AS clave_cat, Clave_Pred AS clave_pred, DESCRIPCIO AS descr, Parroquia_ AS parroquia, Barrio_Nom AS barrio, ESTADO AS estado, Clasificac AS clase, nombre AS nombre, Total_Area AS area, Area_Verif AS area_verif, Total_Aval AS avaluo, Contribuye AS contrib, Documento_ AS documento, Numero_Reg AS numero_reg, INSTITUCIO AS institucion, Fuente AS fuente, ubicacion AS ubicacion FROM BIENES_MUNICIPALES_3" `
   -skipfailures
 
 Write-Host "GeoJSON actualizados en $dataDir"
+

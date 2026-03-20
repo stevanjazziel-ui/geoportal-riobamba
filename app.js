@@ -46,6 +46,7 @@ const sidebarScrollUp = document.getElementById("sidebar-scroll-up");
 const sidebarScrollDown = document.getElementById("sidebar-scroll-down");
 const sidebarScrollThumb = document.getElementById("sidebar-scroll-thumb");
 const categoryCards = Array.from(document.querySelectorAll(".category-card"));
+const dashboardGrid = document.getElementById("dashboard-grid");
 const bienesCategories = [
   { value: "Area Verde", label: "Area Verde", countId: "count-area-verde", color: "#15803d" },
   { value: "Bienes Municipales Rurale", label: "Bienes Municipales Rurales", countId: "count-bienes-rurales", color: "#65a30d" },
@@ -98,6 +99,12 @@ function collectPropertyEntries(properties) {
   return Object.entries(properties || {})
     .filter(([, value]) => value !== null && value !== undefined && String(value).trim() !== "")
     .slice(0, 24);
+}
+
+function hasRegistroOTramite(properties) {
+  const documento = String(properties?.documento || "").trim();
+  const numeroRegistro = String(properties?.numero_reg || "").trim();
+  return documento !== "" || numeroRegistro !== "";
 }
 
 function renderDetails(feature, layerName) {
@@ -300,6 +307,58 @@ function getBienesCategoryLabel(value) {
   return bienesCategories.find((category) => category.value === value)?.label || value;
 }
 
+function renderBienesDashboards(features) {
+  if (!dashboardGrid) {
+    return;
+  }
+
+  const summary = Object.fromEntries(
+    bienesCategories.map((category) => [
+      category.value,
+      { label: category.label, total: 0, con: 0, sin: 0 }
+    ])
+  );
+
+  for (const feature of features || []) {
+    const category = String(feature?.properties?.clase || "").trim();
+    if (!Object.hasOwn(summary, category)) {
+      continue;
+    }
+
+    summary[category].total += 1;
+    if (hasRegistroOTramite(feature.properties)) {
+      summary[category].con += 1;
+    } else {
+      summary[category].sin += 1;
+    }
+  }
+
+  dashboardGrid.innerHTML = bienesCategories
+    .map((category) => {
+      const item = summary[category.value];
+      return `
+        <article class="dashboard-card">
+          <span class="dashboard-title">${escapeHtml(item.label)}</span>
+          <div class="dashboard-metrics">
+            <div class="dashboard-metric">
+              <span class="dashboard-metric-label">Total</span>
+              <strong>${item.total}</strong>
+            </div>
+            <div class="dashboard-metric">
+              <span class="dashboard-metric-label">Con registro o tramite</span>
+              <strong>${item.con}</strong>
+            </div>
+            <div class="dashboard-metric">
+              <span class="dashboard-metric-label">Sin registro o tramite</span>
+              <strong>${item.sin}</strong>
+            </div>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+}
+
 function updateCategoryCardState() {
   categoryCards.forEach((card) => {
     const isActive = activeBienesCategories.has(card.dataset.category);
@@ -488,6 +547,7 @@ async function loadSource(source) {
 
   if (source.id === "bienes") {
     updateBienesCategoryCounts(features);
+    renderBienesDashboards(features);
   }
 
   layer.addTo(map);
