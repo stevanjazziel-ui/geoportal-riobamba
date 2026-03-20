@@ -52,6 +52,7 @@ const openRegistroModalButton = document.getElementById("open-registro-modal");
 const registroModal = document.getElementById("registro-modal");
 const closeRegistroModalButton = document.getElementById("close-registro-modal");
 const registroModalCategory = document.getElementById("registro-modal-category");
+const modalGrid = document.getElementById("modal-grid");
 const modalCountCon = document.getElementById("modal-count-con");
 const modalCountSin = document.getElementById("modal-count-sin");
 const modalListCon = document.getElementById("modal-list-con");
@@ -74,6 +75,7 @@ const activeBienesCategories = new Set();
 const sourceLoadPromises = new Map();
 const bienesLayerIndex = new Map();
 let bienesSupportRecords = [];
+let registroModalView = "both";
 const numberFormatter = new Intl.NumberFormat("es-EC");
 const ignoredTramiteFields = new Set([
   "id",
@@ -287,7 +289,7 @@ function renderModalRecord(record, withSupport) {
 }
 
 function updateRegistroModalLists() {
-  if (!registroModalCategory || !modalCountCon || !modalCountSin || !modalListCon || !modalListSin) {
+  if (!registroModalCategory || !modalCountCon || !modalCountSin || !modalListCon || !modalListSin || !modalGrid) {
     return;
   }
 
@@ -309,6 +311,17 @@ function updateRegistroModalLists() {
   modalListSin.innerHTML = sinRecords.length
     ? sinRecords.map((record) => renderModalRecord(record, false)).join("")
     : '<p class="dashboard-empty">No hay bienes sin respaldo en esta vista.</p>';
+
+  modalGrid.classList.toggle("show-con", registroModalView === "con");
+  modalGrid.classList.toggle("show-sin", registroModalView === "sin");
+}
+
+function updateRegistroModalViewButtons() {
+  document.querySelectorAll(".modal-view-button").forEach((button) => {
+    const isActive = button.dataset.modalView === registroModalView;
+    button.classList.toggle("is-active", isActive);
+    button.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
 }
 
 function openRegistroModal() {
@@ -316,6 +329,7 @@ function openRegistroModal() {
     return;
   }
 
+  updateRegistroModalViewButtons();
   updateRegistroModalLists();
   registroModal.classList.add("is-open");
   registroModal.setAttribute("aria-hidden", "false");
@@ -351,6 +365,14 @@ function bindRegistroModal() {
 
     if (target.closest("#open-registro-modal")) {
       openRegistroModal();
+      return;
+    }
+
+    const viewButton = target.closest(".modal-view-button[data-modal-view]");
+    if (viewButton) {
+      registroModalView = viewButton.getAttribute("data-modal-view") || "both";
+      updateRegistroModalViewButtons();
+      updateRegistroModalLists();
       return;
     }
 

@@ -279,6 +279,11 @@
             <option value="__all__">Todas las clasificaciones</option>
           </select>
         </label>
+        <div class="modal-view-toggle" role="group" aria-label="Vista de registros">
+          <button class="modal-view-button is-active" type="button" data-modal-view="both">Ambos</button>
+          <button class="modal-view-button" type="button" data-modal-view="con">Con respaldo</button>
+          <button class="modal-view-button" type="button" data-modal-view="sin">Sin respaldo</button>
+        </div>
         <div class="modal-stats">
           <article class="modal-stat">
             <span>Con respaldo</span>
@@ -290,14 +295,14 @@
           </article>
         </div>
       </div>
-      <div class="modal-grid">
-        <section class="modal-column">
+      <div id="modal-grid" class="modal-grid">
+        <section class="modal-column modal-column-con">
           <h3>Con respaldo</h3>
           <div id="modal-list-con" class="modal-list">
             <p class="dashboard-empty">Todavia no hay datos cargados.</p>
           </div>
         </section>
-        <section class="modal-column">
+        <section class="modal-column modal-column-sin">
           <h3>Sin respaldo</h3>
           <div id="modal-list-sin" class="modal-list">
             <p class="dashboard-empty">Todavia no hay datos cargados.</p>
