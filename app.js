@@ -36,9 +36,17 @@ const detailsContainer = document.getElementById("feature-details");
 const searchInput = document.getElementById("search-input");
 const clearSelectionButton = document.getElementById("clear-selection");
 const fitAllButton = document.getElementById("fit-all");
+const heroFitAllButton = document.getElementById("hero-fit-all");
+const heroOpenRegistroButton = document.getElementById("hero-open-registro");
 const statCatastro = document.getElementById("stat-catastro");
 const statBienes = document.getElementById("stat-bienes");
 const statResults = document.getElementById("stat-results");
+const heroActiveLayers = document.getElementById("hero-active-layers");
+const heroActiveFilters = document.getElementById("hero-active-filters");
+const heroSupportCount = document.getElementById("hero-support-count");
+const heroCatastroCount = document.getElementById("hero-catastro-count");
+const heroBienesCount = document.getElementById("hero-bienes-count");
+const heroViewMode = document.getElementById("hero-view-mode");
 const toggleCatastro = document.getElementById("toggle-catastro");
 const toggleBienes = document.getElementById("toggle-bienes");
 const sidebar = document.querySelector(".sidebar");
@@ -156,6 +164,28 @@ function collectPropertyEntries(properties) {
 
 function formatNumber(value) {
   return numberFormatter.format(value || 0);
+}
+
+function updateHeroOverview() {
+  if (!heroActiveLayers || !heroActiveFilters || !heroSupportCount || !heroCatastroCount || !heroBienesCount || !heroViewMode) {
+    return;
+  }
+
+  const activeLayers = dataSources.reduce((count, source) => {
+    const layer = layerState.get(source.id)?.layer;
+    return layer && map.hasLayer(layer) ? count + 1 : count;
+  }, 0);
+  const activeFilters = activeBienesCategories.size + (searchInput.value.trim() ? 1 : 0);
+  const supportCount = bienesSupportRecords.filter((record) => record.hasSupport).length;
+  const catastroCount = layerState.get("catastro")?.featureCount || 0;
+  const bienesCount = layerState.get("bienes")?.featureCount || 0;
+
+  heroActiveLayers.textContent = formatNumber(activeLayers);
+  heroActiveFilters.textContent = formatNumber(activeFilters);
+  heroSupportCount.textContent = formatNumber(supportCount);
+  heroCatastroCount.textContent = formatNumber(catastroCount);
+  heroBienesCount.textContent = formatNumber(bienesCount);
+  heroViewMode.textContent = activeFilters > 0 ? "Busqueda y filtro activos" : "Exploracion general";
 }
 
 function normalizeText(value) {
@@ -561,6 +591,8 @@ function updateSearch() {
   } else {
     mapMessage.textContent = "Capas cargadas y listas para exploracion.";
   }
+
+  updateHeroOverview();
 }
 
 function fitAllLayers() {
@@ -785,6 +817,7 @@ function renderBienesDashboards(features) {
   }).join("");
   populateRegistroModalCategories();
   updateRegistroModalLists();
+  updateHeroOverview();
   requestAnimationFrame(updateSidebarScrollUi);
 }
 
@@ -994,6 +1027,7 @@ function bindLayerToggles() {
       if (source) {
         map.removeLayer(source.layer);
       }
+      updateHeroOverview();
       return;
     }
 
@@ -1007,11 +1041,13 @@ function bindLayerToggles() {
         statCatastro.textContent = String(source.featureCount || 0);
       }
       mapMessage.textContent = "Capas cargadas y listas para exploracion.";
+      updateHeroOverview();
       fitAllLayers();
     } catch (error) {
       console.error("catastro", error);
       event.target.checked = false;
       mapMessage.textContent = "No se pudo cargar el catastro municipal.";
+      updateHeroOverview();
     }
   });
 
@@ -1021,6 +1057,7 @@ function bindLayerToggles() {
       if (source) {
         map.removeLayer(source.layer);
       }
+      updateHeroOverview();
       return;
     }
 
@@ -1034,11 +1071,13 @@ function bindLayerToggles() {
         statBienes.textContent = String(source.featureCount || 0);
       }
       mapMessage.textContent = "Capas cargadas y listas para exploracion.";
+      updateHeroOverview();
       fitAllLayers();
     } catch (error) {
       console.error("bienes", error);
       event.target.checked = false;
       mapMessage.textContent = "No se pudieron cargar los bienes municipales.";
+      updateHeroOverview();
     }
   });
 
@@ -1176,12 +1215,15 @@ async function initialize() {
     ]);
   }
 
+  updateHeroOverview();
   requestAnimationFrame(updateSidebarScrollUi);
 }
 
 searchInput.addEventListener("input", updateSearch);
 clearSelectionButton.addEventListener("click", clearSelection);
 fitAllButton.addEventListener("click", fitAllLayers);
+heroFitAllButton?.addEventListener("click", fitAllLayers);
+heroOpenRegistroButton?.addEventListener("click", openRegistroModal);
 
 initialize().catch((error) => {
   console.error(error);
