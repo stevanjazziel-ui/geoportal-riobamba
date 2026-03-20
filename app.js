@@ -54,9 +54,7 @@ const bienesCategories = [
   { value: "Comodato", label: "Comodato", countId: "count-comodato", color: "#7c3aed", dashKey: "comodato" },
   { value: "Monstrencos_urbanos", label: "Monstrencos Urbanos", countId: "count-monstrencos-urbanos", color: "#ea580c", dashKey: "monstrencos-urbanos" },
   { value: "Mostrencos_Rurales", label: "Mostrencos Rurales", countId: "count-mostrencos-rurales", color: "#92400e", dashKey: "mostrencos-rurales" },
-  { value: "Subdivisiones", label: "Subdivisiones", countId: "count-subdivisiones", color: "#dc2626", dashKey: "subdivisiones" },
-  { value: "Urbanizaciones Rurales", label: "Urbanizaciones Rurales", countId: "count-urbanizaciones-rurales", color: "#0f766e", dashKey: "urbanizaciones-rurales" },
-  { value: "Urbanizaciones Urbanas", label: "Urbanizaciones Urbanas", countId: "count-urbanizaciones-urbanas", color: "#0891b2", dashKey: "urbanizaciones-urbanas" }
+  { value: "Subdivisiones", label: "Subdivisiones", countId: "count-subdivisiones", color: "#dc2626", dashKey: "subdivisiones" }
 ];
 const bienesCategoryCounters = Object.fromEntries(
   bienesCategories.map((category) => [category.value, document.getElementById(category.countId)])
