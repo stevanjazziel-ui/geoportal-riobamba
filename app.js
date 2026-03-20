@@ -48,7 +48,6 @@ const sidebarScrollThumb = document.getElementById("sidebar-scroll-thumb");
 const categoryCards = Array.from(document.querySelectorAll(".category-card"));
 const dashboardGrid = document.getElementById("dashboard-grid");
 const dashboardNote = document.getElementById("dashboard-note");
-const dashboardExamples = document.getElementById("dashboard-examples");
 const openRegistroModalButton = document.getElementById("open-registro-modal");
 const registroModal = document.getElementById("registro-modal");
 const closeRegistroModalButton = document.getElementById("close-registro-modal");
@@ -333,16 +332,28 @@ function closeRegistroModal() {
 }
 
 function bindRegistroModal() {
-  if (!registroModal || !openRegistroModalButton || !closeRegistroModalButton || !registroModalCategory) {
+  if (!registroModal || !registroModalCategory) {
     return;
   }
 
-  openRegistroModalButton.addEventListener("click", openRegistroModal);
-  closeRegistroModalButton.addEventListener("click", closeRegistroModal);
+  if (bindRegistroModal.bound) {
+    return;
+  }
+
+  bindRegistroModal.bound = true;
   registroModalCategory.addEventListener("change", updateRegistroModalLists);
-  registroModal.addEventListener("click", (event) => {
+  document.addEventListener("click", (event) => {
     const target = event.target;
-    if (target instanceof HTMLElement && target.dataset.closeModal === "true") {
+    if (!(target instanceof Element)) {
+      return;
+    }
+
+    if (target.closest("#open-registro-modal")) {
+      openRegistroModal();
+      return;
+    }
+
+    if (target.closest("#close-registro-modal") || target.closest("[data-close-modal='true']")) {
       closeRegistroModal();
     }
   });
@@ -555,7 +566,7 @@ function getBienesCategoryLabel(value) {
 }
 
 function renderBienesDashboards(features) {
-  if (!dashboardGrid || !dashboardExamples) {
+  if (!dashboardGrid) {
     return;
   }
 
@@ -563,10 +574,9 @@ function renderBienesDashboards(features) {
   const summary = Object.fromEntries(
     bienesCategories.map((category) => [
       category.value,
-      { label: category.label, total: 0, con: 0, sin: 0, keywordCounts: {}, examples: [] }
+      { label: category.label, total: 0, con: 0, sin: 0, keywordCounts: {} }
     ])
   );
-  const supportExamples = [];
 
   for (const feature of features || []) {
     const category = String(feature?.properties?.clase || "").trim();
@@ -581,20 +591,6 @@ function renderBienesDashboards(features) {
       tramiteAnalysis.keywords.forEach((keyword) => {
         summary[category].keywordCounts[keyword] = (summary[category].keywordCounts[keyword] || 0) + 1;
       });
-
-      const example = {
-        id: feature?.properties?.id || "",
-        categoryLabel: summary[category].label,
-        title: getFeatureDisplayTitle(feature.properties),
-        labels: tramiteAnalysis.labels,
-        excerpt: tramiteAnalysis.excerpt,
-        matchedField: tramiteAnalysis.matchedField
-      };
-
-      if (summary[category].examples.length < 1) {
-        summary[category].examples.push(example);
-      }
-      supportExamples.push(example);
     } else {
       summary[category].sin += 1;
     }
@@ -667,43 +663,6 @@ function renderBienesDashboards(features) {
       </article>
     `;
   }).join("");
-
-  const categoryExamples = bienesCategories
-    .map((category) => summary[category.value].examples[0])
-    .filter(Boolean);
-  const examplePool = [...categoryExamples];
-
-  supportExamples.forEach((example) => {
-    if (examplePool.length >= 8) {
-      return;
-    }
-
-    const exists = examplePool.some((current) => current.id === example.id);
-    if (!exists) {
-      examplePool.push(example);
-    }
-  });
-
-  if (!examplePool.length) {
-    dashboardExamples.innerHTML = '<p class="dashboard-empty">No se detectaron referencias de tramite, resolucion o registro en las clasificaciones visibles.</p>';
-    requestAnimationFrame(updateSidebarScrollUi);
-    return;
-  }
-
-  dashboardExamples.innerHTML = examplePool.map((example) => `
-    <article class="dashboard-example">
-      <div class="dashboard-example-head">
-        <span class="dashboard-example-title">${escapeHtml(example.categoryLabel)}</span>
-        <span class="dashboard-example-id">ID ${escapeHtml(example.id || "s/d")}</span>
-      </div>
-      <div class="dashboard-tags">
-        ${example.labels.map((label) => `<span class="dashboard-tag">${escapeHtml(label)}</span>`).join("")}
-      </div>
-      <p class="dashboard-example-text"><strong>${escapeHtml(example.title)}</strong></p>
-      <p class="dashboard-example-text">${escapeHtml(example.excerpt || "Sin extracto disponible.")}</p>
-      <p class="dashboard-example-text">Campo detectado: ${escapeHtml(example.matchedField || "Referencia documental")}</p>
-    </article>
-  `).join("");
   populateRegistroModalCategories();
   updateRegistroModalLists();
   requestAnimationFrame(updateSidebarScrollUi);

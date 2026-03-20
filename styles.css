@@ -411,55 +411,6 @@ body {
   background: rgba(31, 41, 51, 0.04);
 }
 
-.dashboard-examples {
-  margin-top: 14px;
-  display: grid;
-  gap: 10px;
-}
-
-.dashboard-examples h3 {
-  margin: 0;
-  font-size: 0.92rem;
-}
-
-.dashboard-examples-list {
-  display: grid;
-  gap: 10px;
-}
-
-.dashboard-example {
-  padding: 12px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.74);
-  border: 1px solid rgba(31, 41, 51, 0.08);
-  display: grid;
-  gap: 8px;
-}
-
-.dashboard-example-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}
-
-.dashboard-example-title {
-  font-weight: 700;
-  color: var(--ink);
-}
-
-.dashboard-example-id {
-  color: var(--muted);
-  font-size: 0.8rem;
-}
-
-.dashboard-example-text {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.84rem;
-  line-height: 1.45;
-}
-
 .modal-shell {
   position: fixed;
   inset: 0;
