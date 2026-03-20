@@ -133,8 +133,8 @@ body::after {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: minmax(360px, 430px) 1fr;
-  min-height: 100vh;
+  grid-template-columns: minmax(320px, 380px) 1fr;
+  height: 100vh;
 }
 
 .sidebar {
@@ -872,15 +872,16 @@ body::after {
   position: relative;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  gap: 12px;
-  min-height: 100vh;
-  padding: 16px 16px 16px 12px;
+  gap: 10px;
+  min-height: 0;
+  height: 100vh;
+  padding: 12px 14px 12px 10px;
 }
 
 .map-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
-  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 260px);
+  gap: 10px;
   align-items: stretch;
 }
 
@@ -895,14 +896,14 @@ body::after {
 }
 
 .map-hero-copy {
-  padding: 14px 16px;
+  padding: 12px 14px;
 }
 
 .map-hud {
   display: grid;
-  align-content: start;
-  gap: 6px;
-  padding: 14px 16px;
+  align-content: center;
+  gap: 4px;
+  padding: 12px 14px;
 }
 
 .map-hero-copy::before,
@@ -917,23 +918,20 @@ body::after {
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 6px 10px;
+  padding: 5px 10px;
   border-radius: 999px;
   background: rgba(6, 20, 31, 0.72);
   border: 1px solid rgba(57, 208, 255, 0.16);
   color: var(--muted-strong);
   box-shadow: var(--shadow-soft);
   font-weight: 700;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .hero-governance {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
+  display: none;
 }
 
 .hero-governance-item {
@@ -949,10 +947,7 @@ body::after {
 }
 
 .hero-metrics {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  margin-top: 10px;
+  display: none;
 }
 
 .hero-metric {
@@ -993,30 +988,27 @@ body::after {
 }
 
 .map-hero h2 {
-  margin-top: 8px;
-  font-size: clamp(1.45rem, 1.9vw, 2.2rem);
-  line-height: 1.02;
+  margin-top: 6px;
+  font-size: clamp(1.15rem, 1.5vw, 1.65rem);
+  line-height: 1.04;
   text-shadow: 0 0 22px rgba(57, 208, 255, 0.1);
 }
 
 .map-hero p {
-  margin-top: 8px;
-  max-width: 62ch;
-  font-size: 0.82rem;
-  line-height: 1.45;
+  margin-top: 6px;
+  max-width: 54ch;
+  font-size: 0.76rem;
+  line-height: 1.4;
 }
 
 .map-message {
   display: block;
-  font-size: 0.84rem;
+  font-size: 0.78rem;
   line-height: 1.4;
 }
 
 .hud-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  margin-top: 6px;
+  display: none;
 }
 
 .hud-chip {
@@ -1156,8 +1148,8 @@ body::after {
 }
 
 .map-overlay-card {
-  max-width: min(360px, calc(50% - 6px));
-  padding: 14px 16px;
+  max-width: min(280px, calc(50% - 6px));
+  padding: 10px 12px;
   border-radius: 18px;
   border: 1px solid rgba(57, 208, 255, 0.16);
   background: rgba(6, 20, 31, 0.62);
@@ -1182,10 +1174,10 @@ body::after {
 }
 
 .map-overlay-card p {
-  margin: 8px 0 0;
+  margin: 6px 0 0;
   color: var(--muted);
-  font-size: 0.84rem;
-  line-height: 1.5;
+  font-size: 0.76rem;
+  line-height: 1.4;
 }
 
 .legend-item {
