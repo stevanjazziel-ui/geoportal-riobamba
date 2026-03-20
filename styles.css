@@ -1065,55 +1065,6 @@ body::after {
   z-index: 1;
 }
 
-.frame-corner {
-  position: absolute;
-  width: 38px;
-  height: 38px;
-  z-index: 4;
-  pointer-events: none;
-}
-
-.frame-corner::before,
-.frame-corner::after {
-  content: "";
-  position: absolute;
-  background: linear-gradient(180deg, rgba(137, 240, 255, 0.95), rgba(57, 208, 255, 0.7));
-  box-shadow: 0 0 14px rgba(57, 208, 255, 0.3);
-}
-
-.frame-corner::before {
-  width: 100%;
-  height: 2px;
-}
-
-.frame-corner::after {
-  width: 2px;
-  height: 100%;
-}
-
-.frame-corner-top-left {
-  top: 16px;
-  left: 16px;
-}
-
-.frame-corner-top-right {
-  top: 16px;
-  right: 16px;
-  transform: rotate(90deg);
-}
-
-.frame-corner-bottom-left {
-  bottom: 16px;
-  left: 16px;
-  transform: rotate(-90deg);
-}
-
-.frame-corner-bottom-right {
-  right: 16px;
-  bottom: 16px;
-  transform: rotate(180deg);
-}
-
 .map-scanline {
   position: absolute;
   left: 0;
@@ -1380,8 +1331,8 @@ body::after {
 
 .modal-column {
   min-height: 0;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 10px;
   overflow: hidden;
 }
@@ -1389,15 +1340,18 @@ body::after {
 .modal-column h3 {
   margin: 0;
   font-size: 0.95rem;
+  flex: 0 0 auto;
 }
 
 .modal-list {
-  min-height: 0;
-  height: 100%;
+  flex: 1 1 auto;
+  min-height: 240px;
   overflow: auto;
   padding-right: 6px;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 10px;
+  padding-bottom: 6px;
   overscroll-behavior: contain;
 }
 
@@ -1415,6 +1369,7 @@ body::after {
   gap: 8px;
   padding: 12px;
   cursor: pointer;
+  align-content: start;
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -1425,14 +1380,22 @@ body::after {
 }
 
 .modal-item-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
+  display: grid;
+  gap: 6px;
+  align-items: start;
 }
 
 .modal-item-title {
+  display: block;
   font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.28;
+}
+
+.modal-item-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
 }
 
 @media (max-width: 1180px) {
@@ -1618,11 +1581,6 @@ body::after {
   .hero-governance {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .frame-corner {
-    width: 28px;
-    height: 28px;
   }
 
   .modal-stats {
