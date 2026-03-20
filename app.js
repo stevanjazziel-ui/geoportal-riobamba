@@ -18,14 +18,14 @@ const dataSources = [
     name: "Catastro municipal",
     color: "#5b6770",
     fillColor: "rgba(91, 103, 112, 0)",
-    path: "./data/catastro_riobamba.geojson?v=20260320-12"
+    path: "./data/catastro_riobamba.geojson?v=20260320-13"
   },
   {
     id: "bienes",
     name: "Bienes municipales",
     color: "#b45309",
     fillColor: "rgba(180, 83, 9, 0.24)",
-    path: "./data/bienes_municipales.geojson?v=20260320-12"
+    path: "./data/bienes_municipales.geojson?v=20260320-13"
   }
 ];
 
@@ -97,7 +97,7 @@ const ignoredTramiteFields = new Set([
   "area_verif",
   "avaluo"
 ]);
-const documentSupportFields = new Set(["documento", "numero_reg"]);
+const documentSupportFields = new Set(["documento", "numero_reg", "ref"]);
 const tramiteKeywordPatterns = [
   { term: "tramite", label: "tramite" },
   { term: "resolucion", label: "resolucion" },
@@ -119,6 +119,7 @@ const tramiteKeywordPatterns = [
 const propertyLabelMap = {
   documento: "Documento",
   numero_reg: "Numero de registro",
+  ref: "REF",
   nombre: "Nombre",
   descr: "Descripcion",
   ubicacion: "Ubicacion",
