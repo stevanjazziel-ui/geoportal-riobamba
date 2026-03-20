@@ -1021,6 +1021,9 @@ function buildGeoJsonLayer(source, geojson) {
 
   const layer = L.geoJSON(geojson, {
     style: (feature) => getFeatureStyle(source, feature),
+    pointToLayer(feature, latlng) {
+      return L.circleMarker(latlng, getFeatureStyle(source, feature));
+    },
     onEachFeature(feature, featureLayer) {
       const baseStyle = getFeatureStyle(source, feature);
       featureLayer.__sourceId = source.id;
@@ -1068,14 +1071,22 @@ function buildGeoJsonLayer(source, geojson) {
   return layer;
 }
 
-function normalizeFeatures(features) {
+function normalizeFeatures(source, features) {
   return (features || []).filter((feature) => {
     const geometry = feature?.geometry;
     if (!geometry) {
       return false;
     }
 
-    return geometry.type === "Polygon" || geometry.type === "MultiPolygon";
+    if (geometry.type === "Polygon" || geometry.type === "MultiPolygon") {
+      return true;
+    }
+
+    if (source?.id === "bienes") {
+      return geometry.type === "Point" || geometry.type === "MultiPoint";
+    }
+
+    return false;
   });
 }
 
