@@ -106,8 +106,162 @@
 
         <section class="panel dashboard-panel">
           <h2>Dashboard de Tramites</h2>
-          <p class="helper-text">Se considera "con registro o tramite" cuando el bien tiene `Documento_` o `Numero_Reg`.</p>
-          <div id="dashboard-grid" class="dashboard-grid"></div>
+          <p class="helper-text">Cada tarjeta muestra total, cuántos tienen registro o tramite y cuántos no.</p>
+          <div id="dashboard-grid" class="dashboard-grid">
+            <article class="dashboard-card">
+              <span class="dashboard-title">Area Verde</span>
+              <div class="dashboard-metrics">
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Total</span>
+                  <strong id="dash-total-area-verde">0</strong>
+                </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Con registro o tramite</span>
+                  <strong id="dash-con-area-verde">0</strong>
+                </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Sin registro o tramite</span>
+                  <strong id="dash-sin-area-verde">0</strong>
+                </div>
+              </div>
+            </article>
+            <article class="dashboard-card">
+              <span class="dashboard-title">Bienes Municipales Rurales</span>
+              <div class="dashboard-metrics">
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Total</span>
+                  <strong id="dash-total-bienes-rurales">0</strong>
+                </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Con registro o tramite</span>
+                  <strong id="dash-con-bienes-rurales">0</strong>
+                </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Sin registro o tramite</span>
+                  <strong id="dash-sin-bienes-rurales">0</strong>
+                </div>
+              </div>
+            </article>
+            <article class="dashboard-card">
+              <span class="dashboard-title">Bienes Municipales Urbanos</span>
+              <div class="dashboard-metrics">
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Total</span>
+                  <strong id="dash-total-bienes-urbanos">0</strong>
+                </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Con registro o tramite</span>
+                  <strong id="dash-con-bienes-urbanos">0</strong>
+                </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Sin registro o tramite</span>
+                  <strong id="dash-sin-bienes-urbanos">0</strong>
+                </div>
+              </div>
+            </article>
+            <article class="dashboard-card">
+              <span class="dashboard-title">Comodato</span>
+              <div class="dashboard-metrics">
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Total</span>
+                  <strong id="dash-total-comodato">0</strong>
+                </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Con registro o tramite</span>
+                  <strong id="dash-con-comodato">0</strong>
+                </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Sin registro o tramite</span>
+                  <strong id="dash-sin-comodato">0</strong>
+                </div>
+              </div>
+            </article>
+            <article class="dashboard-card">
+              <span class="dashboard-title">Monstrencos Urbanos</span>
+              <div class="dashboard-metrics">
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Total</span>
+                  <strong id="dash-total-monstrencos-urbanos">0</strong>
+                </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Con registro o tramite</span>
+                  <strong id="dash-con-monstrencos-urbanos">0</strong>
+                </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Sin registro o tramite</span>
+                  <strong id="dash-sin-monstrencos-urbanos">0</strong>
+                </div>
+              </div>
+            </article>
+            <article class="dashboard-card">
+              <span class="dashboard-title">Mostrencos Rurales</span>
+              <div class="dashboard-metrics">
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Total</span>
+                  <strong id="dash-total-mostrencos-rurales">0</strong>
+                </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Con registro o tramite</span>
+                  <strong id="dash-con-mostrencos-rurales">0</strong>
+                </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Sin registro o tramite</span>
+                  <strong id="dash-sin-mostrencos-rurales">0</strong>
+                </div>
+              </div>
+            </article>
+            <article class="dashboard-card">
+              <span class="dashboard-title">Subdivisiones</span>
+              <div class="dashboard-metrics">
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Total</span>
+                  <strong id="dash-total-subdivisiones">0</strong>
+                </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Con registro o tramite</span>
+                  <strong id="dash-con-subdivisiones">0</strong>
+                </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Sin registro o tramite</span>
+                  <strong id="dash-sin-subdivisiones">0</strong>
+                </div>
+              </div>
+            </article>
+            <article class="dashboard-card">
+              <span class="dashboard-title">Urbanizaciones Rurales</span>
+              <div class="dashboard-metrics">
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Total</span>
+                  <strong id="dash-total-urbanizaciones-rurales">0</strong>
+                </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Con registro o tramite</span>
+                  <strong id="dash-con-urbanizaciones-rurales">0</strong>
+                </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Sin registro o tramite</span>
+                  <strong id="dash-sin-urbanizaciones-rurales">0</strong>
+                </div>
+              </div>
+            </article>
+            <article class="dashboard-card">
+              <span class="dashboard-title">Urbanizaciones Urbanas</span>
+              <div class="dashboard-metrics">
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Total</span>
+                  <strong id="dash-total-urbanizaciones-urbanas">0</strong>
+                </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Con registro o tramite</span>
+                  <strong id="dash-con-urbanizaciones-urbanas">0</strong>
+                </div>
+                <div class="dashboard-metric">
+                  <span class="dashboard-metric-label">Sin registro o tramite</span>
+                  <strong id="dash-sin-urbanizaciones-urbanas">0</strong>
+                </div>
+              </div>
+            </article>
+          </div>
         </section>
 
         <section class="panel details-panel">

@@ -48,15 +48,15 @@ const sidebarScrollThumb = document.getElementById("sidebar-scroll-thumb");
 const categoryCards = Array.from(document.querySelectorAll(".category-card"));
 const dashboardGrid = document.getElementById("dashboard-grid");
 const bienesCategories = [
-  { value: "Area Verde", label: "Area Verde", countId: "count-area-verde", color: "#15803d" },
-  { value: "Bienes Municipales Rurale", label: "Bienes Municipales Rurales", countId: "count-bienes-rurales", color: "#65a30d" },
-  { value: "Bienes Municipales Urbano", label: "Bienes Municipales Urbanos", countId: "count-bienes-urbanos", color: "#b45309" },
-  { value: "Comodato", label: "Comodato", countId: "count-comodato", color: "#7c3aed" },
-  { value: "Monstrencos_urbanos", label: "Monstrencos Urbanos", countId: "count-monstrencos-urbanos", color: "#ea580c" },
-  { value: "Mostrencos_Rurales", label: "Mostrencos Rurales", countId: "count-mostrencos-rurales", color: "#92400e" },
-  { value: "Subdivisiones", label: "Subdivisiones", countId: "count-subdivisiones", color: "#dc2626" },
-  { value: "Urbanizaciones Rurales", label: "Urbanizaciones Rurales", countId: "count-urbanizaciones-rurales", color: "#0f766e" },
-  { value: "Urbanizaciones Urbanas", label: "Urbanizaciones Urbanas", countId: "count-urbanizaciones-urbanas", color: "#0891b2" }
+  { value: "Area Verde", label: "Area Verde", countId: "count-area-verde", color: "#15803d", dashKey: "area-verde" },
+  { value: "Bienes Municipales Rurale", label: "Bienes Municipales Rurales", countId: "count-bienes-rurales", color: "#65a30d", dashKey: "bienes-rurales" },
+  { value: "Bienes Municipales Urbano", label: "Bienes Municipales Urbanos", countId: "count-bienes-urbanos", color: "#b45309", dashKey: "bienes-urbanos" },
+  { value: "Comodato", label: "Comodato", countId: "count-comodato", color: "#7c3aed", dashKey: "comodato" },
+  { value: "Monstrencos_urbanos", label: "Monstrencos Urbanos", countId: "count-monstrencos-urbanos", color: "#ea580c", dashKey: "monstrencos-urbanos" },
+  { value: "Mostrencos_Rurales", label: "Mostrencos Rurales", countId: "count-mostrencos-rurales", color: "#92400e", dashKey: "mostrencos-rurales" },
+  { value: "Subdivisiones", label: "Subdivisiones", countId: "count-subdivisiones", color: "#dc2626", dashKey: "subdivisiones" },
+  { value: "Urbanizaciones Rurales", label: "Urbanizaciones Rurales", countId: "count-urbanizaciones-rurales", color: "#0f766e", dashKey: "urbanizaciones-rurales" },
+  { value: "Urbanizaciones Urbanas", label: "Urbanizaciones Urbanas", countId: "count-urbanizaciones-urbanas", color: "#0891b2", dashKey: "urbanizaciones-urbanas" }
 ];
 const bienesCategoryCounters = Object.fromEntries(
   bienesCategories.map((category) => [category.value, document.getElementById(category.countId)])
@@ -333,30 +333,24 @@ function renderBienesDashboards(features) {
     }
   }
 
-  dashboardGrid.innerHTML = bienesCategories
-    .map((category) => {
-      const item = summary[category.value];
-      return `
-        <article class="dashboard-card">
-          <span class="dashboard-title">${escapeHtml(item.label)}</span>
-          <div class="dashboard-metrics">
-            <div class="dashboard-metric">
-              <span class="dashboard-metric-label">Total</span>
-              <strong>${item.total}</strong>
-            </div>
-            <div class="dashboard-metric">
-              <span class="dashboard-metric-label">Con registro o tramite</span>
-              <strong>${item.con}</strong>
-            </div>
-            <div class="dashboard-metric">
-              <span class="dashboard-metric-label">Sin registro o tramite</span>
-              <strong>${item.sin}</strong>
-            </div>
-          </div>
-        </article>
-      `;
-    })
-    .join("");
+  bienesCategories.forEach((category) => {
+    const item = summary[category.value];
+    const totalElement = document.getElementById(`dash-total-${category.dashKey}`);
+    const conElement = document.getElementById(`dash-con-${category.dashKey}`);
+    const sinElement = document.getElementById(`dash-sin-${category.dashKey}`);
+
+    if (totalElement) {
+      totalElement.textContent = String(item.total);
+    }
+
+    if (conElement) {
+      conElement.textContent = String(item.con);
+    }
+
+    if (sinElement) {
+      sinElement.textContent = String(item.sin);
+    }
+  });
 }
 
 function updateCategoryCardState() {
