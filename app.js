@@ -280,7 +280,7 @@ function renderModalRecord(record, withSupport) {
     : '<p class="modal-item-text">No se encontraron referencias de tramite, resolucion, registro o documento en los atributos revisados.</p>';
 
   return `
-    <article class="modal-item" data-record-id="${escapeHtml(record.id || "")}">
+    <article class="modal-item ${withSupport ? "modal-item-support" : "modal-item-empty"}" data-record-id="${escapeHtml(record.id || "")}">
       <div class="modal-item-head">
         <span class="modal-item-title">${escapeHtml(record.title)}</span>
         <div class="modal-item-meta-row">
