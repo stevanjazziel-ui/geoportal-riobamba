@@ -1369,6 +1369,14 @@ body::after {
   display: grid;
   gap: 8px;
   padding: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.modal-item:hover {
+  transform: translateY(-1px);
+  border-color: rgba(216, 164, 65, 0.34);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
 }
 
 .modal-item-head {

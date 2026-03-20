@@ -72,6 +72,7 @@ const bienesCategoryCounters = Object.fromEntries(
 let selectedLayer = null;
 const activeBienesCategories = new Set();
 const sourceLoadPromises = new Map();
+const bienesLayerIndex = new Map();
 let bienesSupportRecords = [];
 const numberFormatter = new Intl.NumberFormat("es-EC");
 const ignoredTramiteFields = new Set([
@@ -274,7 +275,7 @@ function renderModalRecord(record, withSupport) {
     : '<p class="modal-item-text">No se encontraron referencias de tramite, resolucion, registro o documento en los atributos revisados.</p>';
 
   return `
-    <article class="modal-item">
+    <article class="modal-item" data-record-id="${escapeHtml(record.id || "")}">
       <div class="modal-item-head">
         <span class="modal-item-title">${escapeHtml(record.title)}</span>
         <span class="modal-item-meta">${escapeHtml(record.categoryLabel)}</span>
@@ -353,6 +354,12 @@ function bindRegistroModal() {
       return;
     }
 
+    const recordCard = target.closest(".modal-item[data-record-id]");
+    if (recordCard) {
+      focusBienesRecord(recordCard.getAttribute("data-record-id"));
+      return;
+    }
+
     if (target.closest("#close-registro-modal") || target.closest("[data-close-modal='true']")) {
       closeRegistroModal();
     }
@@ -363,6 +370,65 @@ function bindRegistroModal() {
       closeRegistroModal();
     }
   });
+}
+
+function selectFeatureLayer(featureLayer) {
+  if (!featureLayer) {
+    return;
+  }
+
+  if (selectedLayer && selectedLayer !== featureLayer && selectedLayer.__baseStyle) {
+    selectedLayer.setStyle(selectedLayer.__baseStyle);
+  }
+
+  selectedLayer = featureLayer;
+  featureLayer.setStyle({
+    ...featureLayer.__highlightStyle,
+    fillColor: featureLayer.__baseStyle?.fillColor
+  });
+  if (featureLayer.bringToFront) {
+    featureLayer.bringToFront();
+  }
+  renderDetails(featureLayer.feature, featureLayer.__sourceName || "Capa");
+}
+
+function focusBienesRecord(recordId) {
+  const normalizedId = String(recordId || "").trim();
+  if (!normalizedId) {
+    return;
+  }
+
+  const bienesSource = layerState.get("bienes");
+  const featureLayer = bienesLayerIndex.get(normalizedId);
+  if (!bienesSource?.layer || !featureLayer) {
+    mapMessage.textContent = "No fue posible ubicar ese bien municipal en el mapa.";
+    return;
+  }
+
+  if (!map.hasLayer(bienesSource.layer)) {
+    bienesSource.layer.addTo(map);
+    toggleBienes.checked = true;
+  }
+
+  if (activeBienesCategories.size > 0) {
+    activeBienesCategories.clear();
+    updateCategoryCardState();
+    refreshBienesFilter();
+  }
+
+  selectFeatureLayer(featureLayer);
+
+  const bounds = featureLayer.getBounds ? featureLayer.getBounds() : null;
+  if (bounds?.isValid()) {
+    map.fitBounds(bounds.pad(0.8));
+  }
+
+  if (featureLayer.openPopup) {
+    featureLayer.openPopup();
+  }
+
+  closeRegistroModal();
+  mapMessage.textContent = `Ubicando bien municipal ${normalizedId}.`;
 }
 
 function renderDetails(feature, layerName) {
@@ -792,28 +858,29 @@ function buildGeoJsonLayer(source, geojson) {
     opacity: 1
   };
 
+  if (source.id === "bienes") {
+    bienesLayerIndex.clear();
+  }
+
   const layer = L.geoJSON(geojson, {
     style: (feature) => getFeatureStyle(source, feature),
     onEachFeature(feature, featureLayer) {
       const baseStyle = getFeatureStyle(source, feature);
       featureLayer.__sourceId = source.id;
+      featureLayer.__sourceName = source.name;
       featureLayer.__searchText = getFeatureText(feature.properties);
       featureLayer.__baseStyle = baseStyle;
       featureLayer.__dimmedStyle = getDimmedStyle(baseStyle);
       featureLayer.__hiddenStyle = getHiddenStyle(baseStyle);
-      featureLayer.on("click", () => {
-        if (selectedLayer && selectedLayer !== featureLayer) {
-          if (selectedLayer.__baseStyle) {
-            selectedLayer.setStyle(selectedLayer.__baseStyle);
-          }
-        }
+      featureLayer.__highlightStyle = highlightStyle;
 
-        selectedLayer = featureLayer;
-        featureLayer.setStyle({
-          ...highlightStyle,
-          fillColor: baseStyle.fillColor
-        });
-        renderDetails(feature, source.name);
+      const featureId = String(feature?.properties?.id || "").trim();
+      if (source.id === "bienes" && featureId) {
+        bienesLayerIndex.set(featureId, featureLayer);
+      }
+
+      featureLayer.on("click", () => {
+        selectFeatureLayer(featureLayer);
       });
 
       const entries = collectPropertyEntries(feature.properties);
