@@ -1272,7 +1272,7 @@ body::after {
   position: relative;
   z-index: 1;
   width: min(1180px, 100%);
-  max-height: min(88vh, 920px);
+  height: min(88vh, 920px);
   padding: 22px;
   border-radius: 28px;
   background: linear-gradient(180deg, rgba(10, 30, 45, 0.98), rgba(6, 20, 31, 0.98));
@@ -1362,6 +1362,7 @@ body::after {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
   align-items: stretch;
+  overflow: hidden;
 }
 
 .modal-grid.show-con {
@@ -1382,6 +1383,7 @@ body::after {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   gap: 10px;
+  overflow: hidden;
 }
 
 .modal-column h3 {
@@ -1391,6 +1393,7 @@ body::after {
 
 .modal-list {
   min-height: 0;
+  height: 100%;
   overflow: auto;
   padding-right: 6px;
   display: grid;
@@ -1541,7 +1544,7 @@ body::after {
   }
 
   .modal-card {
-    max-height: 94vh;
+    height: 94vh;
     padding: 18px;
   }
 

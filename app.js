@@ -57,6 +57,7 @@ const modalCountCon = document.getElementById("modal-count-con");
 const modalCountSin = document.getElementById("modal-count-sin");
 const modalListCon = document.getElementById("modal-list-con");
 const modalListSin = document.getElementById("modal-list-sin");
+const modalViewButtons = Array.from(document.querySelectorAll(".modal-view-button"));
 const bienesCategories = [
   { value: "Area Verde", label: "Area Verde", countId: "count-area-verde", color: "#15803d", dashKey: "area-verde" },
   { value: "Bienes Municipales Rurale", label: "Bienes Municipales Rurales", countId: "count-bienes-rurales", color: "#65a30d", dashKey: "bienes-rurales" },
@@ -317,7 +318,7 @@ function updateRegistroModalLists() {
 }
 
 function updateRegistroModalViewButtons() {
-  document.querySelectorAll(".modal-view-button").forEach((button) => {
+  modalViewButtons.forEach((button) => {
     const isActive = button.dataset.modalView === registroModalView;
     button.classList.toggle("is-active", isActive);
     button.setAttribute("aria-pressed", isActive ? "true" : "false");
@@ -357,6 +358,13 @@ function bindRegistroModal() {
 
   bindRegistroModal.bound = true;
   registroModalCategory.addEventListener("change", updateRegistroModalLists);
+  modalViewButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      registroModalView = button.dataset.modalView || "both";
+      updateRegistroModalViewButtons();
+      updateRegistroModalLists();
+    });
+  });
   document.addEventListener("click", (event) => {
     const target = event.target;
     if (!(target instanceof Element)) {
@@ -365,14 +373,6 @@ function bindRegistroModal() {
 
     if (target.closest("#open-registro-modal")) {
       openRegistroModal();
-      return;
-    }
-
-    const viewButton = target.closest(".modal-view-button[data-modal-view]");
-    if (viewButton) {
-      registroModalView = viewButton.getAttribute("data-modal-view") || "both";
-      updateRegistroModalViewButtons();
-      updateRegistroModalLists();
       return;
     }
 
