@@ -53,6 +53,8 @@ const registroModal = document.getElementById("registro-modal");
 const closeRegistroModalButton = document.getElementById("close-registro-modal");
 const registroModalCategory = document.getElementById("registro-modal-category");
 const modalGrid = document.getElementById("modal-grid");
+const modalColumnCon = document.getElementById("modal-column-con");
+const modalColumnSin = document.getElementById("modal-column-sin");
 const modalCountCon = document.getElementById("modal-count-con");
 const modalCountSin = document.getElementById("modal-count-sin");
 const modalListCon = document.getElementById("modal-list-con");
@@ -281,8 +283,10 @@ function renderModalRecord(record, withSupport) {
     <article class="modal-item" data-record-id="${escapeHtml(record.id || "")}">
       <div class="modal-item-head">
         <span class="modal-item-title">${escapeHtml(record.title)}</span>
-        <span class="modal-item-meta">${escapeHtml(record.categoryLabel)}</span>
-        <span class="modal-item-meta">ID ${escapeHtml(record.id || "s/d")}</span>
+        <div class="modal-item-meta-row">
+          <span class="modal-item-meta">${escapeHtml(record.categoryLabel)}</span>
+          <span class="modal-item-meta">ID ${escapeHtml(record.id || "s/d")}</span>
+        </div>
       </div>
       ${supportMarkup}
     </article>
@@ -290,7 +294,7 @@ function renderModalRecord(record, withSupport) {
 }
 
 function updateRegistroModalLists() {
-  if (!registroModalCategory || !modalCountCon || !modalCountSin || !modalListCon || !modalListSin || !modalGrid) {
+  if (!registroModalCategory || !modalCountCon || !modalCountSin || !modalListCon || !modalListSin || !modalGrid || !modalColumnCon || !modalColumnSin) {
     return;
   }
 
@@ -315,6 +319,10 @@ function updateRegistroModalLists() {
 
   modalGrid.classList.toggle("show-con", registroModalView === "con");
   modalGrid.classList.toggle("show-sin", registroModalView === "sin");
+  modalColumnCon.hidden = registroModalView === "sin";
+  modalColumnSin.hidden = registroModalView === "con";
+  modalListCon.scrollTop = 0;
+  modalListSin.scrollTop = 0;
 }
 
 function updateRegistroModalViewButtons() {
