@@ -600,8 +600,8 @@ function resetSelectedLayerIfHidden(layer, styleKind) {
 }
 
 function getFeatureText(properties) {
-  return Object.values(properties || {})
-    .filter((value) => value !== null && value !== undefined)
+  return [properties?.numero_reg, properties?.ref]
+    .filter((value) => value !== null && value !== undefined && String(value).trim() !== "")
     .join(" ")
     .toLowerCase();
 }
