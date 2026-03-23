@@ -1177,8 +1177,8 @@ function getFeatureStyle(source, feature) {
 
   const color = getBienesColor(feature?.properties?.clase);
   const hasSupport = hasCertificadoGravamen(feature?.properties);
-  const noSupportStroke = "#dbeafe";
-  const noSupportFill = mixHexColors(color, "#f8fafc", 0.35);
+  const noSupportStroke = mixHexColors(color, "#94a3b8", 0.42);
+  const noSupportFill = mixHexColors(color, "#cbd5e1", 0.22);
   const geometryType = feature?.geometry?.type || "";
   if (geometryType === "Point" || geometryType === "MultiPoint") {
     if (hasSupport) {
