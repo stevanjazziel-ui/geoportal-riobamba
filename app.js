@@ -3,10 +3,15 @@
   preferCanvas: true
 });
 
+const maxSatelliteZoom = 18;
+
+map.options.maxZoom = maxSatelliteZoom;
+
 L.control.zoom({ position: "topright" }).addTo(map);
 
 L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
-  maxZoom: 20,
+  maxZoom: maxSatelliteZoom,
+  maxNativeZoom: maxSatelliteZoom,
   attribution: "Tiles &copy; Esri"
 }).addTo(map);
 
