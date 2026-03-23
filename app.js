@@ -283,12 +283,8 @@ function getSupportSummary(tramiteAnalysis) {
 }
 
 function hasCertificadoGravamen(properties) {
-  const text = [properties?.numero_reg, properties?.documento]
-    .filter((value) => value !== null && value !== undefined && String(value).trim() !== "")
-    .join(" ")
-    .toLowerCase();
-
-  return /certificado|cetificado|gravamen/.test(text);
+  return [properties?.numero_reg, properties?.ref]
+    .some((value) => value !== null && value !== undefined && String(value).trim() !== "");
 }
 
 function sortRecords(records) {
