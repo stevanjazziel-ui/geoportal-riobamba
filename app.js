@@ -927,12 +927,13 @@ function renderBienesDashboards(features) {
       return `
         <button class="dashboard-summary-item" type="button" data-category="${escapeHtml(category.value)}" aria-pressed="false">
           <span class="dashboard-summary-title">${escapeHtml(item.label)}</span>
-          <p class="dashboard-summary-text">
+          <span class="dashboard-summary-text">
             Con certificado de gravamen ${formatNumber(item.gravamenCon)} y sin certificado de gravamen ${formatNumber(item.gravamenSin)}.
-          </p>
+          </span>
         </button>
       `;
     }).join("");
+    bindDashboardSummaryActions();
     updateDashboardSummaryState();
   }
 
@@ -1009,6 +1010,19 @@ function updateDashboardSummaryState() {
     const isActive = activeBienesCategories.size === 1 && activeBienesCategories.has(item.dataset.category);
     item.classList.toggle("is-active", isActive);
     item.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
+}
+
+function bindDashboardSummaryActions() {
+  if (!dashboardSummaryList) {
+    return;
+  }
+
+  const summaryItems = Array.from(dashboardSummaryList.querySelectorAll(".dashboard-summary-item"));
+  summaryItems.forEach((item) => {
+    item.onclick = async () => {
+      await focusBienesCategory(item.dataset.category);
+    };
   });
 }
 
