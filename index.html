@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://tile.openstreetmap.org">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="./styles.css?v=20260323-2">
+  <link rel="stylesheet" href="./styles.css?v=20260323-3">
 </head>
 <body>
   <div class="app-shell">
@@ -63,10 +63,10 @@
         <section class="panel dashboard-panel">
           <div class="panel-heading">
             <p class="panel-kicker">Control documental</p>
-            <h2>Dashboard de tramites</h2>
+            <h2>Dashboard de respaldo</h2>
           </div>
-          <p class="helper-text">Cada anillo compara bienes con respaldo documental frente a bienes sin respaldo.</p>
-          <p id="dashboard-note" class="dashboard-note">Revisando toda la base en busca de tramites, resoluciones, registros y documentos de respaldo.</p>
+          <p class="helper-text">Cada anillo compara bienes con numero de registro o REF frente a bienes sin esos datos.</p>
+          <p id="dashboard-note" class="dashboard-note">Revisando numero de registro y REF para identificar bienes con respaldo.</p>
           <button id="open-registro-modal" class="button secondary dashboard-open-button" type="button">Ver ventana de registros</button>
           <div id="dashboard-grid" class="dashboard-grid">
             <p class="dashboard-empty">Calculando dashboard...</p>
@@ -170,7 +170,7 @@
         <div class="map-hero-copy">
           <span class="badge">Riobamba - GeoSIG</span>
           <h2>Exploracion territorial municipal</h2>
-          <p>Visualizacion operativa para consulta catastral, bienes y respaldo documental en una sola interfaz.</p>
+          <p>Visualizacion operativa para consulta catastral, bienes y respaldo por numero de registro o REF en una sola interfaz.</p>
           <div class="hero-metrics" aria-label="Resumen operativo del visor">
             <article class="hero-metric">
               <span class="hero-metric-label">Capas activas</span>
@@ -231,7 +231,7 @@
       <div class="modal-header">
         <div>
           <h2 id="registro-modal-title">Ventana de Registros</h2>
-          <p class="modal-subtitle">Listado de bienes con respaldo documental y bienes sin respaldo segun la revision actual.</p>
+          <p class="modal-subtitle">Listado de bienes con numero de registro o REF y bienes sin esos datos segun la revision actual.</p>
         </div>
         <button id="close-registro-modal" class="button ghost modal-close" type="button">Cerrar</button>
       </div>
@@ -276,7 +276,7 @@
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="./app.js?v=20260323-2"></script>
+  <script src="./app.js?v=20260323-3"></script>
 </body>
 </html>
 

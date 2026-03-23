@@ -97,25 +97,7 @@ const ignoredTramiteFields = new Set([
   "area_verif",
   "avaluo"
 ]);
-const documentSupportFields = new Set(["documento", "numero_reg", "ref"]);
-const tramiteKeywordPatterns = [
-  { term: "tramite", label: "tramite" },
-  { term: "resolucion", label: "resolucion" },
-  { term: "registro", label: "registro" },
-  { term: "registr", label: "registro" },
-  { term: "certificado", label: "certificado" },
-  { term: "ordenanza", label: "ordenanza" },
-  { term: "escritura", label: "escritura" },
-  { term: "inscrip", label: "inscripcion" },
-  { term: "acuerdo", label: "acuerdo" },
-  { term: "convenio", label: "convenio" },
-  { term: "minuta", label: "minuta" },
-  { term: "protocol", label: "protocolizacion" },
-  { term: "sentencia", label: "sentencia" },
-  { term: "adjudic", label: "adjudicacion" },
-  { term: "legaliz", label: "legalizacion" },
-  { term: "regulariz", label: "regularizacion" }
-];
+const documentSupportFields = new Set(["numero_reg", "ref"]);
 const propertyLabelMap = {
   documento: "Documento",
   numero_reg: "Numero de registro",
@@ -215,7 +197,6 @@ function buildExcerpt(value) {
 
 function analyzeTramiteSupport(properties) {
   const labels = new Set();
-  const keywords = new Set();
   const fieldMatches = [];
 
   Object.entries(properties || {}).forEach(([key, rawValue]) => {
@@ -230,27 +211,17 @@ function analyzeTramiteSupport(properties) {
 
     const normalizedValue = normalizeText(value);
     const fieldLabel = getPropertyLabel(key);
-    const matchedKeywords = [];
-
     if (documentSupportFields.has(key)) {
       labels.add(fieldLabel);
     }
 
-    tramiteKeywordPatterns.forEach((pattern) => {
-      if (normalizedValue.includes(pattern.term)) {
-        matchedKeywords.push(pattern.label);
-        keywords.add(pattern.label);
-        labels.add(pattern.label);
-      }
-    });
-
-    if (documentSupportFields.has(key) || matchedKeywords.length > 0) {
+    if (documentSupportFields.has(key)) {
       fieldMatches.push({
         field: key,
         fieldLabel,
         value,
         excerpt: buildExcerpt(value),
-        matchedKeywords: Array.from(new Set(matchedKeywords))
+        matchedKeywords: []
       });
     }
   });
@@ -260,7 +231,7 @@ function analyzeTramiteSupport(properties) {
   return {
     hasSupport: labels.size > 0,
     labels: Array.from(labels),
-    keywords: Array.from(keywords),
+    keywords: Array.from(labels),
     fieldsSummary: fieldMatches.map((match) => `${match.fieldLabel}: ${buildExcerpt(match.value)}`).join(" | "),
     fieldMatches,
     matchedField: excerptSource?.fieldLabel || "",
@@ -297,12 +268,12 @@ function getFeatureDescription(properties) {
 
 function getSupportSummary(tramiteAnalysis) {
   if (!tramiteAnalysis?.hasSupport) {
-    return "No se detectaron referencias de registro, documentacion, tramite o resolucion.";
+    return "No tiene numero de registro ni referencia.";
   }
 
   const labels = tramiteAnalysis.labels?.length
     ? tramiteAnalysis.labels.join(", ")
-    : "Con respaldo detectado";
+    : "Numero de registro o REF";
   return `Si. Detectado en: ${labels}.`;
 }
 
@@ -810,7 +781,7 @@ function renderBienesDashboards(features) {
   );
 
   if (dashboardNote) {
-    dashboardNote.textContent = `${formatNumber(totalConRespaldo)} bienes muestran senales documentales al revisar campos como documento, numero de registro, nombre, institucion y fuente.`;
+    dashboardNote.textContent = `${formatNumber(totalConRespaldo)} bienes tienen respaldo porque cuentan con numero de registro o REF.`;
   }
 
   dashboardGrid.innerHTML = bienesCategories.map((category) => {
@@ -837,7 +808,7 @@ function renderBienesDashboards(features) {
           </div>
           <div class="dashboard-copy">
             <span class="dashboard-title">${escapeHtml(item.label)}</span>
-            <p class="dashboard-copy-text">${formatNumber(item.con)} de ${formatNumber(item.total)} bienes muestran senales de tramite, resolucion, registro o documento de respaldo.</p>
+            <p class="dashboard-copy-text">${formatNumber(item.con)} de ${formatNumber(item.total)} bienes cuentan con numero de registro o REF.</p>
           </div>
         </div>
         <div class="dashboard-metrics">
@@ -855,7 +826,7 @@ function renderBienesDashboards(features) {
           </div>
         </div>
         <div class="dashboard-tags">
-          ${topSignals || '<span class="dashboard-tag is-muted">Sin palabras clave detectadas</span>'}
+          ${topSignals || '<span class="dashboard-tag is-muted">Sin registro o REF</span>'}
         </div>
       </article>
     `;
