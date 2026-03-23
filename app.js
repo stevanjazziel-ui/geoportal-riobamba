@@ -61,6 +61,7 @@ const sidebarScrollThumb = document.getElementById("sidebar-scroll-thumb");
 const categoryCards = Array.from(document.querySelectorAll(".category-card"));
 const dashboardGrid = document.getElementById("dashboard-grid");
 const dashboardNote = document.getElementById("dashboard-note");
+const dashboardSummaryList = document.getElementById("dashboard-summary-list");
 const openRegistroModalButton = document.getElementById("open-registro-modal");
 const registroModal = document.getElementById("registro-modal");
 const closeRegistroModalButton = document.getElementById("close-registro-modal");
@@ -918,6 +919,20 @@ function renderBienesDashboards(features) {
 
   if (dashboardNote) {
     dashboardNote.textContent = `${formatNumber(totalConRespaldo)} bienes tienen respaldo porque cuentan con numero de registro o REF.`;
+  }
+
+  if (dashboardSummaryList) {
+    dashboardSummaryList.innerHTML = bienesCategories.map((category) => {
+      const item = summary[category.value];
+      return `
+        <article class="dashboard-summary-item">
+          <span class="dashboard-summary-title">${escapeHtml(item.label)}</span>
+          <p class="dashboard-summary-text">
+            Con certificado de gravamen ${formatNumber(item.gravamenCon)} y sin certificado de gravamen ${formatNumber(item.gravamenSin)}.
+          </p>
+        </article>
+      `;
+    }).join("");
   }
 
   dashboardGrid.innerHTML = bienesCategories.map((category) => {
