@@ -925,14 +925,15 @@ function renderBienesDashboards(features) {
     dashboardSummaryList.innerHTML = bienesCategories.map((category) => {
       const item = summary[category.value];
       return `
-        <article class="dashboard-summary-item">
+        <button class="dashboard-summary-item" type="button" data-category="${escapeHtml(category.value)}" aria-pressed="false">
           <span class="dashboard-summary-title">${escapeHtml(item.label)}</span>
           <p class="dashboard-summary-text">
             Con certificado de gravamen ${formatNumber(item.gravamenCon)} y sin certificado de gravamen ${formatNumber(item.gravamenSin)}.
           </p>
-        </article>
+        </button>
       `;
     }).join("");
+    updateDashboardSummaryState();
   }
 
   dashboardGrid.innerHTML = bienesCategories.map((category) => {
@@ -994,6 +995,21 @@ function updateCategoryCardState() {
     card.classList.toggle("is-active", isActive);
     card.setAttribute("aria-pressed", isActive ? "true" : "false");
   });
+
+  updateDashboardSummaryState();
+}
+
+function updateDashboardSummaryState() {
+  if (!dashboardSummaryList) {
+    return;
+  }
+
+  const summaryItems = Array.from(dashboardSummaryList.querySelectorAll(".dashboard-summary-item"));
+  summaryItems.forEach((item) => {
+    const isActive = activeBienesCategories.size === 1 && activeBienesCategories.has(item.dataset.category);
+    item.classList.toggle("is-active", isActive);
+    item.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
 }
 
 function getLayerStyleKind(sourceId, layer, query) {
@@ -1050,6 +1066,45 @@ function refreshBienesFilter() {
 
   updateCategoryCardState();
   updateSearch();
+}
+
+async function ensureBienesLayerVisible() {
+  if (toggleBienes.checked) {
+    return true;
+  }
+
+  toggleBienes.checked = true;
+  mapMessage.textContent = "Cargando bienes municipales...";
+  try {
+    await ensureSourceLoaded("bienes");
+    const source = layerState.get("bienes");
+    if (source) {
+      source.layer.addTo(map);
+      statBienes.textContent = String(source.featureCount || 0);
+    }
+    return true;
+  } catch (error) {
+    console.error("bienes", error);
+    toggleBienes.checked = false;
+    activeBienesCategories.clear();
+    updateCategoryCardState();
+    mapMessage.textContent = "No se pudieron cargar los bienes municipales.";
+    return false;
+  }
+}
+
+async function focusBienesCategory(category) {
+  activeBienesCategories.clear();
+  activeBienesCategories.add(category);
+  updateCategoryCardState();
+
+  const isReady = await ensureBienesLayerVisible();
+  if (!isReady) {
+    return;
+  }
+
+  refreshBienesFilter();
+  fitFilteredBienesBounds();
 }
 
 function getBienesColor(category) {
@@ -1370,24 +1425,8 @@ function bindLayerToggles() {
       }
       updateCategoryCardState();
 
-      if (!toggleBienes.checked) {
-        toggleBienes.checked = true;
-        mapMessage.textContent = "Cargando bienes municipales...";
-        try {
-          await ensureSourceLoaded("bienes");
-          const source = layerState.get("bienes");
-          if (source) {
-            source.layer.addTo(map);
-            statBienes.textContent = String(source.featureCount || 0);
-          }
-        } catch (error) {
-          console.error("bienes", error);
-          toggleBienes.checked = false;
-          activeBienesCategories.clear();
-          updateCategoryCardState();
-          mapMessage.textContent = "No se pudieron cargar los bienes municipales.";
-          return;
-        }
+      if (!(await ensureBienesLayerVisible())) {
+        return;
       }
 
       refreshBienesFilter();
@@ -1397,6 +1436,15 @@ function bindLayerToggles() {
         fitAllLayers();
       }
     });
+  });
+
+  dashboardSummaryList?.addEventListener("click", async (event) => {
+    const summaryItem = event.target.closest(".dashboard-summary-item");
+    if (!summaryItem) {
+      return;
+    }
+
+    await focusBienesCategory(summaryItem.dataset.category);
   });
 }
 

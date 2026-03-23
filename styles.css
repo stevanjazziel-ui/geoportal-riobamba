@@ -590,10 +590,27 @@ body::after {
 }
 
 .dashboard-summary-item {
+  display: block;
+  width: 100%;
   padding: 12px 14px;
   border-radius: 14px;
   border: 1px solid rgba(57, 208, 255, 0.12);
   background: rgba(6, 20, 31, 0.56);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.dashboard-summary-item:hover {
+  border-color: rgba(137, 240, 255, 0.24);
+  transform: translateY(-1px);
+}
+
+.dashboard-summary-item.is-active {
+  border-color: rgba(216, 164, 65, 0.38);
+  background: linear-gradient(180deg, rgba(18, 60, 86, 0.88), rgba(8, 24, 37, 0.94));
+  box-shadow: 0 0 0 1px rgba(216, 164, 65, 0.12), 0 14px 28px rgba(57, 208, 255, 0.08);
 }
 
 .dashboard-summary-title {
