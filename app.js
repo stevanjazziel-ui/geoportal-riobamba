@@ -87,6 +87,7 @@ const bienesCategoryCounters = Object.fromEntries(
 );
 
 let selectedLayer = null;
+let sidebarScrollDragState = null;
 const activeBienesCategories = new Set();
 const sourceLoadPromises = new Map();
 const bienesLayerIndex = new Map();
@@ -691,6 +692,73 @@ function updateSidebarScrollUi() {
   sidebarScrollDown.disabled = sidebar.scrollTop >= scrollRange - 1;
 }
 
+function getSidebarScrollMetrics() {
+  if (!sidebar || !sidebarScrollThumb) {
+    return null;
+  }
+
+  const track = sidebarScrollThumb.parentElement;
+  if (!track) {
+    return null;
+  }
+
+  const scrollRange = Math.max(0, sidebar.scrollHeight - sidebar.clientHeight);
+  const trackHeight = track.clientHeight;
+  const thumbHeight = Math.max(48, (sidebar.clientHeight / sidebar.scrollHeight) * trackHeight);
+  const maxThumbTravel = Math.max(0, trackHeight - thumbHeight);
+
+  return {
+    track,
+    trackHeight,
+    scrollRange,
+    thumbHeight,
+    maxThumbTravel
+  };
+}
+
+function setSidebarScrollFromThumbOffset(thumbOffset) {
+  const metrics = getSidebarScrollMetrics();
+  if (!metrics || !sidebar) {
+    return;
+  }
+
+  if (metrics.scrollRange <= 0 || metrics.maxThumbTravel <= 0) {
+    sidebar.scrollTop = 0;
+    updateSidebarScrollUi();
+    return;
+  }
+
+  const clampedOffset = Math.max(0, Math.min(metrics.maxThumbTravel, thumbOffset));
+  const progress = clampedOffset / metrics.maxThumbTravel;
+  sidebar.scrollTop = progress * metrics.scrollRange;
+  updateSidebarScrollUi();
+}
+
+function handleSidebarThumbPointerMove(event) {
+  if (!sidebarScrollDragState) {
+    return;
+  }
+
+  event.preventDefault();
+  const metrics = getSidebarScrollMetrics();
+  if (!metrics) {
+    return;
+  }
+
+  const trackRect = metrics.track.getBoundingClientRect();
+  const thumbOffset = event.clientY - trackRect.top - sidebarScrollDragState.pointerOffset;
+  setSidebarScrollFromThumbOffset(thumbOffset);
+}
+
+function stopSidebarThumbPointerDrag() {
+  if (!sidebarScrollDragState || !sidebarScrollThumb) {
+    return;
+  }
+
+  sidebarScrollDragState = null;
+  sidebarScrollThumb.classList.remove("is-dragging");
+}
+
 function scrollSidebarBy(amount) {
   if (!sidebar) {
     return;
@@ -703,14 +771,41 @@ function scrollSidebarBy(amount) {
 }
 
 function bindSidebarScrollUi() {
-  if (!sidebar || !sidebarScrollUp || !sidebarScrollDown) {
+  if (!sidebar || !sidebarScrollUp || !sidebarScrollDown || !sidebarScrollThumb) {
     return;
   }
 
+  const track = sidebarScrollThumb.parentElement;
   sidebar.addEventListener("scroll", updateSidebarScrollUi);
   window.addEventListener("resize", updateSidebarScrollUi);
   sidebarScrollUp.addEventListener("click", () => scrollSidebarBy(-220));
   sidebarScrollDown.addEventListener("click", () => scrollSidebarBy(220));
+  track?.addEventListener("pointerdown", (event) => {
+    if (event.target === sidebarScrollThumb) {
+      return;
+    }
+
+    const metrics = getSidebarScrollMetrics();
+    if (!metrics) {
+      return;
+    }
+
+    const trackRect = metrics.track.getBoundingClientRect();
+    const thumbOffset = event.clientY - trackRect.top - metrics.thumbHeight / 2;
+    setSidebarScrollFromThumbOffset(thumbOffset);
+  });
+  sidebarScrollThumb.addEventListener("pointerdown", (event) => {
+    const thumbRect = sidebarScrollThumb.getBoundingClientRect();
+    sidebarScrollDragState = {
+      pointerOffset: event.clientY - thumbRect.top
+    };
+    sidebarScrollThumb.classList.add("is-dragging");
+    event.preventDefault();
+    event.stopPropagation();
+  });
+  window.addEventListener("pointermove", handleSidebarThumbPointerMove);
+  window.addEventListener("pointerup", stopSidebarThumbPointerDrag);
+  window.addEventListener("pointercancel", stopSidebarThumbPointerDrag);
   updateSidebarScrollUi();
 }
 
