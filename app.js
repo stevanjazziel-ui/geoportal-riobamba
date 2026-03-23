@@ -998,47 +998,48 @@ function getFeatureStyle(source, feature) {
 
   const color = getBienesColor(feature?.properties?.clase);
   const hasSupport = hasCertificadoGravamen(feature?.properties);
-  const mutedColor = mixHexColors(color, "#f8fafc", 0.52);
+  const noSupportStroke = "#dbeafe";
+  const noSupportFill = mixHexColors(color, "#f8fafc", 0.35);
   const geometryType = feature?.geometry?.type || "";
   if (geometryType === "Point" || geometryType === "MultiPoint") {
     if (hasSupport) {
       return {
-        radius: 6.6,
-        color,
-        weight: 2.2,
+        radius: 7.4,
+        color: "#f8fafc",
+        weight: 2.1,
         fillColor: color,
-        fillOpacity: 0.5,
+        fillOpacity: 0.9,
         opacity: 1
       };
     }
 
     return {
-      radius: 5.2,
-      color: mutedColor,
-      weight: 1.8,
-      fillColor: mutedColor,
-      fillOpacity: 0.14,
-      opacity: 0.82
+      radius: 5.4,
+      color: noSupportStroke,
+      weight: 2.1,
+      fillColor: noSupportFill,
+      fillOpacity: 0.24,
+      opacity: 0.98
     };
   }
 
   if (hasSupport) {
     return {
       color,
-      weight: 2.35,
+      weight: 3.2,
       fillColor: color,
-      fillOpacity: 0,
-      opacity: 0.98
+      fillOpacity: 0.16,
+      opacity: 1
     };
   }
 
   return {
-    color: mutedColor,
-    weight: 1.5,
-    fillColor: mutedColor,
-    fillOpacity: 0,
-    opacity: 0.68,
-    dashArray: "6 4"
+    color: noSupportStroke,
+    weight: 2.2,
+    fillColor: noSupportFill,
+    fillOpacity: 0.04,
+    opacity: 0.98,
+    dashArray: "4 8"
   };
 }
 
