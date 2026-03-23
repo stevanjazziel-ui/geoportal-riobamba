@@ -834,14 +834,6 @@ function renderBienesDashboards(features) {
             <strong>${formatNumber(item.total)}</strong>
           </div>
           <div class="dashboard-metric">
-            <span class="dashboard-metric-label">Con respaldo</span>
-            <strong>${formatNumber(item.con)}</strong>
-          </div>
-          <div class="dashboard-metric">
-            <span class="dashboard-metric-label">Sin respaldo</span>
-            <strong>${formatNumber(item.sin)}</strong>
-          </div>
-          <div class="dashboard-metric">
             <span class="dashboard-metric-label">Con cert. gravamen</span>
             <strong>${formatNumber(item.gravamenCon)}</strong>
           </div>
