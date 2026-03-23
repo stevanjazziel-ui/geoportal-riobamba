@@ -956,6 +956,35 @@ function getBienesColor(category) {
   return bienesFallbackPalette[hash % bienesFallbackPalette.length];
 }
 
+function hexToRgb(hex) {
+  const sanitized = String(hex || "").trim().replace("#", "");
+  if (!/^[0-9a-fA-F]{6}$/.test(sanitized)) {
+    return null;
+  }
+
+  return {
+    red: Number.parseInt(sanitized.slice(0, 2), 16),
+    green: Number.parseInt(sanitized.slice(2, 4), 16),
+    blue: Number.parseInt(sanitized.slice(4, 6), 16)
+  };
+}
+
+function mixHexColors(baseHex, targetHex, ratio) {
+  const baseRgb = hexToRgb(baseHex);
+  const targetRgb = hexToRgb(targetHex);
+  if (!baseRgb || !targetRgb) {
+    return baseHex;
+  }
+
+  const mixRatio = Math.max(0, Math.min(1, ratio));
+  const channels = ["red", "green", "blue"].map((channel) => {
+    const value = Math.round(baseRgb[channel] + (targetRgb[channel] - baseRgb[channel]) * mixRatio);
+    return value.toString(16).padStart(2, "0");
+  });
+
+  return `#${channels.join("")}`;
+}
+
 function getFeatureStyle(source, feature) {
   if (source.id === "catastro") {
     return {
@@ -968,24 +997,48 @@ function getFeatureStyle(source, feature) {
   }
 
   const color = getBienesColor(feature?.properties?.clase);
+  const hasSupport = hasCertificadoGravamen(feature?.properties);
+  const mutedColor = mixHexColors(color, "#f8fafc", 0.52);
   const geometryType = feature?.geometry?.type || "";
   if (geometryType === "Point" || geometryType === "MultiPoint") {
+    if (hasSupport) {
+      return {
+        radius: 6.6,
+        color,
+        weight: 2.2,
+        fillColor: color,
+        fillOpacity: 0.5,
+        opacity: 1
+      };
+    }
+
     return {
-      radius: 6,
+      radius: 5.2,
+      color: mutedColor,
+      weight: 1.8,
+      fillColor: mutedColor,
+      fillOpacity: 0.14,
+      opacity: 0.82
+    };
+  }
+
+  if (hasSupport) {
+    return {
       color,
-      weight: 2,
+      weight: 2.35,
       fillColor: color,
-      fillOpacity: 0.22,
-      opacity: 0.95
+      fillOpacity: 0,
+      opacity: 0.98
     };
   }
 
   return {
-    color,
-    weight: 2,
-    fillColor: color,
+    color: mutedColor,
+    weight: 1.5,
+    fillColor: mutedColor,
     fillOpacity: 0,
-    opacity: 0.95
+    opacity: 0.68,
+    dashArray: "6 4"
   };
 }
 
@@ -1024,7 +1077,8 @@ function buildGeoJsonLayer(source, geojson) {
     color: "#111827",
     weight: 2.5,
     fillOpacity: 0,
-    opacity: 1
+    opacity: 1,
+    dashArray: null
   };
 
   if (source.id === "bienes") {
