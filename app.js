@@ -282,6 +282,15 @@ function getSupportSummary(tramiteAnalysis) {
   return `Si. Detectado en: ${labels}.`;
 }
 
+function hasCertificadoGravamen(properties) {
+  const text = [properties?.numero_reg, properties?.documento]
+    .filter((value) => value !== null && value !== undefined && String(value).trim() !== "")
+    .join(" ")
+    .toLowerCase();
+
+  return /certificado|cetificado|gravamen/.test(text);
+}
+
 function sortRecords(records) {
   return [...records].sort((left, right) => {
     const categoryCompare = left.categoryLabel.localeCompare(right.categoryLabel, "es");
@@ -743,7 +752,7 @@ function renderBienesDashboards(features) {
   const summary = Object.fromEntries(
     bienesCategories.map((category) => [
       category.value,
-      { label: category.label, total: 0, con: 0, sin: 0, keywordCounts: {} }
+      { label: category.label, total: 0, con: 0, sin: 0, gravamenCon: 0, gravamenSin: 0, keywordCounts: {} }
     ])
   );
 
@@ -754,6 +763,7 @@ function renderBienesDashboards(features) {
     }
 
     const tramiteAnalysis = analyzeTramiteSupport(feature.properties);
+    const hasGravamen = hasCertificadoGravamen(feature.properties);
     summary[category].total += 1;
     if (tramiteAnalysis.hasSupport) {
       summary[category].con += 1;
@@ -762,6 +772,12 @@ function renderBienesDashboards(features) {
       });
     } else {
       summary[category].sin += 1;
+    }
+
+    if (hasGravamen) {
+      summary[category].gravamenCon += 1;
+    } else {
+      summary[category].gravamenSin += 1;
     }
 
     bienesSupportRecords.push({
@@ -828,6 +844,14 @@ function renderBienesDashboards(features) {
           <div class="dashboard-metric">
             <span class="dashboard-metric-label">Sin respaldo</span>
             <strong>${formatNumber(item.sin)}</strong>
+          </div>
+          <div class="dashboard-metric">
+            <span class="dashboard-metric-label">Con cert. gravamen</span>
+            <strong>${formatNumber(item.gravamenCon)}</strong>
+          </div>
+          <div class="dashboard-metric">
+            <span class="dashboard-metric-label">Sin cert. gravamen</span>
+            <strong>${formatNumber(item.gravamenSin)}</strong>
           </div>
         </div>
         <div class="dashboard-tags">
