@@ -5,9 +5,9 @@
 
 L.control.zoom({ position: "topright" }).addTo(map);
 
-L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
   maxZoom: 20,
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  attribution: "Tiles &copy; Esri"
 }).addTo(map);
 
 map.setView([-1.664, -78.654], 13);
