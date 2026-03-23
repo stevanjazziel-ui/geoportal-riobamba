@@ -282,6 +282,22 @@ function getSupportSummary(tramiteAnalysis) {
   return `Si. Detectado en: ${labels}.`;
 }
 
+function getSupportReferenceDetails(properties) {
+  const numeroRegistro = String(properties?.numero_reg || "").trim();
+  const referencia = String(properties?.ref || "").trim();
+  const details = [];
+
+  if (numeroRegistro) {
+    details.push({ label: "Numero de registro", value: numeroRegistro });
+  }
+
+  if (referencia) {
+    details.push({ label: "Referencia", value: referencia });
+  }
+
+  return details;
+}
+
 function hasCertificadoGravamen(properties) {
   return [properties?.numero_reg, properties?.ref]
     .some((value) => value !== null && value !== undefined && String(value).trim() !== "");
@@ -312,6 +328,11 @@ function populateRegistroModalCategories() {
 }
 
 function renderModalRecord(record, withSupport) {
+  const supportReferenceMarkup = record.supportReferences?.length
+    ? record.supportReferences.map((item) => (
+      `<p class="modal-item-text"><strong>${escapeHtml(item.label)}:</strong> ${escapeHtml(item.value)}</p>`
+    )).join("")
+    : "";
   const labelsMarkup = record.labels.length
     ? `
       <div class="modal-item-tags">
@@ -341,6 +362,7 @@ function renderModalRecord(record, withSupport) {
         <p class="modal-item-text"><strong>Descripcion:</strong> ${escapeHtml(record.description)}</p>
         <p class="modal-item-text"><strong>Clasificacion:</strong> ${escapeHtml(record.categoryLabel)}</p>
         <p class="modal-item-text"><strong>Estado documental:</strong> ${escapeHtml(record.supportSummary)}</p>
+        ${supportReferenceMarkup}
       </div>
       <p class="modal-item-signals">Campos y senales detectadas</p>
       ${labelsMarkup}
@@ -352,6 +374,7 @@ function renderModalRecord(record, withSupport) {
         <p class="modal-item-text"><strong>Descripcion:</strong> ${escapeHtml(record.description)}</p>
         <p class="modal-item-text"><strong>Clasificacion:</strong> ${escapeHtml(record.categoryLabel)}</p>
         <p class="modal-item-text"><strong>Estado documental:</strong> ${escapeHtml(record.supportSummary)}</p>
+        ${supportReferenceMarkup}
       </div>
     `;
 
@@ -786,6 +809,7 @@ function renderBienesDashboards(features) {
       hasSupport: tramiteAnalysis.hasSupport,
       labels: tramiteAnalysis.labels,
       fieldMatches: tramiteAnalysis.fieldMatches,
+      supportReferences: getSupportReferenceDetails(feature.properties),
       supportSummary: getSupportSummary(tramiteAnalysis),
       excerpt: tramiteAnalysis.excerpt,
       matchedField: tramiteAnalysis.matchedField
@@ -1033,6 +1057,12 @@ function buildGeoJsonLayer(source, geojson) {
 
       if (source.id === "bienes") {
         const tramiteAnalysis = analyzeTramiteSupport(feature.properties);
+        const supportReferences = getSupportReferenceDetails(feature.properties);
+        const supportReferencesMarkup = supportReferences.length
+          ? `<br>${supportReferences.map((item) => (
+            `<strong>${escapeHtml(item.label)}:</strong> ${escapeHtml(item.value)}`
+          )).join("<br>")}`
+          : "";
         featureLayer.bindPopup(`
           <div class="map-popup">
             <strong>${escapeHtml(source.name)}</strong><br>
@@ -1040,6 +1070,7 @@ function buildGeoJsonLayer(source, geojson) {
             <strong>Descripcion:</strong> ${escapeHtml(getFeatureDescription(feature.properties))}<br>
             <strong>Clasificacion:</strong> ${escapeHtml(String(feature.properties?.clase || "Sin clasificacion").trim() || "Sin clasificacion")}<br>
             <strong>Estado documental:</strong> ${escapeHtml(getSupportSummary(tramiteAnalysis))}
+            ${supportReferencesMarkup}
           </div>
         `);
         return;
