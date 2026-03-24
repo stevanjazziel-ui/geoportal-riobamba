@@ -46,6 +46,8 @@ const heroOpenRegistroButton = document.getElementById("hero-open-registro");
 const mapFocusTitle = document.getElementById("map-focus-title");
 const mapFocusPercent = document.getElementById("map-focus-percent");
 const mapFocusCopy = document.getElementById("map-focus-copy");
+const mapFocusChart = document.getElementById("map-focus-chart");
+const mapFocusTags = document.getElementById("map-focus-tags");
 const mapFocusTotal = document.getElementById("map-focus-total");
 const mapFocusCon = document.getElementById("map-focus-con");
 const mapFocusSin = document.getElementById("map-focus-sin");
@@ -166,7 +168,7 @@ function formatNumber(value) {
 }
 
 function updateMapFocusPanel() {
-  if (!mapFocusTitle || !mapFocusPercent || !mapFocusCopy || !mapFocusTotal || !mapFocusCon || !mapFocusSin) {
+  if (!mapFocusTitle || !mapFocusPercent || !mapFocusCopy || !mapFocusChart || !mapFocusTags || !mapFocusTotal || !mapFocusCon || !mapFocusSin) {
     return;
   }
 
@@ -183,16 +185,27 @@ function updateMapFocusPanel() {
     mapFocusTotal.textContent = "0";
     mapFocusCon.textContent = "0";
     mapFocusSin.textContent = "0";
+    mapFocusChart.style.setProperty("--focus-chart-fill", "#39d0ff");
+    mapFocusChart.style.setProperty("--focus-chart-angle", "0deg");
+    mapFocusTags.innerHTML = '<span class="map-focus-tag is-muted">Sin lectura activa</span>';
     return;
   }
 
   const percentage = item.total ? Math.round((item.con / item.total) * 100) : 0;
+  const topSignals = Object.entries(item.keywordCounts || {})
+    .sort((left, right) => right[1] - left[1])
+    .slice(0, 3)
+    .map(([keyword]) => `<span class="map-focus-tag">${escapeHtml(keyword)}</span>`)
+    .join("");
   mapFocusTitle.textContent = item.label;
   mapFocusPercent.textContent = `${percentage}%`;
   mapFocusCopy.textContent = `${formatNumber(item.gravamenCon)} de ${formatNumber(item.total)} bienes de esta clasificacion cuentan con numero de registro o REF.`;
   mapFocusTotal.textContent = formatNumber(item.total);
   mapFocusCon.textContent = formatNumber(item.gravamenCon);
   mapFocusSin.textContent = formatNumber(item.gravamenSin);
+  mapFocusChart.style.setProperty("--focus-chart-fill", getBienesColor(focusCategory));
+  mapFocusChart.style.setProperty("--focus-chart-angle", `${percentage * 3.6}deg`);
+  mapFocusTags.innerHTML = topSignals || '<span class="map-focus-tag is-muted">Sin registro o REF</span>';
 }
 
 function updateHeroOverview() {
