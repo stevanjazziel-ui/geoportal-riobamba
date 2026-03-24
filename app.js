@@ -41,10 +41,17 @@ const detailsContainer = document.getElementById("feature-details");
 const searchInput = document.getElementById("search-input");
 const clearSelectionButton = document.getElementById("clear-selection");
 const fitAllButton = document.getElementById("fit-all");
+const heroFitAllButton = document.getElementById("hero-fit-all");
+const heroOpenRegistroButton = document.getElementById("hero-open-registro");
 const statCatastro = document.getElementById("stat-catastro");
 const statBienes = document.getElementById("stat-bienes");
 const statResults = document.getElementById("stat-results");
-const statSupport = document.getElementById("stat-support");
+const heroActiveLayers = document.getElementById("hero-active-layers");
+const heroActiveFilters = document.getElementById("hero-active-filters");
+const heroSupportCount = document.getElementById("hero-support-count");
+const heroCatastroCount = document.getElementById("hero-catastro-count");
+const heroBienesCount = document.getElementById("hero-bienes-count");
+const heroViewMode = document.getElementById("hero-view-mode");
 const toggleCatastro = document.getElementById("toggle-catastro");
 const toggleBienes = document.getElementById("toggle-bienes");
 const sidebar = document.querySelector(".sidebar");
@@ -150,6 +157,10 @@ function formatNumber(value) {
 }
 
 function updateHeroOverview() {
+  if (!heroActiveLayers || !heroActiveFilters || !heroSupportCount || !heroCatastroCount || !heroBienesCount || !heroViewMode) {
+    return;
+  }
+
   const activeLayers = dataSources.reduce((count, source) => {
     const layer = layerState.get(source.id)?.layer;
     return layer && map.hasLayer(layer) ? count + 1 : count;
@@ -159,9 +170,12 @@ function updateHeroOverview() {
   const catastroCount = layerState.get("catastro")?.featureCount || 0;
   const bienesCount = layerState.get("bienes")?.featureCount || 0;
 
-  if (statSupport) {
-    statSupport.textContent = formatNumber(supportCount);
-  }
+  heroActiveLayers.textContent = formatNumber(activeLayers);
+  heroActiveFilters.textContent = formatNumber(activeFilters);
+  heroSupportCount.textContent = formatNumber(supportCount);
+  heroCatastroCount.textContent = formatNumber(catastroCount);
+  heroBienesCount.textContent = formatNumber(bienesCount);
+  heroViewMode.textContent = activeFilters > 0 ? "Busqueda y filtro activos" : "Exploracion general";
 }
 
 function normalizeText(value) {
@@ -1549,6 +1563,8 @@ async function initialize() {
 searchInput.addEventListener("input", updateSearch);
 clearSelectionButton.addEventListener("click", clearSelection);
 fitAllButton.addEventListener("click", fitAllLayers);
+heroFitAllButton?.addEventListener("click", fitAllLayers);
+heroOpenRegistroButton?.addEventListener("click", openRegistroModal);
 
 initialize().catch((error) => {
   console.error(error);
