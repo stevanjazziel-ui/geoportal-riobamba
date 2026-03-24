@@ -46,6 +46,7 @@ const heroOpenRegistroButton = document.getElementById("hero-open-registro");
 const statCatastro = document.getElementById("stat-catastro");
 const statBienes = document.getElementById("stat-bienes");
 const statResults = document.getElementById("stat-results");
+const statSupport = document.getElementById("stat-support");
 const heroActiveLayers = document.getElementById("hero-active-layers");
 const heroActiveFilters = document.getElementById("hero-active-filters");
 const heroSupportCount = document.getElementById("hero-support-count");
@@ -176,6 +177,9 @@ function updateHeroOverview() {
   heroCatastroCount.textContent = formatNumber(catastroCount);
   heroBienesCount.textContent = formatNumber(bienesCount);
   heroViewMode.textContent = activeFilters > 0 ? "Busqueda y filtro activos" : "Exploracion general";
+  if (statSupport) {
+    statSupport.textContent = formatNumber(supportCount);
+  }
 }
 
 function normalizeText(value) {

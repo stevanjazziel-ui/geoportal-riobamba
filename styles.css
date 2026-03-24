@@ -1890,8 +1890,9 @@ body::after {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     grid-template-areas:
-      "brand brand brand brand control control search search stats stats info info"
-      "dashboard dashboard dashboard dashboard dashboard dashboard category category category details details details";
+      "brand brand brand control control search search search info info info info"
+      "stats stats stats stats stats stats stats stats stats stats stats stats"
+      "dashboard dashboard dashboard dashboard dashboard category category category details details details details";
     gap: 12px;
     align-items: stretch;
   }
@@ -1903,9 +1904,8 @@ body::after {
   .brand-card,
   .panel-signal,
   .panel-search,
-  .stats-panel,
   .info-panel {
-    min-height: 156px;
+    min-height: 148px;
   }
 
   .brand-card {
@@ -1923,6 +1923,7 @@ body::after {
 
   .stats-panel {
     grid-area: stats;
+    min-height: 0;
   }
 
   .info-panel {
@@ -1933,8 +1934,8 @@ body::after {
   .dashboard-panel,
   .category-panel,
   .details-panel {
-    min-height: 228px;
-    max-height: 228px;
+    min-height: 220px;
+    max-height: 220px;
     overflow: auto;
   }
 
@@ -1956,18 +1957,18 @@ body::after {
   }
 
   .brand-card h1 {
-    font-size: clamp(1.7rem, 2vw, 2.2rem);
-    line-height: 0.95;
+    font-size: clamp(1.45rem, 1.8vw, 1.95rem);
+    line-height: 0.98;
   }
 
   .lede {
-    max-width: 38ch;
-    font-size: 0.88rem;
-    line-height: 1.45;
+    max-width: 42ch;
+    font-size: 0.82rem;
+    line-height: 1.38;
   }
 
   .brand-pulse {
-    width: 58px;
+    width: 50px;
   }
 
   .panel {
@@ -2001,6 +2002,45 @@ body::after {
 
   .dashboard-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stats-panel .stat-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    border-top: 1px solid rgba(57, 208, 255, 0.16);
+    border-left: 1px solid rgba(57, 208, 255, 0.16);
+  }
+
+  .stats-panel .stat-card {
+    min-height: 132px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 0;
+    border-top: 0;
+    border-left: 0;
+    border-right: 1px solid rgba(57, 208, 255, 0.16);
+    border-bottom: 1px solid rgba(57, 208, 255, 0.16);
+    background: linear-gradient(180deg, rgba(9, 28, 42, 0.88), rgba(7, 20, 31, 0.94));
+    box-shadow: none;
+  }
+
+  .stats-panel .stat-card::before {
+    background: linear-gradient(135deg, rgba(57, 208, 255, 0.06), transparent 42%);
+  }
+
+  .stats-panel .stat-label {
+    color: #95c8ff;
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+  }
+
+  .stats-panel .stat-card strong {
+    margin-top: 10px;
+    font-size: clamp(2rem, 2.2vw, 2.7rem);
+    line-height: 1;
   }
 
   .status-list,
@@ -2044,27 +2084,26 @@ body::after {
   .map-hero-copy {
     grid-template-columns: minmax(0, 1fr) auto;
     column-gap: 14px;
-    row-gap: 8px;
-    padding: 12px 16px;
+    row-gap: 6px;
+    padding: 10px 14px;
   }
 
   .map-hud {
-    padding: 12px 16px;
+    padding: 10px 14px;
   }
 
   .map-hero h2 {
-    font-size: clamp(1.05rem, 1.5vw, 1.5rem);
+    font-size: clamp(0.96rem, 1.3vw, 1.22rem);
   }
 
   .map-hero p {
-    max-width: 60ch;
-    font-size: 0.76rem;
-    line-height: 1.35;
+    max-width: 58ch;
+    font-size: 0.7rem;
+    line-height: 1.28;
   }
 
   .hero-metrics {
-    grid-template-columns: repeat(3, minmax(100px, 1fr));
-    gap: 10px;
+    display: none;
   }
 
   .hero-actions {
@@ -2073,7 +2112,7 @@ body::after {
   }
 
   .hero-action {
-    min-width: 148px;
+    min-width: 138px;
   }
 
   .map-frame {
