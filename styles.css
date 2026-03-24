@@ -1794,9 +1794,9 @@ body::after {
 }
 
 .map-toolbar {
-  display: grid;
-  grid-template-columns: minmax(220px, 0.9fr) minmax(260px, 1.1fr) auto;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   padding: 10px 12px;
   border-radius: 18px;
@@ -1881,6 +1881,17 @@ body::after {
   font-weight: 700;
 }
 
+.map-focus-panel-floating {
+  position: absolute;
+  top: 126px;
+  left: 18px;
+  z-index: 520;
+  width: min(360px, calc(40% - 18px));
+  background: rgba(6, 20, 31, 0.68);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow-soft);
+}
+
 .map-frame {
   min-height: 0;
 }
@@ -1927,7 +1938,6 @@ body::after {
   .map-toolbar {
     flex-direction: column;
     align-items: stretch;
-    grid-template-columns: 1fr;
   }
 
   .map-toolbar-actions {
@@ -1940,6 +1950,11 @@ body::after {
 
   .dashboard-summary-list {
     grid-template-columns: 1fr;
+  }
+
+  .map-focus-panel-floating {
+    top: 140px;
+    width: min(340px, calc(100% - 36px));
   }
 
   .map-hero {
@@ -2033,6 +2048,13 @@ body::after {
 
   .map-toolbar-actions {
     width: 100%;
+  }
+
+  .map-focus-panel-floating {
+    top: auto;
+    bottom: 18px;
+    left: 12px;
+    width: min(320px, calc(100% - 24px));
   }
 
   .map-hero {
@@ -2168,6 +2190,13 @@ body::after {
   .map-toolbar-actions {
     display: grid;
     grid-template-columns: 1fr;
+  }
+
+  .map-focus-panel-floating {
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    width: auto;
   }
 
   .details-header {
