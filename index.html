@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://tile.openstreetmap.org">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="./styles.css?v=20260324-01">
+  <link rel="stylesheet" href="./styles.css?v=20260324-02">
 </head>
 <body>
   <div class="app-shell">
@@ -31,33 +31,6 @@
             </div>
           </div>
         </div>
-
-        <section class="panel panel-explore">
-          <div class="panel-heading">
-            <p class="panel-kicker">Exploracion</p>
-            <h2>Capas y busqueda</h2>
-          </div>
-          <div class="explore-grid">
-            <div class="explore-block">
-              <span class="field-label">Capas activas</span>
-              <label class="toggle">
-                <input id="toggle-catastro" type="checkbox">
-                <span>Catastro municipal</span>
-              </label>
-              <label class="toggle">
-                <input id="toggle-bienes" type="checkbox" checked>
-                <span>Bienes municipales</span>
-              </label>
-            </div>
-            <div class="explore-block">
-              <label class="field-label" for="search-input">Buscar por registro o referencia</label>
-              <input id="search-input" class="search-input" type="search" placeholder="Escribe un numero de registro o REF">
-              <p class="helper-text">
-                La busqueda solo revisa <strong>Numero de registro</strong> y <strong>REF</strong> en los bienes municipales.
-              </p>
-            </div>
-          </div>
-        </section>
 
         <section class="panel stats-panel">
           <div class="panel-heading">
@@ -139,6 +112,33 @@
           </div>
           <div id="dashboard-grid" class="dashboard-grid">
             <p class="dashboard-empty">Calculando dashboard...</p>
+          </div>
+        </section>
+
+        <section class="panel panel-explore">
+          <div class="panel-heading">
+            <p class="panel-kicker">Exploracion</p>
+            <h2>Capas y busqueda</h2>
+          </div>
+          <div class="explore-grid">
+            <div class="explore-block">
+              <span class="field-label">Capas activas</span>
+              <label class="toggle">
+                <input id="toggle-catastro" type="checkbox">
+                <span>Catastro municipal</span>
+              </label>
+              <label class="toggle">
+                <input id="toggle-bienes" type="checkbox" checked>
+                <span>Bienes municipales</span>
+              </label>
+            </div>
+            <div class="explore-block">
+              <label class="field-label" for="search-input">Buscar por registro o referencia</label>
+              <input id="search-input" class="search-input" type="search" placeholder="Escribe un numero de registro o REF">
+              <p class="helper-text">
+                La busqueda solo revisa <strong>Numero de registro</strong> y <strong>REF</strong> en los bienes municipales.
+              </p>
+            </div>
           </div>
         </section>
 
