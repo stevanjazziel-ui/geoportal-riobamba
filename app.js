@@ -298,9 +298,10 @@ function updateHeroOverview() {
   const supportCount = bienesSupportRecords.filter((record) => record.hasSupport).length;
   const catastroCount = layerState.get("catastro")?.featureCount || 0;
   const bienesCount = layerState.get("bienes")?.featureCount || 0;
+  const noSupportCount = Math.max(0, bienesCount - supportCount);
 
   if (statSupport) {
-    statSupport.textContent = formatNumber(supportCount);
+    statSupport.textContent = formatNumber(noSupportCount);
   }
 
   if (!heroActiveLayers || !heroActiveFilters || !heroSupportCount || !heroCatastroCount || !heroBienesCount || !heroViewMode) {
