@@ -909,7 +909,7 @@ function updateBienesCategoryCounts(features) {
   const counts = Object.fromEntries(bienesCategories.map((category) => [category.value, 0]));
 
   for (const feature of features || []) {
-    const category = String(feature?.properties?.clase || "").trim();
+    const category = normalizeBienesCategory(feature?.properties?.clase);
     if (Object.hasOwn(counts, category)) {
       counts[category] += 1;
     }
@@ -938,7 +938,7 @@ function renderBienesDashboards(features) {
   );
 
   for (const feature of features || []) {
-    const category = String(feature?.properties?.clase || "").trim();
+    const category = normalizeBienesCategory(feature?.properties?.clase);
     if (!Object.hasOwn(summary, category)) {
       continue;
     }
@@ -1105,7 +1105,7 @@ function getLayerStyleKind(sourceId, layer, query) {
   const matchesQuery = !query || layer.__searchText.includes(query);
 
   if (sourceId === "bienes" && activeBienesCategories.size > 0) {
-    const category = String(layer.feature?.properties?.clase || "").trim();
+    const category = normalizeBienesCategory(layer.feature?.properties?.clase);
     if (!activeBienesCategories.has(category)) {
       return "hidden";
     }
@@ -1202,7 +1202,7 @@ async function focusBienesCategory(category) {
 }
 
 function getBienesColor(category) {
-  const normalizedCategory = String(category || "").trim();
+  const normalizedCategory = normalizeBienesCategory(category);
   if (bienesColorMap[normalizedCategory]) {
     return bienesColorMap[normalizedCategory];
   }
@@ -1382,7 +1382,7 @@ function buildGeoJsonLayer(source, geojson) {
             <strong>${escapeHtml(source.name)}</strong><br>
             <strong>Clave:</strong> ${escapeHtml(getFeatureKey(feature.properties))}<br>
             <strong>Descripcion:</strong> ${escapeHtml(getFeatureDescription(feature.properties))}<br>
-            <strong>Clasificacion:</strong> ${escapeHtml(String(feature.properties?.clase || "Sin clasificacion").trim() || "Sin clasificacion")}<br>
+            <strong>Clasificacion:</strong> ${escapeHtml(normalizeBienesCategory(feature.properties?.clase) || "Sin clasificacion")}<br>
             <strong>Estado documental:</strong> ${escapeHtml(getSupportSummary(tramiteAnalysis))}
             ${supportReferencesMarkup}
           </div>
