@@ -85,8 +85,7 @@ const modalListSin = document.getElementById("modal-list-sin");
 const modalViewButtons = Array.from(document.querySelectorAll(".modal-view-button"));
 const bienesCategories = [
   { value: "Area Verde", label: "Area Verde", countId: "count-area-verde", color: "#15803d", dashKey: "area-verde" },
-  { value: "Bienes Municipales Rurale", label: "Bienes Municipales Rurales", countId: "count-bienes-rurales", color: "#65a30d", dashKey: "bienes-rurales" },
-  { value: "Bienes Municipales Urbano", label: "Bienes Municipales Urbanos", countId: "count-bienes-urbanos", color: "#b45309", dashKey: "bienes-urbanos" },
+  { value: "Propiedades municipales", label: "Propiedades municipales", countId: "count-propiedades-municipales", color: "#0f766e", dashKey: "propiedades-municipales" },
   { value: "Comodato", label: "Comodato", countId: "count-comodato", color: "#7c3aed", dashKey: "comodato" },
   { value: "Monstrencos_urbanos", label: "Monstrencos Urbanos", countId: "count-monstrencos-urbanos", color: "#ea580c", dashKey: "monstrencos-urbanos" },
   { value: "Mostrencos_Rurales", label: "Mostrencos Rurales", countId: "count-mostrencos-rurales", color: "#92400e", dashKey: "mostrencos-rurales" },
@@ -165,6 +164,15 @@ function collectPropertyEntries(properties) {
 
 function formatNumber(value) {
   return numberFormatter.format(value || 0);
+}
+
+function normalizeBienesCategory(value) {
+  const category = String(value || "").trim();
+  if (category === "Bienes Municipales Rurale" || category === "Bienes Municipales Urbano") {
+    return "Propiedades municipales";
+  }
+
+  return category;
 }
 
 function updateMapFocusPanel() {
@@ -1398,6 +1406,10 @@ function buildGeoJsonLayer(source, geojson) {
 
 function normalizeFeatures(source, features) {
   return (features || []).filter((feature) => {
+    if (source?.id === "bienes" && feature?.properties) {
+      feature.properties.clase = normalizeBienesCategory(feature.properties.clase);
+    }
+
     const geometry = feature?.geometry;
     if (!geometry) {
       return false;
