@@ -1835,7 +1835,7 @@ body::after {
 .map-overlay-stack {
   display: grid;
   gap: 12px;
-  width: min(430px, calc(46% - 18px));
+  width: min(500px, calc(54% - 18px));
   pointer-events: none;
 }
 
@@ -1845,19 +1845,32 @@ body::after {
 
 .map-summary-panel {
   display: grid;
-  gap: 12px;
-  padding: 16px;
+  gap: 10px;
+  padding: 14px 14px 12px;
 }
 
 .map-summary-head strong {
   font-family: "Space Grotesk", "IBM Plex Sans", sans-serif;
-  font-size: 1.35rem;
+  font-size: 1.15rem;
   line-height: 1;
 }
 
 .map-stat-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
+}
+
+.map-summary-panel .stat-card {
+  min-height: 88px;
+  padding: 12px;
+}
+
+.map-summary-panel .stat-card strong {
+  font-size: clamp(1.45rem, 2.1vw, 1.9rem);
+}
+
+.map-summary-panel .stat-label {
+  font-size: 0.74rem;
 }
 
 .map-focus-panel {
@@ -2104,7 +2117,7 @@ body::after {
   }
 
   .map-overlay-stack {
-    width: min(380px, calc(100% - 36px));
+    width: min(430px, calc(100% - 36px));
   }
 
   .map-focus-panel {
