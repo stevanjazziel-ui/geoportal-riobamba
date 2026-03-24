@@ -1787,6 +1787,10 @@ body::after {
   margin-top: 4px;
 }
 
+.dashboard-hidden {
+  display: none;
+}
+
 .map-stage {
   grid-template-rows: auto minmax(0, 1fr);
   gap: 10px;
