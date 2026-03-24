@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://tile.openstreetmap.org">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="./styles.css?v=20260323-12">
+  <link rel="stylesheet" href="./styles.css?v=20260324-01">
 </head>
 <body>
   <div class="app-shell">
@@ -22,7 +22,7 @@
               <p class="eyebrow">Geoportal</p>
               <h1>Catastro y Bienes Municipales</h1>
               <p class="lede">
-                Visualizador territorial para explorar predios catastrales y bienes municipales del canton Riobamba.
+                Visualizador territorial para explorar predios catastrales, bienes municipales y su respaldo por numero de registro o REF.
               </p>
             </div>
             <div class="brand-pulse" aria-hidden="true">
@@ -32,47 +32,55 @@
           </div>
         </div>
 
-        <section class="panel panel-signal">
+        <section class="panel panel-explore">
           <div class="panel-heading">
-            <p class="panel-kicker">Control</p>
-            <h2>Capas operativas</h2>
+            <p class="panel-kicker">Exploracion</p>
+            <h2>Capas y busqueda</h2>
           </div>
-          <label class="toggle">
-            <input id="toggle-catastro" type="checkbox">
-            <span>Catastro municipal</span>
-          </label>
-          <label class="toggle">
-            <input id="toggle-bienes" type="checkbox" checked>
-            <span>Bienes municipales</span>
-          </label>
-          <button id="fit-all" class="button secondary" type="button">Ajustar vista</button>
+          <div class="explore-grid">
+            <div class="explore-block">
+              <span class="field-label">Capas activas</span>
+              <label class="toggle">
+                <input id="toggle-catastro" type="checkbox">
+                <span>Catastro municipal</span>
+              </label>
+              <label class="toggle">
+                <input id="toggle-bienes" type="checkbox" checked>
+                <span>Bienes municipales</span>
+              </label>
+            </div>
+            <div class="explore-block">
+              <label class="field-label" for="search-input">Buscar por registro o referencia</label>
+              <input id="search-input" class="search-input" type="search" placeholder="Escribe un numero de registro o REF">
+              <p class="helper-text">
+                La busqueda solo revisa <strong>Numero de registro</strong> y <strong>REF</strong> en los bienes municipales.
+              </p>
+            </div>
+          </div>
         </section>
 
-        <section class="panel panel-search">
+        <section class="panel stats-panel">
           <div class="panel-heading">
-            <p class="panel-kicker">Consulta</p>
-            <h2>Busqueda territorial</h2>
+            <p class="panel-kicker">Resumen</p>
+            <h2>Metricas clave</h2>
           </div>
-          <label class="field-label" for="search-input">Buscar por registro o referencia</label>
-          <input id="search-input" class="search-input" type="search" placeholder="Escribe un numero de registro o REF">
-          <p class="helper-text">
-            La busqueda solo revisa `Numero de registro` y `REF` en los bienes municipales.
-          </p>
-        </section>
-
-        <section class="panel dashboard-panel">
-          <div class="panel-heading">
-            <p class="panel-kicker">Control documental</p>
-            <h2>Dashboard de respaldo</h2>
-          </div>
-          <p class="helper-text">Cada anillo compara bienes con numero de registro o REF frente a bienes sin esos datos.</p>
-          <p id="dashboard-note" class="dashboard-note">Revisando numero de registro y REF para identificar bienes con respaldo.</p>
-          <div id="dashboard-summary-list" class="dashboard-summary-list">
-            <p class="dashboard-empty">Calculando resumen documental...</p>
-          </div>
-          <button id="open-registro-modal" class="button secondary dashboard-open-button" type="button">Ver ventana de registros</button>
-          <div id="dashboard-grid" class="dashboard-grid">
-            <p class="dashboard-empty">Calculando dashboard...</p>
+          <div class="stat-grid">
+            <article class="stat-card">
+              <span class="stat-label">Catastro</span>
+              <strong id="stat-catastro">0</strong>
+            </article>
+            <article class="stat-card">
+              <span class="stat-label">Bienes</span>
+              <strong id="stat-bienes">0</strong>
+            </article>
+            <article class="stat-card stat-card-accent">
+              <span class="stat-label">Con respaldo</span>
+              <strong id="stat-support">0</strong>
+            </article>
+            <article class="stat-card">
+              <span class="stat-label">Coincidencias</span>
+              <strong id="stat-results">0</strong>
+            </article>
           </div>
         </section>
 
@@ -114,24 +122,23 @@
           </div>
         </section>
 
-        <section class="panel stats-panel">
+        <section class="panel dashboard-panel">
           <div class="panel-heading">
-            <p class="panel-kicker">Resumen</p>
-            <h2>Metricas clave</h2>
+            <p class="panel-kicker">Control documental</p>
+            <h2>Lectura de respaldo</h2>
           </div>
-          <div class="stat-grid">
-            <article class="stat-card">
-              <span class="stat-label">Catastro</span>
-              <strong id="stat-catastro">0</strong>
-            </article>
-            <article class="stat-card">
-              <span class="stat-label">Bienes</span>
-              <strong id="stat-bienes">0</strong>
-            </article>
-            <article class="stat-card">
-              <span class="stat-label">Coincidencias</span>
-              <strong id="stat-results">0</strong>
-            </article>
+          <div class="dashboard-toolbar">
+            <div>
+              <p class="helper-text">Cada anillo compara bienes con numero de registro o REF frente a bienes sin esos datos.</p>
+              <p id="dashboard-note" class="dashboard-note">Revisando numero de registro y REF para identificar bienes con respaldo.</p>
+            </div>
+            <button id="open-registro-modal" class="button secondary dashboard-open-button" type="button">Ver ventana de registros</button>
+          </div>
+          <div id="dashboard-summary-list" class="dashboard-summary-list">
+            <p class="dashboard-empty">Calculando resumen documental...</p>
+          </div>
+          <div id="dashboard-grid" class="dashboard-grid">
+            <p class="dashboard-empty">Calculando dashboard...</p>
           </div>
         </section>
 
@@ -148,15 +155,9 @@
           </div>
         </section>
 
-        <section class="panel info-panel">
-          <div class="panel-heading">
-            <p class="panel-kicker">Sistema</p>
-            <h2>Estado de carga</h2>
-          </div>
-          <ul id="status-list" class="status-list">
-            <li>Cargando interfaz...</li>
-          </ul>
-        </section>
+        <ul id="status-list" class="status-list is-compact" aria-live="polite">
+          <li>Cargando interfaz...</li>
+        </ul>
       </div>
 
       <div class="sidebar-scroll-ui" aria-label="Control de desplazamiento del panel lateral">
@@ -169,61 +170,25 @@
     </aside>
 
     <main class="map-stage">
-      <div class="map-hero">
-        <div class="map-hero-copy">
-          <span class="badge">Riobamba - GeoSIG</span>
-          <h2>Exploracion territorial municipal</h2>
-          <p>Visualizacion operativa para consulta catastral, bienes y respaldo por numero de registro o REF en una sola interfaz.</p>
-          <div class="hero-metrics" aria-label="Resumen operativo del visor">
-            <article class="hero-metric">
-              <span class="hero-metric-label">Capas activas</span>
-              <strong id="hero-active-layers">0</strong>
-            </article>
-            <article class="hero-metric">
-              <span class="hero-metric-label">Filtros activos</span>
-              <strong id="hero-active-filters">0</strong>
-            </article>
-            <article class="hero-metric">
-              <span class="hero-metric-label">Con respaldo</span>
-              <strong id="hero-support-count">0</strong>
-            </article>
-          </div>
-          <div class="hero-actions">
-            <button id="hero-fit-all" class="button secondary hero-action" type="button">Ajustar vista</button>
-            <button id="hero-open-registro" class="button ghost hero-action" type="button">Ver registros</button>
-          </div>
+      <div class="map-toolbar">
+        <div class="map-toolbar-copy">
+          <span class="badge">Mapa principal</span>
+          <p id="map-message" class="map-message">Preparando capas geograficas...</p>
         </div>
-        <div class="map-hud">
-          <span class="hud-label">Estado del visor</span>
-          <span id="map-message" class="map-message">Preparando capas geograficas...</span>
-          <div class="hud-grid">
-            <div class="hud-chip">
-              <span class="hud-chip-label">Catastro</span>
-              <strong id="hero-catastro-count">0</strong>
-            </div>
-            <div class="hud-chip">
-              <span class="hud-chip-label">Bienes</span>
-              <strong id="hero-bienes-count">0</strong>
-            </div>
-            <div class="hud-chip">
-              <span class="hud-chip-label">Consulta</span>
-              <strong id="hero-view-mode">Busqueda y filtro</strong>
-            </div>
-          </div>
+        <div class="map-toolbar-actions">
+          <button id="fit-all" class="button secondary hero-action" type="button">Ajustar vista</button>
+          <button id="hero-open-registro" class="button ghost hero-action" type="button">Ver registros</button>
         </div>
       </div>
       <div class="map-frame">
         <div class="map-scanline" aria-hidden="true"></div>
         <div class="map-overlay map-overlay-top">
-          <article class="map-overlay-card legend-card">
-            <span class="map-overlay-label">Capas activas</span>
+          <article class="map-overlay-card legend-card legend-card-unified">
+            <span class="map-overlay-label">Lectura del mapa</span>
             <div class="legend-list">
               <span class="legend-item"><span class="legend-swatch legend-swatch-catastro"></span>Catastro</span>
               <span class="legend-item"><span class="legend-swatch legend-swatch-bienes"></span>Bienes</span>
             </div>
-          </article>
-          <article class="map-overlay-card legend-card legend-card-support">
-            <span class="map-overlay-label">Respaldo</span>
             <div class="legend-support-list">
               <span class="legend-support-item">
                 <span class="legend-support-line legend-support-line-solid"></span>
@@ -292,7 +257,7 @@
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="./app.js?v=20260323-16"></script>
+  <script src="./app.js?v=20260324-01"></script>
 </body>
 </html>
 

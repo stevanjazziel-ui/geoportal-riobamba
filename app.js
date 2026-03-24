@@ -45,6 +45,7 @@ const heroFitAllButton = document.getElementById("hero-fit-all");
 const heroOpenRegistroButton = document.getElementById("hero-open-registro");
 const statCatastro = document.getElementById("stat-catastro");
 const statBienes = document.getElementById("stat-bienes");
+const statSupport = document.getElementById("stat-support");
 const statResults = document.getElementById("stat-results");
 const heroActiveLayers = document.getElementById("hero-active-layers");
 const heroActiveFilters = document.getElementById("hero-active-filters");
@@ -157,18 +158,22 @@ function formatNumber(value) {
 }
 
 function updateHeroOverview() {
-  if (!heroActiveLayers || !heroActiveFilters || !heroSupportCount || !heroCatastroCount || !heroBienesCount || !heroViewMode) {
-    return;
-  }
-
   const activeLayers = dataSources.reduce((count, source) => {
     const layer = layerState.get(source.id)?.layer;
     return layer && map.hasLayer(layer) ? count + 1 : count;
   }, 0);
-  const activeFilters = activeBienesCategories.size + (searchInput.value.trim() ? 1 : 0);
+  const activeFilters = activeBienesCategories.size + (((searchInput?.value || "").trim()) ? 1 : 0);
   const supportCount = bienesSupportRecords.filter((record) => record.hasSupport).length;
   const catastroCount = layerState.get("catastro")?.featureCount || 0;
   const bienesCount = layerState.get("bienes")?.featureCount || 0;
+
+  if (statSupport) {
+    statSupport.textContent = formatNumber(supportCount);
+  }
+
+  if (!heroActiveLayers || !heroActiveFilters || !heroSupportCount || !heroCatastroCount || !heroBienesCount || !heroViewMode) {
+    return;
+  }
 
   heroActiveLayers.textContent = formatNumber(activeLayers);
   heroActiveFilters.textContent = formatNumber(activeFilters);
@@ -613,7 +618,7 @@ function getFeatureText(properties) {
 }
 
 function updateSearch() {
-  const query = searchInput.value.trim().toLowerCase();
+  const query = (searchInput?.value || "").trim().toLowerCase();
   let matches = 0;
 
   for (const source of layerState.values()) {
@@ -630,7 +635,9 @@ function updateSearch() {
     });
   }
 
-  statResults.textContent = query ? String(matches) : "0";
+  if (statResults) {
+    statResults.textContent = query ? String(matches) : "0";
+  }
   if (query) {
     mapMessage.textContent = `${matches} elemento(s) coinciden con la busqueda actual.`;
   } else if (activeBienesCategories.size > 0) {
@@ -816,7 +823,7 @@ function fitFilteredBienesBounds() {
     return;
   }
 
-  const query = searchInput.value.trim().toLowerCase();
+  const query = (searchInput?.value || "").trim().toLowerCase();
   const bounds = [];
 
   source.layer.eachLayer((layer) => {
@@ -1072,7 +1079,7 @@ function refreshBienesFilter() {
     return;
   }
 
-  const query = searchInput.value.trim().toLowerCase();
+  const query = (searchInput?.value || "").trim().toLowerCase();
   source.layer.eachLayer((layer) => {
     const styleKind = getLayerStyleKind("bienes", layer, query);
     applyLayerStyle(layer, styleKind);
@@ -1094,7 +1101,11 @@ async function ensureBienesLayerVisible() {
     const source = layerState.get("bienes");
     if (source) {
       source.layer.addTo(map);
-      statBienes.textContent = String(source.featureCount || 0);
+      if (statBienes) {
+        if (statBienes) {
+          statBienes.textContent = String(source.featureCount || 0);
+        }
+      }
     }
     return true;
   } catch (error) {
@@ -1386,7 +1397,9 @@ function bindLayerToggles() {
       const source = layerState.get("catastro");
       if (source) {
         source.layer.addTo(map);
-        statCatastro.textContent = String(source.featureCount || 0);
+        if (statCatastro) {
+          statCatastro.textContent = String(source.featureCount || 0);
+        }
       }
       mapMessage.textContent = "Capas cargadas y listas para exploracion.";
       updateHeroOverview();
@@ -1416,7 +1429,9 @@ function bindLayerToggles() {
       const source = layerState.get("bienes");
       if (source) {
         source.layer.addTo(map);
-        statBienes.textContent = String(source.featureCount || 0);
+        if (statBienes) {
+          statBienes.textContent = String(source.featureCount || 0);
+        }
       }
       mapMessage.textContent = "Capas cargadas y listas para exploracion.";
       updateHeroOverview();
@@ -1536,8 +1551,13 @@ async function initialize() {
     }
   });
 
-  statCatastro.textContent = String(counts.catastro || 0);
-  statBienes.textContent = String(counts.bienes || 0);
+  if (statCatastro) {
+    statCatastro.textContent = String(counts.catastro || 0);
+  }
+
+  if (statBienes) {
+    statBienes.textContent = String(counts.bienes || 0);
+  }
 
   if (messages.length) {
     setStatus(messages);
@@ -1560,9 +1580,9 @@ async function initialize() {
   requestAnimationFrame(updateSidebarScrollUi);
 }
 
-searchInput.addEventListener("input", updateSearch);
+searchInput?.addEventListener("input", updateSearch);
 clearSelectionButton.addEventListener("click", clearSelection);
-fitAllButton.addEventListener("click", fitAllLayers);
+fitAllButton?.addEventListener("click", fitAllLayers);
 heroFitAllButton?.addEventListener("click", fitAllLayers);
 heroOpenRegistroButton?.addEventListener("click", openRegistroModal);
 
