@@ -1798,9 +1798,9 @@ body::after {
 }
 
 .map-toolbar {
-  display: grid;
-  grid-template-columns: minmax(220px, 0.8fr) minmax(360px, 1.25fr) auto;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   padding: 10px 12px;
   border-radius: 18px;
@@ -1843,10 +1843,6 @@ body::after {
   background: rgba(6, 20, 31, 0.72);
   backdrop-filter: blur(14px);
   box-shadow: var(--shadow-soft);
-}
-
-.map-focus-panel-toolbar {
-  width: 100%;
 }
 
 .map-focus-top {
@@ -2036,7 +2032,6 @@ body::after {
   .map-toolbar {
     flex-direction: column;
     align-items: stretch;
-    grid-template-columns: 1fr;
   }
 
   .map-toolbar-actions {
