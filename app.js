@@ -158,10 +158,6 @@ function formatNumber(value) {
 }
 
 function updateHeroOverview() {
-  if (!heroActiveLayers || !heroActiveFilters || !heroSupportCount || !heroCatastroCount || !heroBienesCount || !heroViewMode) {
-    return;
-  }
-
   const activeLayers = dataSources.reduce((count, source) => {
     const layer = layerState.get(source.id)?.layer;
     return layer && map.hasLayer(layer) ? count + 1 : count;
@@ -171,12 +167,24 @@ function updateHeroOverview() {
   const catastroCount = layerState.get("catastro")?.featureCount || 0;
   const bienesCount = layerState.get("bienes")?.featureCount || 0;
 
-  heroActiveLayers.textContent = formatNumber(activeLayers);
-  heroActiveFilters.textContent = formatNumber(activeFilters);
-  heroSupportCount.textContent = formatNumber(supportCount);
-  heroCatastroCount.textContent = formatNumber(catastroCount);
-  heroBienesCount.textContent = formatNumber(bienesCount);
-  heroViewMode.textContent = activeFilters > 0 ? "Busqueda y filtro activos" : "Exploracion general";
+  if (heroActiveLayers) {
+    heroActiveLayers.textContent = formatNumber(activeLayers);
+  }
+  if (heroActiveFilters) {
+    heroActiveFilters.textContent = formatNumber(activeFilters);
+  }
+  if (heroSupportCount) {
+    heroSupportCount.textContent = formatNumber(supportCount);
+  }
+  if (heroCatastroCount) {
+    heroCatastroCount.textContent = formatNumber(catastroCount);
+  }
+  if (heroBienesCount) {
+    heroBienesCount.textContent = formatNumber(bienesCount);
+  }
+  if (heroViewMode) {
+    heroViewMode.textContent = activeFilters > 0 ? "Busqueda y filtro activos" : "Exploracion general";
+  }
   if (statSupport) {
     statSupport.textContent = formatNumber(supportCount);
   }

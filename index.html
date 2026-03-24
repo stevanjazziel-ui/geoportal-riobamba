@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://tile.openstreetmap.org">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="./styles.css?v=20260324-4">
+  <link rel="stylesheet" href="./styles.css?v=20260324-5">
 </head>
 <body>
   <div class="app-shell">
@@ -173,49 +173,6 @@
     </aside>
 
     <main class="map-stage">
-      <div class="map-hero">
-        <div class="map-hero-copy">
-          <span class="badge">Riobamba - GeoSIG</span>
-          <h2>Exploracion territorial municipal</h2>
-          <p>Visualizacion operativa para consulta catastral, bienes y respaldo por numero de registro o REF en una sola interfaz.</p>
-          <div class="hero-metrics" aria-label="Resumen operativo del visor">
-            <article class="hero-metric">
-              <span class="hero-metric-label">Capas activas</span>
-              <strong id="hero-active-layers">0</strong>
-            </article>
-            <article class="hero-metric">
-              <span class="hero-metric-label">Filtros activos</span>
-              <strong id="hero-active-filters">0</strong>
-            </article>
-            <article class="hero-metric">
-              <span class="hero-metric-label">Con respaldo</span>
-              <strong id="hero-support-count">0</strong>
-            </article>
-          </div>
-          <div class="hero-actions">
-            <button id="hero-fit-all" class="button secondary hero-action" type="button">Ajustar vista</button>
-            <button id="hero-open-registro" class="button ghost hero-action" type="button">Ver registros</button>
-          </div>
-        </div>
-        <div class="map-hud">
-          <span class="hud-label">Estado del visor</span>
-          <span id="map-message" class="map-message">Preparando capas geograficas...</span>
-          <div class="hud-grid">
-            <div class="hud-chip">
-              <span class="hud-chip-label">Catastro</span>
-              <strong id="hero-catastro-count">0</strong>
-            </div>
-            <div class="hud-chip">
-              <span class="hud-chip-label">Bienes</span>
-              <strong id="hero-bienes-count">0</strong>
-            </div>
-            <div class="hud-chip">
-              <span class="hud-chip-label">Consulta</span>
-              <strong id="hero-view-mode">Busqueda y filtro</strong>
-            </div>
-          </div>
-        </div>
-      </div>
       <div class="map-frame">
         <div class="map-scanline" aria-hidden="true"></div>
         <div class="map-overlay map-overlay-top">
@@ -225,6 +182,10 @@
               <span class="legend-item"><span class="legend-swatch legend-swatch-catastro"></span>Catastro</span>
               <span class="legend-item"><span class="legend-swatch legend-swatch-bienes"></span>Bienes</span>
             </div>
+          </article>
+          <article class="map-overlay-card map-overlay-card-status">
+            <span class="map-overlay-label">Estado</span>
+            <span id="map-message" class="map-message">Preparando capas geograficas...</span>
           </article>
           <article class="map-overlay-card legend-card legend-card-support">
             <span class="map-overlay-label">Respaldo</span>
@@ -296,7 +257,7 @@
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="./app.js?v=20260324-1"></script>
+  <script src="./app.js?v=20260324-2"></script>
 </body>
 </html>
 
