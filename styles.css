@@ -1639,26 +1639,31 @@ body::after {
 }
 
 .brand-card {
-  padding: 20px;
+  padding: 14px 16px;
 }
 
 .brand-grid {
-  grid-template-columns: minmax(0, 1fr) 60px;
-  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) 46px;
+  gap: 10px;
+  align-items: start;
 }
 
 .brand-pulse {
-  width: 60px;
+  width: 46px;
+  align-self: start;
 }
 
 .brand-card h1 {
-  font-size: clamp(1.9rem, 2.5vw, 2.55rem);
+  font-size: clamp(1.45rem, 1.95vw, 1.95rem);
+  line-height: 0.96;
+  max-width: 10ch;
 }
 
 .lede {
-  max-width: none;
-  font-size: 0.94rem;
-  line-height: 1.48;
+  margin-top: 8px;
+  max-width: 26ch;
+  font-size: 0.84rem;
+  line-height: 1.4;
 }
 
 .panel {
