@@ -1835,7 +1835,7 @@ body::after {
 .map-overlay-stack {
   display: grid;
   gap: 12px;
-  width: min(500px, calc(54% - 18px));
+  width: min(560px, calc(60% - 18px));
   pointer-events: none;
 }
 
@@ -1890,7 +1890,7 @@ body::after {
   display: grid;
   grid-template-columns: 112px minmax(0, 1fr);
   gap: 18px;
-  align-items: center;
+  align-items: start;
 }
 
 .map-focus-copy-wrap {
@@ -1957,15 +1957,16 @@ body::after {
 .map-focus-head strong {
   min-width: 0;
   font-family: "Space Grotesk", "IBM Plex Sans", sans-serif;
-  font-size: 1.85rem;
-  line-height: 0.98;
+  font-size: clamp(1.48rem, 1.75vw, 1.82rem);
+  line-height: 1.02;
+  text-wrap: balance;
 }
 
 .map-focus-copy {
   margin: 0;
   color: var(--muted);
-  font-size: 0.98rem;
-  line-height: 1.6;
+  font-size: 0.94rem;
+  line-height: 1.5;
 }
 
 .map-focus-metrics {
