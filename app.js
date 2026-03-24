@@ -53,6 +53,7 @@ const mapFocusCon = document.getElementById("map-focus-con");
 const mapFocusSin = document.getElementById("map-focus-sin");
 const statCatastro = document.getElementById("stat-catastro");
 const statBienes = document.getElementById("stat-bienes");
+const statRegularized = document.getElementById("stat-regularized");
 const statSupport = document.getElementById("stat-support");
 const statResults = document.getElementById("stat-results");
 const heroActiveLayers = document.getElementById("hero-active-layers");
@@ -299,6 +300,10 @@ function updateHeroOverview() {
   const catastroCount = layerState.get("catastro")?.featureCount || 0;
   const bienesCount = layerState.get("bienes")?.featureCount || 0;
   const noSupportCount = Math.max(0, bienesCount - supportCount);
+
+  if (statRegularized) {
+    statRegularized.textContent = formatNumber(supportCount);
+  }
 
   if (statSupport) {
     statSupport.textContent = formatNumber(noSupportCount);
