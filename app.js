@@ -87,8 +87,7 @@ const bienesCategories = [
   { value: "Area Verde", label: "Area Verde", countId: "count-area-verde", color: "#15803d", dashKey: "area-verde" },
   { value: "Propiedades municipales", label: "Propiedades municipales", countId: "count-propiedades-municipales", color: "#0f766e", dashKey: "propiedades-municipales" },
   { value: "Comodato", label: "Comodato", countId: "count-comodato", color: "#7c3aed", dashKey: "comodato" },
-  { value: "Bienes Mostrencos", label: "Bienes Mostrencos", countId: "count-bienes-mostrencos", color: "#ea580c", dashKey: "bienes-mostrencos" },
-  { value: "Subdivisiones", label: "Subdivisiones", countId: "count-subdivisiones", color: "#dc2626", dashKey: "subdivisiones" }
+  { value: "Bienes Mostrencos", label: "Bienes Mostrencos", countId: "count-bienes-mostrencos", color: "#ea580c", dashKey: "bienes-mostrencos" }
 ];
 const bienesCategoryCounters = Object.fromEntries(
   bienesCategories.map((category) => [category.value, document.getElementById(category.countId)])
@@ -1411,6 +1410,9 @@ function normalizeFeatures(source, features) {
   return (features || []).filter((feature) => {
     if (source?.id === "bienes" && feature?.properties) {
       feature.properties.clase = normalizeBienesCategory(feature.properties.clase);
+      if (feature.properties.clase === "Subdivisiones") {
+        return false;
+      }
     }
 
     const geometry = feature?.geometry;
