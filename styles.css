@@ -1922,7 +1922,7 @@ body::after {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     grid-template-areas:
-      "brand brand brand control control search search search info info info info"
+      "brand brand brand brand control control control info info info info info"
       "stats stats stats stats stats stats stats stats stats stats stats stats"
       "dashboard dashboard dashboard dashboard dashboard category category category details details details details";
     gap: 12px;
@@ -1947,10 +1947,6 @@ body::after {
 
   .panel-signal {
     grid-area: control;
-  }
-
-  .panel-search {
-    grid-area: search;
   }
 
   .stats-panel {

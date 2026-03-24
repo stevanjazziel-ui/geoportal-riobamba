@@ -10,12 +10,13 @@
   <link rel="preconnect" href="https://tile.openstreetmap.org">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="./styles.css?v=20260324-6">
+  <link rel="stylesheet" href="./styles.css?v=20260324-7">
 </head>
 <body>
   <div class="app-shell">
     <aside class="sidebar">
       <div class="sidebar-content">
+        <input id="search-input" type="hidden" value="">
         <div class="brand-card">
           <div class="brand-grid">
             <div>
@@ -46,18 +47,6 @@
             <span>Bienes municipales</span>
           </label>
           <button id="fit-all" class="button secondary" type="button">Ajustar vista</button>
-        </section>
-
-        <section class="panel panel-search">
-          <div class="panel-heading">
-            <p class="panel-kicker">Consulta</p>
-            <h2>Busqueda territorial</h2>
-          </div>
-          <label class="field-label" for="search-input">Buscar por registro o referencia</label>
-          <input id="search-input" class="search-input" type="search" placeholder="Escribe un numero de registro o REF">
-          <p class="helper-text">
-            La busqueda solo revisa `Numero de registro` y `REF` en los bienes municipales.
-          </p>
         </section>
 
         <section class="panel dashboard-panel">
