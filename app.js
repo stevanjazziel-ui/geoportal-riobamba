@@ -87,8 +87,7 @@ const bienesCategories = [
   { value: "Area Verde", label: "Area Verde", countId: "count-area-verde", color: "#15803d", dashKey: "area-verde" },
   { value: "Propiedades municipales", label: "Propiedades municipales", countId: "count-propiedades-municipales", color: "#0f766e", dashKey: "propiedades-municipales" },
   { value: "Comodato", label: "Comodato", countId: "count-comodato", color: "#7c3aed", dashKey: "comodato" },
-  { value: "Monstrencos_urbanos", label: "Monstrencos Urbanos", countId: "count-monstrencos-urbanos", color: "#ea580c", dashKey: "monstrencos-urbanos" },
-  { value: "Mostrencos_Rurales", label: "Mostrencos Rurales", countId: "count-mostrencos-rurales", color: "#92400e", dashKey: "mostrencos-rurales" },
+  { value: "Bienes Mostrencos", label: "Bienes Mostrencos", countId: "count-bienes-mostrencos", color: "#ea580c", dashKey: "bienes-mostrencos" },
   { value: "Subdivisiones", label: "Subdivisiones", countId: "count-subdivisiones", color: "#dc2626", dashKey: "subdivisiones" }
 ];
 const bienesCategoryCounters = Object.fromEntries(
@@ -170,6 +169,10 @@ function normalizeBienesCategory(value) {
   const category = String(value || "").trim();
   if (category === "Bienes Municipales Rurale" || category === "Bienes Municipales Urbano") {
     return "Propiedades municipales";
+  }
+
+  if (category === "Monstrencos_urbanos" || category === "Mostrencos_Rurales") {
+    return "Bienes Mostrencos";
   }
 
   return category;
