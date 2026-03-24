@@ -43,6 +43,11 @@ const clearSelectionButton = document.getElementById("clear-selection");
 const fitAllButton = document.getElementById("fit-all");
 const heroFitAllButton = document.getElementById("hero-fit-all");
 const heroOpenRegistroButton = document.getElementById("hero-open-registro");
+const mapFocusTitle = document.getElementById("map-focus-title");
+const mapFocusPercent = document.getElementById("map-focus-percent");
+const mapFocusTotal = document.getElementById("map-focus-total");
+const mapFocusCon = document.getElementById("map-focus-con");
+const mapFocusSin = document.getElementById("map-focus-sin");
 const statCatastro = document.getElementById("stat-catastro");
 const statBienes = document.getElementById("stat-bienes");
 const statSupport = document.getElementById("stat-support");
@@ -93,6 +98,8 @@ let sidebarScrollDragState = null;
 const activeBienesCategories = new Set();
 const sourceLoadPromises = new Map();
 const bienesLayerIndex = new Map();
+let dashboardCategorySummary = {};
+let dashboardFocusCategory = null;
 let bienesSupportRecords = [];
 let registroModalView = "both";
 const numberFormatter = new Intl.NumberFormat("es-EC");
@@ -155,6 +162,34 @@ function collectPropertyEntries(properties) {
 
 function formatNumber(value) {
   return numberFormatter.format(value || 0);
+}
+
+function updateMapFocusPanel() {
+  if (!mapFocusTitle || !mapFocusPercent || !mapFocusTotal || !mapFocusCon || !mapFocusSin) {
+    return;
+  }
+
+  const fallbackCategory = activeBienesCategories.size === 1 ? Array.from(activeBienesCategories)[0] : null;
+  const focusCategory = dashboardFocusCategory && dashboardCategorySummary[dashboardFocusCategory]
+    ? dashboardFocusCategory
+    : fallbackCategory;
+  const item = focusCategory ? dashboardCategorySummary[focusCategory] : null;
+
+  if (!item) {
+    mapFocusTitle.textContent = "Selecciona una clasificacion";
+    mapFocusPercent.textContent = "0%";
+    mapFocusTotal.textContent = "0";
+    mapFocusCon.textContent = "0";
+    mapFocusSin.textContent = "0";
+    return;
+  }
+
+  const percentage = item.total ? Math.round((item.con / item.total) * 100) : 0;
+  mapFocusTitle.textContent = item.label;
+  mapFocusPercent.textContent = `${percentage}%`;
+  mapFocusTotal.textContent = formatNumber(item.total);
+  mapFocusCon.textContent = formatNumber(item.gravamenCon);
+  mapFocusSin.textContent = formatNumber(item.gravamenSin);
 }
 
 function updateHeroOverview() {
@@ -924,6 +959,11 @@ function renderBienesDashboards(features) {
     0
   );
 
+  dashboardCategorySummary = summary;
+  if (!dashboardFocusCategory || !dashboardCategorySummary[dashboardFocusCategory]) {
+    dashboardFocusCategory = bienesCategories.find((category) => summary[category.value]?.total > 0)?.value || null;
+  }
+
   if (dashboardNote) {
     dashboardNote.textContent = `${formatNumber(totalConRespaldo)} bienes tienen respaldo porque cuentan con numero de registro o REF.`;
   }
@@ -993,6 +1033,7 @@ function renderBienesDashboards(features) {
   }).join("");
   populateRegistroModalCategories();
   updateRegistroModalLists();
+  updateMapFocusPanel();
   updateHeroOverview();
   requestAnimationFrame(updateSidebarScrollUi);
 }
@@ -1005,6 +1046,7 @@ function updateCategoryCardState() {
   });
 
   updateDashboardSummaryState();
+  updateMapFocusPanel();
 }
 
 function updateDashboardSummaryState() {
@@ -1028,6 +1070,8 @@ function bindDashboardSummaryActions() {
   const summaryItems = Array.from(dashboardSummaryList.querySelectorAll(".dashboard-summary-item"));
   summaryItems.forEach((item) => {
     item.onclick = async () => {
+      dashboardFocusCategory = item.dataset.category;
+      updateMapFocusPanel();
       await focusBienesCategory(item.dataset.category);
     };
   });
@@ -1119,6 +1163,7 @@ async function ensureBienesLayerVisible() {
 }
 
 async function focusBienesCategory(category) {
+  dashboardFocusCategory = category;
   activeBienesCategories.clear();
   activeBienesCategories.add(category);
   updateCategoryCardState();
@@ -1449,8 +1494,12 @@ function bindLayerToggles() {
       const category = card.dataset.category;
       if (activeBienesCategories.has(category)) {
         activeBienesCategories.delete(category);
+        if (dashboardFocusCategory === category) {
+          dashboardFocusCategory = activeBienesCategories.size ? Array.from(activeBienesCategories).at(-1) : null;
+        }
       } else {
         activeBienesCategories.add(category);
+        dashboardFocusCategory = category;
       }
       updateCategoryCardState();
 
@@ -1473,6 +1522,8 @@ function bindLayerToggles() {
       return;
     }
 
+    dashboardFocusCategory = summaryItem.dataset.category;
+    updateMapFocusPanel();
     await focusBienesCategory(summaryItem.dataset.category);
   });
 }
