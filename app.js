@@ -177,6 +177,77 @@ function normalizeBienesCategory(value) {
   return category;
 }
 
+function normalizeGeometryForSource(source, geometry) {
+  if (!geometry) {
+    return null;
+  }
+
+  if (geometry.type !== "GeometryCollection") {
+    return geometry;
+  }
+
+  const geometries = Array.isArray(geometry.geometries) ? geometry.geometries : [];
+  const polygonParts = [];
+  const pointParts = [];
+
+  geometries.forEach((part) => {
+    if (!part || !part.type) {
+      return;
+    }
+
+    if (part.type === "Polygon") {
+      polygonParts.push(part.coordinates);
+      return;
+    }
+
+    if (part.type === "MultiPolygon") {
+      polygonParts.push(...(part.coordinates || []));
+      return;
+    }
+
+    if (source?.id === "bienes") {
+      if (part.type === "Point") {
+        pointParts.push(part.coordinates);
+        return;
+      }
+
+      if (part.type === "MultiPoint") {
+        pointParts.push(...(part.coordinates || []));
+      }
+    }
+  });
+
+  if (polygonParts.length === 1) {
+    return {
+      type: "Polygon",
+      coordinates: polygonParts[0]
+    };
+  }
+
+  if (polygonParts.length > 1) {
+    return {
+      type: "MultiPolygon",
+      coordinates: polygonParts
+    };
+  }
+
+  if (source?.id === "bienes" && pointParts.length === 1) {
+    return {
+      type: "Point",
+      coordinates: pointParts[0]
+    };
+  }
+
+  if (source?.id === "bienes" && pointParts.length > 1) {
+    return {
+      type: "MultiPoint",
+      coordinates: pointParts
+    };
+  }
+
+  return null;
+}
+
 function updateMapFocusPanel() {
   if (!mapFocusTitle || !mapFocusPercent || !mapFocusCopy || !mapFocusChart || !mapFocusTags || !mapFocusTotal || !mapFocusCon || !mapFocusSin) {
     return;
@@ -1415,10 +1486,12 @@ function normalizeFeatures(source, features) {
       }
     }
 
-    const geometry = feature?.geometry;
+    const geometry = normalizeGeometryForSource(source, feature?.geometry);
     if (!geometry) {
       return false;
     }
+
+    feature.geometry = geometry;
 
     if (geometry.type === "Polygon" || geometry.type === "MultiPolygon") {
       return true;
