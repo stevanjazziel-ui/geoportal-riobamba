@@ -1025,11 +1025,11 @@ function renderBienesDashboards(features) {
           <div
             class="dashboard-chart"
             style="--chart-fill: ${escapeHtml(category.color)}; --chart-angle: ${percentage * 3.6}deg;"
-            aria-label="${escapeHtml(category.label)}: ${percentage}% con respaldo"
+            aria-label="${escapeHtml(category.label)}: ${percentage}% con gravamen"
           >
             <div class="dashboard-chart-center">
               <strong>${percentage}%</strong>
-              <span>con respaldo</span>
+              <span>con gravamen</span>
             </div>
           </div>
           <div class="dashboard-copy">
