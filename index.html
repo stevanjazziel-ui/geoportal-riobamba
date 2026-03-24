@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://tile.openstreetmap.org">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="./styles.css?v=20260324-5">
+  <link rel="stylesheet" href="./styles.css?v=20260324-6">
 </head>
 <body>
   <div class="app-shell">
@@ -175,32 +175,7 @@
     <main class="map-stage">
       <div class="map-frame">
         <div class="map-scanline" aria-hidden="true"></div>
-        <div class="map-overlay map-overlay-top">
-          <article class="map-overlay-card legend-card">
-            <span class="map-overlay-label">Capas activas</span>
-            <div class="legend-list">
-              <span class="legend-item"><span class="legend-swatch legend-swatch-catastro"></span>Catastro</span>
-              <span class="legend-item"><span class="legend-swatch legend-swatch-bienes"></span>Bienes</span>
-            </div>
-          </article>
-          <article class="map-overlay-card map-overlay-card-status">
-            <span class="map-overlay-label">Estado</span>
-            <span id="map-message" class="map-message">Preparando capas geograficas...</span>
-          </article>
-          <article class="map-overlay-card legend-card legend-card-support">
-            <span class="map-overlay-label">Respaldo</span>
-            <div class="legend-support-list">
-              <span class="legend-support-item">
-                <span class="legend-support-line legend-support-line-solid"></span>
-                Con registro o referencia
-              </span>
-              <span class="legend-support-item">
-                <span class="legend-support-line legend-support-line-dashed"></span>
-                Sin registro o referencia
-              </span>
-            </div>
-          </article>
-        </div>
+        <span id="map-message" class="sr-only" aria-live="polite">Preparando capas geograficas...</span>
         <div id="map" aria-label="Mapa del geoportal"></div>
       </div>
     </main>
@@ -257,7 +232,7 @@
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="./app.js?v=20260324-2"></script>
+  <script src="./app.js?v=20260324-3"></script>
 </body>
 </html>
 

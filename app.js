@@ -41,18 +41,10 @@ const detailsContainer = document.getElementById("feature-details");
 const searchInput = document.getElementById("search-input");
 const clearSelectionButton = document.getElementById("clear-selection");
 const fitAllButton = document.getElementById("fit-all");
-const heroFitAllButton = document.getElementById("hero-fit-all");
-const heroOpenRegistroButton = document.getElementById("hero-open-registro");
 const statCatastro = document.getElementById("stat-catastro");
 const statBienes = document.getElementById("stat-bienes");
 const statResults = document.getElementById("stat-results");
 const statSupport = document.getElementById("stat-support");
-const heroActiveLayers = document.getElementById("hero-active-layers");
-const heroActiveFilters = document.getElementById("hero-active-filters");
-const heroSupportCount = document.getElementById("hero-support-count");
-const heroCatastroCount = document.getElementById("hero-catastro-count");
-const heroBienesCount = document.getElementById("hero-bienes-count");
-const heroViewMode = document.getElementById("hero-view-mode");
 const toggleCatastro = document.getElementById("toggle-catastro");
 const toggleBienes = document.getElementById("toggle-bienes");
 const sidebar = document.querySelector(".sidebar");
@@ -167,24 +159,6 @@ function updateHeroOverview() {
   const catastroCount = layerState.get("catastro")?.featureCount || 0;
   const bienesCount = layerState.get("bienes")?.featureCount || 0;
 
-  if (heroActiveLayers) {
-    heroActiveLayers.textContent = formatNumber(activeLayers);
-  }
-  if (heroActiveFilters) {
-    heroActiveFilters.textContent = formatNumber(activeFilters);
-  }
-  if (heroSupportCount) {
-    heroSupportCount.textContent = formatNumber(supportCount);
-  }
-  if (heroCatastroCount) {
-    heroCatastroCount.textContent = formatNumber(catastroCount);
-  }
-  if (heroBienesCount) {
-    heroBienesCount.textContent = formatNumber(bienesCount);
-  }
-  if (heroViewMode) {
-    heroViewMode.textContent = activeFilters > 0 ? "Busqueda y filtro activos" : "Exploracion general";
-  }
   if (statSupport) {
     statSupport.textContent = formatNumber(supportCount);
   }
@@ -1575,8 +1549,6 @@ async function initialize() {
 searchInput.addEventListener("input", updateSearch);
 clearSelectionButton.addEventListener("click", clearSelection);
 fitAllButton.addEventListener("click", fitAllLayers);
-heroFitAllButton?.addEventListener("click", fitAllLayers);
-heroOpenRegistroButton?.addEventListener("click", openRegistroModal);
 
 initialize().catch((error) => {
   console.error(error);

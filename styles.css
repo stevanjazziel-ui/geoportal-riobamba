@@ -89,6 +89,18 @@
   box-sizing: border-box;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 html,
 body {
   margin: 0;
@@ -1227,10 +1239,6 @@ body::after {
   line-height: 1.4;
 }
 
-.map-overlay-card-status {
-  max-width: min(360px, calc(50% - 6px));
-}
-
 .legend-item {
   display: inline-flex;
   align-items: center;
@@ -2211,7 +2219,6 @@ body::after {
   }
 
   .badge,
-  .hud-label,
   .panel-kicker,
   .eyebrow,
   .map-overlay-label {
@@ -2223,20 +2230,6 @@ body::after {
     border-color: rgba(45, 122, 212, 0.16);
     color: #32588b;
     box-shadow: none;
-  }
-
-  .map-message,
-  .hud-chip-label {
-    color: #5b7690;
-  }
-
-  .hud-chip {
-    background: #ffffff;
-    border-color: rgba(45, 122, 212, 0.16);
-  }
-
-  .hud-chip strong {
-    color: #17324d;
   }
 
   .map-frame {
@@ -2260,14 +2253,4 @@ body::after {
     opacity: 0.45;
   }
 
-  .map-overlay-card {
-    background: rgba(255, 255, 255, 0.94);
-    border-color: rgba(45, 122, 212, 0.18);
-    box-shadow: 0 10px 22px rgba(31, 81, 151, 0.12);
-  }
-
-  .legend-item,
-  .legend-support-item {
-    color: #36506c;
-  }
 }
