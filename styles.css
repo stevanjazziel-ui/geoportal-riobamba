@@ -1927,9 +1927,11 @@ body::after {
 
 .map-focus-panel {
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 18px;
   min-width: 0;
   width: 100%;
+  min-height: clamp(560px, calc(100vh - 210px), 720px);
   padding: 22px 22px 20px;
   border-radius: 22px;
   border: 1px solid rgba(57, 208, 255, 0.14);
@@ -2023,7 +2025,10 @@ body::after {
 
 .map-focus-distribution {
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: stretch;
   gap: 12px;
+  min-height: 0;
 }
 
 .map-focus-distribution-head {
@@ -2042,7 +2047,9 @@ body::after {
 
 .map-focus-distribution-rows {
   display: grid;
+  align-content: start;
   gap: 12px;
+  min-height: 0;
 }
 
 .map-focus-distribution-row {
@@ -2333,6 +2340,8 @@ body::after {
   }
 
   .map-focus-panel {
+    grid-template-rows: auto;
+    min-height: auto;
     width: min(360px, calc(100% - 24px));
   }
 
@@ -2352,6 +2361,10 @@ body::after {
   .map-focus-distribution-head {
     align-items: start;
     flex-direction: column;
+  }
+
+  .map-focus-distribution {
+    grid-template-rows: auto;
   }
 
   .map-focus-distribution-head strong {
