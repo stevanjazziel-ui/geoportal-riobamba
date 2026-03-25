@@ -245,20 +245,33 @@ function buildMapFocusChartLabels(distributionItems, distributionTotal) {
     return;
   }
 
-  if (!distributionItems.length || !distributionTotal) {
+  const visibleItems = distributionItems.filter((entry) => entry.count > 0);
+
+  if (!visibleItems.length || !distributionTotal) {
     mapFocusChartLabels.innerHTML = "";
+    mapFocusChart?.classList.remove("is-compact-center");
     return;
   }
 
   let startAngle = 0;
-  const radius = 34;
+  mapFocusChart?.classList.toggle("is-compact-center", visibleItems.length >= 3);
 
-  mapFocusChartLabels.innerHTML = distributionItems
-    .filter((entry) => entry.count > 0)
+  mapFocusChartLabels.innerHTML = visibleItems
     .map((entry) => {
       const segmentAngle = (entry.count / distributionTotal) * 360;
       const midAngle = startAngle + (segmentAngle / 2);
       startAngle += segmentAngle;
+
+      let radius = 43;
+      let extraClass = "";
+
+      if (segmentAngle < 18) {
+        radius = 56;
+        extraClass = " is-tiny";
+      } else if (segmentAngle < 34) {
+        radius = 49;
+        extraClass = " is-outer";
+      }
 
       const radians = ((midAngle - 90) * Math.PI) / 180;
       const x = 50 + (Math.cos(radians) * radius);
@@ -266,7 +279,7 @@ function buildMapFocusChartLabels(distributionItems, distributionTotal) {
 
       return `
         <span
-          class="map-focus-chart-segment-label"
+          class="map-focus-chart-segment-label${extraClass}"
           style="left: ${x.toFixed(2)}%; top: ${y.toFixed(2)}%;"
         >
           ${escapeHtml(formatNumber(entry.count))}

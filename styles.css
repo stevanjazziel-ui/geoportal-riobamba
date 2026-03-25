@@ -1970,15 +1970,26 @@ body::after {
 .map-focus-chart-segment-label {
   position: absolute;
   transform: translate(-50%, -50%);
-  padding: 2px 5px;
+  padding: 2px 4px;
   border-radius: 999px;
-  background: rgba(6, 20, 31, 0.88);
+  background: rgba(6, 20, 31, 0.92);
   box-shadow: 0 0 0 1px rgba(57, 208, 255, 0.08);
   color: var(--ink);
   font-family: "Space Grotesk", "IBM Plex Sans", sans-serif;
-  font-size: 0.68rem;
+  font-size: 0.6rem;
+  font-weight: 700;
   line-height: 1;
   white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+.map-focus-chart-segment-label.is-outer {
+  font-size: 0.56rem;
+}
+
+.map-focus-chart-segment-label.is-tiny {
+  font-size: 0.52rem;
+  padding: 1px 4px;
 }
 
 .map-focus-chart::before {
@@ -2004,6 +2015,14 @@ body::after {
   font-size: 2.25rem;
   line-height: 0.95;
   color: var(--ink);
+}
+
+.map-focus-chart.is-compact-center .map-focus-chart-center strong {
+  font-size: 1.85rem;
+}
+
+.map-focus-chart.is-compact-center .map-focus-chart-center span {
+  font-size: 0.82rem;
 }
 
 .map-focus-chart-center span {
@@ -2375,7 +2394,7 @@ body::after {
 
   .map-focus-chart-segment-label {
     padding: 1px 4px;
-    font-size: 0.56rem;
+    font-size: 0.5rem;
   }
 
   .map-focus-distribution-head {
