@@ -1835,7 +1835,7 @@ body::after {
 .map-overlay-stack {
   display: grid;
   gap: 14px;
-  width: min(660px, calc(68% - 18px));
+  width: min(620px, calc(64% - 18px));
   pointer-events: none;
 }
 
