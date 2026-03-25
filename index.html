@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://tile.openstreetmap.org">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="./styles.css?v=20260325-35">
+  <link rel="stylesheet" href="./styles.css?v=20260325-36">
 </head>
 <body>
   <div class="app-shell">
@@ -157,6 +157,20 @@
                     <strong id="map-focus-title">Selecciona una clasificacion</strong>
                   </div>
                   <p id="map-focus-copy" class="map-focus-copy">Haz clic en una categoria para ver su lectura documental en el mapa.</p>
+                  <div class="map-focus-bar-stats" aria-label="Lectura del grafico de barras">
+                    <div class="map-focus-bar-stat">
+                      <span class="map-focus-bar-stat-label">Participacion</span>
+                      <strong id="map-focus-distribution-percent">0%</strong>
+                    </div>
+                    <div class="map-focus-bar-stat">
+                      <span class="map-focus-bar-stat-label">Regularizados</span>
+                      <strong id="map-focus-distribution-count">0</strong>
+                    </div>
+                    <div class="map-focus-bar-stat">
+                      <span class="map-focus-bar-stat-label">Total regularizado</span>
+                      <strong id="map-focus-distribution-base">0</strong>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="map-focus-distribution">
@@ -252,7 +266,7 @@
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="./app.js?v=20260325-23"></script>
+  <script src="./app.js?v=20260325-24"></script>
 </body>
 </html>
 
