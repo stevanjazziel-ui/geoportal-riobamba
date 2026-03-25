@@ -45,6 +45,7 @@ const heroFitAllButton = document.getElementById("hero-fit-all");
 const heroOpenRegistroButton = document.getElementById("hero-open-registro");
 const mapFocusTitle = document.getElementById("map-focus-title");
 const mapFocusPercent = document.getElementById("map-focus-percent");
+const mapFocusPercentLabel = document.getElementById("map-focus-percent-label");
 const mapFocusCopy = document.getElementById("map-focus-copy");
 const mapFocusChart = document.getElementById("map-focus-chart");
 const mapFocusDistributionPercent = document.getElementById("map-focus-distribution-percent");
@@ -278,6 +279,7 @@ function updateMapFocusPanel() {
   if (
     !mapFocusTitle
     || !mapFocusPercent
+    || !mapFocusPercentLabel
     || !mapFocusCopy
     || !mapFocusChart
     || !mapFocusDistributionPercent
@@ -306,12 +308,22 @@ function updateMapFocusPanel() {
     })
     .sort((left, right) => right.regularized - left.regularized);
   const totalRegularized = distributionItems.reduce((accumulator, entry) => accumulator + entry.regularized, 0);
+  const chartGradient = distributionItems.length && totalRegularized
+    ? `conic-gradient(${distributionItems.map((entry, index) => {
+        const startAngle = distributionItems
+          .slice(0, index)
+          .reduce((accumulator, current) => accumulator + ((current.regularized / totalRegularized) * 360), 0);
+        const endAngle = startAngle + ((entry.regularized / totalRegularized) * 360);
+        return `${entry.color} ${startAngle.toFixed(2)}deg ${endAngle.toFixed(2)}deg`;
+      }).join(", ")})`
+    : "conic-gradient(#39d0ff 0deg 360deg)";
 
   mapFocusDistributionTotal.textContent = `${formatNumber(totalRegularized)} predios municipales`;
   mapFocusDistributionBase.textContent = formatNumber(totalRegularized);
+  mapFocusChart.style.setProperty("--focus-chart-gradient", chartGradient);
   mapFocusDistributionRows.innerHTML = distributionItems.length
     ? distributionItems.map((entry) => {
-        const percent = totalRegularized ? Math.round((entry.regularized / totalRegularized) * 100) : 0;
+          const percent = totalRegularized ? Math.round((entry.regularized / totalRegularized) * 100) : 0;
       const distributionSize = percent > 0 ? Math.max(percent, 4) : 0;
       return `
         <div class="map-focus-distribution-row">
@@ -333,23 +345,20 @@ function updateMapFocusPanel() {
   if (!item) {
     mapFocusTitle.textContent = "Selecciona una clasificacion";
     mapFocusPercent.textContent = "0%";
+    mapFocusPercentLabel.textContent = "del total regularizado";
     mapFocusCopy.textContent = "Haz clic en una categoria para ver su lectura documental en el mapa.";
     mapFocusDistributionPercent.textContent = "0%";
     mapFocusDistributionCount.textContent = "0";
-    mapFocusChart.style.setProperty("--focus-chart-fill", "#39d0ff");
-    mapFocusChart.style.setProperty("--focus-chart-angle", "0deg");
     return;
   }
 
-  const percentage = item.total ? Math.round((item.con / item.total) * 100) : 0;
   const distributionPercent = totalRegularized ? Math.round((item.gravamenCon / totalRegularized) * 100) : 0;
   mapFocusTitle.textContent = item.label;
-  mapFocusPercent.textContent = `${percentage}%`;
+  mapFocusPercent.textContent = `${distributionPercent}%`;
+  mapFocusPercentLabel.textContent = "del total regularizado";
   mapFocusCopy.textContent = `${formatNumber(item.gravamenCon)} de ${formatNumber(item.total)} bienes de esta clasificacion cuentan con numero de registro o REF.`;
   mapFocusDistributionPercent.textContent = `${distributionPercent}%`;
   mapFocusDistributionCount.textContent = formatNumber(item.gravamenCon);
-  mapFocusChart.style.setProperty("--focus-chart-fill", getBienesColor(focusCategory));
-  mapFocusChart.style.setProperty("--focus-chart-angle", `${percentage * 3.6}deg`);
 }
 
 function updateHeroOverview() {

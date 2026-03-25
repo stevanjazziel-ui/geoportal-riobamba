@@ -1954,14 +1954,13 @@ body::after {
 }
 
 .map-focus-chart {
-  --focus-chart-angle: 0deg;
-  --focus-chart-fill: #39d0ff;
   --focus-chart-rest: rgba(157, 183, 200, 0.16);
+  --focus-chart-gradient: conic-gradient(#39d0ff 0deg 360deg);
   position: relative;
   width: 132px;
   aspect-ratio: 1;
   border-radius: 999px;
-  background: conic-gradient(var(--focus-chart-fill) 0deg var(--focus-chart-angle), var(--focus-chart-rest) var(--focus-chart-angle) 360deg);
+  background: var(--focus-chart-gradient);
   display: grid;
   place-items: center;
 }
