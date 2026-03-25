@@ -49,6 +49,7 @@ const mapFocusPercentLabel = document.getElementById("map-focus-percent-label");
 const mapFocusModeTitle = document.getElementById("map-focus-mode-title");
 const mapFocusCopy = document.getElementById("map-focus-copy");
 const mapFocusChart = document.getElementById("map-focus-chart");
+const mapFocusDistributionTitle = document.getElementById("map-focus-distribution-title");
 const mapFocusDistributionTotal = document.getElementById("map-focus-distribution-total");
 const mapFocusDistributionRows = document.getElementById("map-focus-distribution-rows");
 const statCatastro = document.getElementById("stat-catastro");
@@ -156,6 +157,86 @@ function getCategoryCountModeTitle(mode) {
   }
 
   return "Bienes municipales totales";
+}
+
+function getCategoryCountModeShortLabel(mode) {
+  if (mode === "regularized") {
+    return "regularizados";
+  }
+
+  if (mode === "nonregularized") {
+    return "no regularizados";
+  }
+
+  return "predios totales";
+}
+
+function getCategoryCountModeDistributionTitle(mode) {
+  if (mode === "regularized") {
+    return "Subclasificaciones regularizadas";
+  }
+
+  if (mode === "nonregularized") {
+    return "Subclasificaciones no regularizadas";
+  }
+
+  return "Subclasificaciones de la categoria";
+}
+
+function getSummaryCountByMode(summaryItem, mode) {
+  if (!summaryItem) {
+    return 0;
+  }
+
+  if (mode === "regularized") {
+    return summaryItem.gravamenCon || 0;
+  }
+
+  if (mode === "nonregularized") {
+    return summaryItem.gravamenSin || 0;
+  }
+
+  return summaryItem.total || 0;
+}
+
+function getBienesSubcategoryLabel(value) {
+  const subcategory = String(value || "").trim();
+
+  if (subcategory === "Area Verde") {
+    return "Area Verde";
+  }
+
+  if (subcategory === "Bienes Municipales Urbano") {
+    return "Bienes Municipales Urbanos";
+  }
+
+  if (subcategory === "Bienes Municipales Rurale") {
+    return "Bienes Municipales Rurales";
+  }
+
+  if (subcategory === "Comodato") {
+    return "Comodato";
+  }
+
+  if (subcategory === "Monstrencos_urbanos") {
+    return "Mostrencos Urbanos";
+  }
+
+  if (subcategory === "Mostrencos_Rurales") {
+    return "Mostrencos Rurales";
+  }
+
+  return subcategory.replaceAll("_", " ") || "Sin subclasificacion";
+}
+
+function getSubcategoryColor(category, index, total) {
+  const baseColor = getBienesColor(category);
+  if (total <= 1 || index === 0) {
+    return baseColor;
+  }
+
+  const mixRatio = Math.min(0.6, 0.18 * index);
+  return mixHexColors(baseColor, "#f8fafc", mixRatio);
 }
 
 function setStatus(messages) {
@@ -293,6 +374,7 @@ function updateMapFocusPanel() {
     || !mapFocusModeTitle
     || !mapFocusCopy
     || !mapFocusChart
+    || !mapFocusDistributionTitle
     || !mapFocusDistributionTotal
     || !mapFocusDistributionRows
   ) {
@@ -304,49 +386,49 @@ function updateMapFocusPanel() {
     ? dashboardFocusCategory
     : fallbackCategory;
   const item = focusCategory ? dashboardCategorySummary[focusCategory] : null;
-  const distributionItems = bienesCategories
-    .map((category) => {
-      const summaryItem = dashboardCategorySummary[category.value];
-      return {
-        value: category.value,
-        label: summaryItem?.label || category.label,
-        regularized: summaryItem?.gravamenCon || 0,
-        color: getBienesColor(category.value)
-      };
-    })
-    .sort((left, right) => right.regularized - left.regularized);
-  const totalRegularized = distributionItems.reduce((accumulator, entry) => accumulator + entry.regularized, 0);
-  const chartGradient = distributionItems.length && totalRegularized
+  const rawSubcategoryItems = item
+    ? Object.values(item.subcategories || {})
+    : [];
+  const distributionItems = rawSubcategoryItems
+    .map((entry, index, source) => ({
+      label: entry.label,
+      count: getSummaryCountByMode(entry, categoryCountMode),
+      color: getSubcategoryColor(focusCategory, index, source.length)
+    }))
+    .sort((left, right) => right.count - left.count || left.label.localeCompare(right.label, "es"));
+  const focusTotal = item ? getSummaryCountByMode(item, categoryCountMode) : 0;
+  const chartGradient = distributionItems.length && focusTotal
     ? `conic-gradient(${distributionItems.map((entry, index) => {
         const startAngle = distributionItems
           .slice(0, index)
-          .reduce((accumulator, current) => accumulator + ((current.regularized / totalRegularized) * 360), 0);
-        const endAngle = startAngle + ((entry.regularized / totalRegularized) * 360);
+          .reduce((accumulator, current) => accumulator + ((current.count / focusTotal) * 360), 0);
+        const endAngle = startAngle + ((entry.count / focusTotal) * 360);
         return `${entry.color} ${startAngle.toFixed(2)}deg ${endAngle.toFixed(2)}deg`;
       }).join(", ")})`
-    : "conic-gradient(#39d0ff 0deg 360deg)";
+    : "conic-gradient(rgba(157, 183, 200, 0.22) 0deg 360deg)";
   mapFocusModeTitle.textContent = getCategoryCountModeTitle(categoryCountMode);
-  mapFocusDistributionTotal.textContent = `${formatNumber(totalRegularized)} predios municipales`;
+  mapFocusDistributionTitle.textContent = getCategoryCountModeDistributionTitle(categoryCountMode);
+  mapFocusDistributionTotal.textContent = `${formatNumber(focusTotal)} ${getCategoryCountModeShortLabel(categoryCountMode)}`;
   mapFocusChart.style.setProperty("--focus-chart-gradient", chartGradient);
   mapFocusDistributionRows.innerHTML = distributionItems.length
     ? distributionItems.map((entry) => {
-          const percent = totalRegularized ? Math.round((entry.regularized / totalRegularized) * 100) : 0;
-      const distributionSize = percent > 0 ? Math.max(percent, 4) : 0;
-      return `
-        <div class="map-focus-distribution-row">
-          <div class="map-focus-distribution-row-head">
-            <span class="map-focus-distribution-label">${escapeHtml(entry.label)}</span>
-            <strong class="map-focus-distribution-value">${percent}%</strong>
+        const percent = focusTotal ? Math.round((entry.count / focusTotal) * 100) : 0;
+        const distributionSize = percent > 0 ? Math.max(percent, 4) : 0;
+        return `
+          <div class="map-focus-distribution-row">
+            <div class="map-focus-distribution-row-head">
+              <span class="map-focus-distribution-label">${escapeHtml(entry.label)}</span>
+              <strong class="map-focus-distribution-value">${percent}%</strong>
+            </div>
+            <div class="map-focus-distribution-bar-shell">
+              <span
+                class="map-focus-distribution-bar"
+                style="--distribution-size: ${distributionSize}%; --distribution-fill: ${escapeHtml(entry.color)};"
+              ></span>
+            </div>
           </div>
-          <div class="map-focus-distribution-bar-shell">
-            <span
-              class="map-focus-distribution-bar"
-              style="--distribution-size: ${distributionSize}%; --distribution-fill: ${escapeHtml(entry.color)};"
-            ></span>
-          </div>
-        </div>
-      `;
-    }).join("")
+        `;
+      }).join("")
     : '<p class="map-focus-distribution-empty">No hay predios regularizados en la vista actual.</p>';
 
   if (!item) {
@@ -354,20 +436,30 @@ function updateMapFocusPanel() {
       brandMainTitle.textContent = defaultBrandTitle;
       brandMainTitle.classList.remove("is-category-title");
     }
-    mapFocusPercent.textContent = "0%";
-    mapFocusPercentLabel.textContent = "del total regularizado";
+    mapFocusPercent.textContent = "0";
+    mapFocusPercentLabel.textContent = getCategoryCountModeShortLabel(categoryCountMode);
     mapFocusCopy.textContent = "Haz clic en una categoria para ver su lectura documental en el mapa.";
     return;
   }
 
-  const distributionPercent = totalRegularized ? Math.round((item.gravamenCon / totalRegularized) * 100) : 0;
   if (brandMainTitle) {
     brandMainTitle.textContent = item.label;
     brandMainTitle.classList.add("is-category-title");
   }
-  mapFocusPercent.textContent = `${distributionPercent}%`;
-  mapFocusPercentLabel.textContent = "del total regularizado";
-  mapFocusCopy.textContent = `${formatNumber(item.gravamenCon)} de ${formatNumber(item.total)} bienes de esta clasificacion cuentan con numero de registro o REF.`;
+  mapFocusPercent.textContent = formatNumber(focusTotal);
+  mapFocusPercentLabel.textContent = getCategoryCountModeShortLabel(categoryCountMode);
+
+  if (categoryCountMode === "regularized") {
+    mapFocusCopy.textContent = `${formatNumber(item.gravamenCon)} de ${formatNumber(item.total)} bienes de esta clasificacion presentan numero de registro o REF.`;
+    return;
+  }
+
+  if (categoryCountMode === "nonregularized") {
+    mapFocusCopy.textContent = `${formatNumber(item.gravamenSin)} de ${formatNumber(item.total)} bienes de esta clasificacion no presentan numero de registro ni REF.`;
+    return;
+  }
+
+  mapFocusCopy.textContent = `${formatNumber(item.total)} bienes de esta clasificacion se distribuyen entre sus subclasificaciones activas.`;
 }
 
 function updateHeroOverview() {
@@ -1128,7 +1220,7 @@ function renderBienesDashboards(features) {
   const summary = Object.fromEntries(
     bienesCategories.map((category) => [
       category.value,
-      { label: category.label, total: 0, con: 0, sin: 0, gravamenCon: 0, gravamenSin: 0, keywordCounts: {} }
+      { label: category.label, total: 0, con: 0, sin: 0, gravamenCon: 0, gravamenSin: 0, keywordCounts: {}, subcategories: {} }
     ])
   );
 
@@ -1154,6 +1246,23 @@ function renderBienesDashboards(features) {
       summary[category].gravamenCon += 1;
     } else {
       summary[category].gravamenSin += 1;
+    }
+
+    const subcategoryLabel = getBienesSubcategoryLabel(feature?.properties?.subclase_raw);
+    if (!summary[category].subcategories[subcategoryLabel]) {
+      summary[category].subcategories[subcategoryLabel] = {
+        label: subcategoryLabel,
+        total: 0,
+        gravamenCon: 0,
+        gravamenSin: 0
+      };
+    }
+
+    summary[category].subcategories[subcategoryLabel].total += 1;
+    if (hasGravamen) {
+      summary[category].subcategories[subcategoryLabel].gravamenCon += 1;
+    } else {
+      summary[category].subcategories[subcategoryLabel].gravamenSin += 1;
     }
 
     bienesSupportRecords.push({
@@ -1624,6 +1733,7 @@ function buildGeoJsonLayer(source, geojson) {
 function normalizeFeatures(source, features) {
   return (features || []).filter((feature) => {
     if (source?.id === "bienes" && feature?.properties) {
+      feature.properties.subclase_raw = String(feature.properties.clase || "").trim();
       feature.properties.clase = normalizeBienesCategory(feature.properties.clase);
       if (feature.properties.clase === "Subdivisiones") {
         return false;
