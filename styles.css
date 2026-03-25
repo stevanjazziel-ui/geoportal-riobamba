@@ -1960,6 +1960,27 @@ body::after {
   place-items: center;
 }
 
+.map-focus-chart-labels {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.map-focus-chart-segment-label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 2px 5px;
+  border-radius: 999px;
+  background: rgba(6, 20, 31, 0.88);
+  box-shadow: 0 0 0 1px rgba(57, 208, 255, 0.08);
+  color: var(--ink);
+  font-family: "Space Grotesk", "IBM Plex Sans", sans-serif;
+  font-size: 0.68rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
 .map-focus-chart::before {
   content: "";
   position: absolute;
@@ -1971,7 +1992,7 @@ body::after {
 
 .map-focus-chart-center {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: grid;
   gap: 4px;
   justify-items: center;
@@ -2350,6 +2371,11 @@ body::after {
 
   .map-focus-chart {
     width: 96px;
+  }
+
+  .map-focus-chart-segment-label {
+    padding: 1px 4px;
+    font-size: 0.56rem;
   }
 
   .map-focus-distribution-head {

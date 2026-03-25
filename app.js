@@ -49,6 +49,7 @@ const mapFocusPercentLabel = document.getElementById("map-focus-percent-label");
 const mapFocusModeTitle = document.getElementById("map-focus-mode-title");
 const mapFocusCopy = document.getElementById("map-focus-copy");
 const mapFocusChart = document.getElementById("map-focus-chart");
+const mapFocusChartLabels = document.getElementById("map-focus-chart-labels");
 const mapFocusDistributionTitle = document.getElementById("map-focus-distribution-title");
 const mapFocusDistributionTotal = document.getElementById("map-focus-distribution-total");
 const mapFocusDistributionRows = document.getElementById("map-focus-distribution-rows");
@@ -239,6 +240,42 @@ function getSubcategoryColor(category, index, total) {
   return mixHexColors(baseColor, "#f8fafc", mixRatio);
 }
 
+function buildMapFocusChartLabels(distributionItems, distributionTotal) {
+  if (!mapFocusChartLabels) {
+    return;
+  }
+
+  if (!distributionItems.length || !distributionTotal) {
+    mapFocusChartLabels.innerHTML = "";
+    return;
+  }
+
+  let startAngle = 0;
+  const radius = 34;
+
+  mapFocusChartLabels.innerHTML = distributionItems
+    .filter((entry) => entry.count > 0)
+    .map((entry) => {
+      const segmentAngle = (entry.count / distributionTotal) * 360;
+      const midAngle = startAngle + (segmentAngle / 2);
+      startAngle += segmentAngle;
+
+      const radians = ((midAngle - 90) * Math.PI) / 180;
+      const x = 50 + (Math.cos(radians) * radius);
+      const y = 50 + (Math.sin(radians) * radius);
+
+      return `
+        <span
+          class="map-focus-chart-segment-label"
+          style="left: ${x.toFixed(2)}%; top: ${y.toFixed(2)}%;"
+        >
+          ${escapeHtml(formatNumber(entry.count))}
+        </span>
+      `;
+    })
+    .join("");
+}
+
 function setStatus(messages) {
   statusList.innerHTML = messages.map((message) => `<li>${message}</li>`).join("");
   requestAnimationFrame(updateSidebarScrollUi);
@@ -374,6 +411,7 @@ function updateMapFocusPanel() {
     || !mapFocusModeTitle
     || !mapFocusCopy
     || !mapFocusChart
+    || !mapFocusChartLabels
     || !mapFocusDistributionTitle
     || !mapFocusDistributionTotal
     || !mapFocusDistributionRows
@@ -411,6 +449,7 @@ function updateMapFocusPanel() {
   mapFocusDistributionTitle.textContent = getCategoryCountModeDistributionTitle(categoryCountMode);
   mapFocusDistributionTotal.textContent = `${formatNumber(distributionTotal)} ${getCategoryCountModeShortLabel(categoryCountMode)}`;
   mapFocusChart.style.setProperty("--focus-chart-gradient", chartGradient);
+  buildMapFocusChartLabels(distributionItems, distributionTotal);
   mapFocusPercent.textContent = formatNumber(distributionTotal);
   mapFocusPercentLabel.textContent = getCategoryCountModeShortLabel(categoryCountMode);
   mapFocusDistributionRows.innerHTML = distributionItems.length
