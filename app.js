@@ -429,6 +429,7 @@ function setCategoryCountMode(mode) {
   categoryCountMode = ["all", "regularized", "nonregularized"].includes(mode) ? mode : "all";
   updateCategoryCountModeUi();
   updateBienesCategoryCounts(bienesFeaturesCache);
+  updateMapFocusPanel();
 }
 
 function normalizeText(value) {
