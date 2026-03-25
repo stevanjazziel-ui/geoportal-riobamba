@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://tile.openstreetmap.org">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-  <link rel="stylesheet" href="./styles.css?v=20260325-22">
+  <link rel="stylesheet" href="./styles.css?v=20260325-23">
 </head>
 <body>
   <div class="app-shell">
@@ -29,6 +29,20 @@
               <span class="brand-pulse-ring"></span>
               <span class="brand-pulse-core"></span>
             </div>
+          </div>
+          <div class="stat-grid brand-stat-grid">
+            <article class="stat-card">
+              <span class="stat-label">Bienes municipales totales</span>
+              <strong id="stat-bienes">0</strong>
+            </article>
+            <article class="stat-card stat-card-accent">
+              <span class="stat-label">Bienes municipales regularizados</span>
+              <strong id="stat-regularized">0</strong>
+            </article>
+            <article class="stat-card">
+              <span class="stat-label">Bienes municipales no regularizados</span>
+              <strong id="stat-support">0</strong>
+            </article>
           </div>
         </div>
 
@@ -127,22 +141,6 @@
         <div class="map-scanline" aria-hidden="true"></div>
         <div class="map-overlay map-overlay-top">
           <div class="map-overlay-stack">
-            <article class="map-overlay-card map-summary-panel">
-              <div class="stat-grid map-stat-grid">
-                <article class="stat-card">
-                  <span class="stat-label">Bienes municipales totales</span>
-                  <strong id="stat-bienes">0</strong>
-                </article>
-                <article class="stat-card stat-card-accent">
-                  <span class="stat-label">Bienes municipales regularizados</span>
-                  <strong id="stat-regularized">0</strong>
-                </article>
-                <article class="stat-card">
-                  <span class="stat-label">Bienes municipales no regularizados</span>
-                  <strong id="stat-support">0</strong>
-                </article>
-              </div>
-            </article>
             <article id="map-focus-panel" class="map-overlay-card map-focus-panel" aria-live="polite">
               <div class="map-focus-top">
                 <div

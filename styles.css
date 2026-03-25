@@ -275,6 +275,25 @@ body::after {
   align-items: start;
 }
 
+.brand-stat-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.brand-card .stat-card {
+  min-height: 108px;
+  padding: 14px 12px;
+}
+
+.brand-card .stat-label {
+  font-size: 0.78rem;
+}
+
+.brand-card .stat-card strong {
+  font-size: clamp(1.6rem, 2.15vw, 2rem);
+}
+
 .brand-pulse {
   position: relative;
   display: grid;
@@ -1648,6 +1667,24 @@ body::after {
   align-items: start;
 }
 
+.brand-stat-grid {
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.brand-card .stat-card {
+  min-height: 96px;
+  padding: 12px 10px;
+}
+
+.brand-card .stat-label {
+  font-size: 0.72rem;
+}
+
+.brand-card .stat-card strong {
+  font-size: clamp(1.35rem, 1.8vw, 1.75rem);
+}
+
 .brand-pulse {
   width: 46px;
   align-self: start;
@@ -2169,6 +2206,10 @@ body::after {
   .brand-grid {
     grid-template-columns: minmax(0, 1fr) 54px;
     gap: 10px;
+  }
+
+  .brand-stat-grid {
+    grid-template-columns: 1fr;
   }
 
   .brand-pulse {
