@@ -411,6 +411,8 @@ function updateMapFocusPanel() {
   mapFocusDistributionTitle.textContent = getCategoryCountModeDistributionTitle(categoryCountMode);
   mapFocusDistributionTotal.textContent = `${formatNumber(distributionTotal)} ${getCategoryCountModeShortLabel(categoryCountMode)}`;
   mapFocusChart.style.setProperty("--focus-chart-gradient", chartGradient);
+  mapFocusPercent.textContent = formatNumber(distributionTotal);
+  mapFocusPercentLabel.textContent = getCategoryCountModeShortLabel(categoryCountMode);
   mapFocusDistributionRows.innerHTML = distributionItems.length
     ? distributionItems.map((entry) => {
         const percent = distributionTotal ? Math.round((entry.count / distributionTotal) * 100) : 0;
@@ -437,8 +439,6 @@ function updateMapFocusPanel() {
       brandMainTitle.textContent = defaultBrandTitle;
       brandMainTitle.classList.remove("is-category-title");
     }
-    mapFocusPercent.textContent = "0";
-    mapFocusPercentLabel.textContent = getCategoryCountModeShortLabel(categoryCountMode);
     mapFocusCopy.textContent = "Haz clic en una categoria para ver su lectura documental en el mapa.";
     return;
   }
@@ -447,8 +447,6 @@ function updateMapFocusPanel() {
     brandMainTitle.textContent = item.label;
     brandMainTitle.classList.add("is-category-title");
   }
-  mapFocusPercent.textContent = formatNumber(focusTotal);
-  mapFocusPercentLabel.textContent = getCategoryCountModeShortLabel(categoryCountMode);
 
   if (categoryCountMode === "regularized") {
     mapFocusCopy.textContent = `${formatNumber(item.gravamenCon)} de ${formatNumber(item.total)} bienes de esta clasificacion presentan numero de registro o REF.`;
