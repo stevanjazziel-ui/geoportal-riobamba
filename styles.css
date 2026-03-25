@@ -1882,7 +1882,7 @@ body::after {
 .map-overlay-stack {
   display: grid;
   gap: 14px;
-  width: min(620px, calc(64% - 18px));
+  width: min(760px, calc(78% - 18px));
   pointer-events: none;
 }
 
@@ -2261,11 +2261,11 @@ body::after {
   }
 
   .map-overlay-stack {
-    width: min(430px, calc(100% - 36px));
+    width: min(560px, calc(78% - 36px));
   }
 
   .map-focus-panel {
-    width: min(380px, calc(100% - 36px));
+    width: min(560px, calc(78% - 36px));
   }
 
   .map-overlay-card {
