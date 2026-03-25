@@ -43,7 +43,7 @@ const clearSelectionButton = document.getElementById("clear-selection");
 const fitAllButton = document.getElementById("fit-all");
 const heroFitAllButton = document.getElementById("hero-fit-all");
 const heroOpenRegistroButton = document.getElementById("hero-open-registro");
-const mapFocusTitle = document.getElementById("map-focus-title");
+const brandMainTitle = document.getElementById("brand-main-title");
 const mapFocusPercent = document.getElementById("map-focus-percent");
 const mapFocusPercentLabel = document.getElementById("map-focus-percent-label");
 const mapFocusCopy = document.getElementById("map-focus-copy");
@@ -143,6 +143,7 @@ const bienesFallbackPalette = [
   "#4d7c0f",
   "#0369a1"
 ];
+const defaultBrandTitle = "Catastro y Bienes Municipales";
 
 function setStatus(messages) {
   statusList.innerHTML = messages.map((message) => `<li>${message}</li>`).join("");
@@ -274,8 +275,7 @@ function normalizeGeometryForSource(source, geometry) {
 
 function updateMapFocusPanel() {
   if (
-    !mapFocusTitle
-    || !mapFocusPercent
+    !mapFocusPercent
     || !mapFocusPercentLabel
     || !mapFocusCopy
     || !mapFocusChart
@@ -335,7 +335,10 @@ function updateMapFocusPanel() {
     : '<p class="map-focus-distribution-empty">No hay predios regularizados en la vista actual.</p>';
 
   if (!item) {
-    mapFocusTitle.textContent = "Selecciona una clasificacion";
+    if (brandMainTitle) {
+      brandMainTitle.textContent = defaultBrandTitle;
+      brandMainTitle.classList.remove("is-category-title");
+    }
     mapFocusPercent.textContent = "0%";
     mapFocusPercentLabel.textContent = "del total regularizado";
     mapFocusCopy.textContent = "Haz clic en una categoria para ver su lectura documental en el mapa.";
@@ -343,7 +346,10 @@ function updateMapFocusPanel() {
   }
 
   const distributionPercent = totalRegularized ? Math.round((item.gravamenCon / totalRegularized) * 100) : 0;
-  mapFocusTitle.textContent = item.label;
+  if (brandMainTitle) {
+    brandMainTitle.textContent = item.label;
+    brandMainTitle.classList.add("is-category-title");
+  }
   mapFocusPercent.textContent = `${distributionPercent}%`;
   mapFocusPercentLabel.textContent = "del total regularizado";
   mapFocusCopy.textContent = `${formatNumber(item.gravamenCon)} de ${formatNumber(item.total)} bienes de esta clasificacion cuentan con numero de registro o REF.`;
