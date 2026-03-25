@@ -47,9 +47,6 @@ const mapFocusTitle = document.getElementById("map-focus-title");
 const mapFocusPercent = document.getElementById("map-focus-percent");
 const mapFocusCopy = document.getElementById("map-focus-copy");
 const mapFocusChart = document.getElementById("map-focus-chart");
-const mapFocusTotal = document.getElementById("map-focus-total");
-const mapFocusCon = document.getElementById("map-focus-con");
-const mapFocusSin = document.getElementById("map-focus-sin");
 const mapFocusDistributionTotal = document.getElementById("map-focus-distribution-total");
 const mapFocusDistributionRows = document.getElementById("map-focus-distribution-rows");
 const statCatastro = document.getElementById("stat-catastro");
@@ -275,7 +272,7 @@ function normalizeGeometryForSource(source, geometry) {
 }
 
 function updateMapFocusPanel() {
-  if (!mapFocusTitle || !mapFocusPercent || !mapFocusCopy || !mapFocusChart || !mapFocusTotal || !mapFocusCon || !mapFocusSin || !mapFocusDistributionTotal || !mapFocusDistributionRows) {
+  if (!mapFocusTitle || !mapFocusPercent || !mapFocusCopy || !mapFocusChart || !mapFocusDistributionTotal || !mapFocusDistributionRows) {
     return;
   }
 
@@ -323,9 +320,6 @@ function updateMapFocusPanel() {
     mapFocusTitle.textContent = "Selecciona una clasificacion";
     mapFocusPercent.textContent = "0%";
     mapFocusCopy.textContent = "Haz clic en una categoria para ver su lectura documental en el mapa.";
-    mapFocusTotal.textContent = "0";
-    mapFocusCon.textContent = "0";
-    mapFocusSin.textContent = "0";
     mapFocusChart.style.setProperty("--focus-chart-fill", "#39d0ff");
     mapFocusChart.style.setProperty("--focus-chart-angle", "0deg");
     return;
@@ -335,9 +329,6 @@ function updateMapFocusPanel() {
   mapFocusTitle.textContent = item.label;
   mapFocusPercent.textContent = `${percentage}%`;
   mapFocusCopy.textContent = `${formatNumber(item.gravamenCon)} de ${formatNumber(item.total)} bienes de esta clasificacion cuentan con numero de registro o REF.`;
-  mapFocusTotal.textContent = formatNumber(item.total);
-  mapFocusCon.textContent = formatNumber(item.gravamenCon);
-  mapFocusSin.textContent = formatNumber(item.gravamenSin);
   mapFocusChart.style.setProperty("--focus-chart-fill", getBienesColor(focusCategory));
   mapFocusChart.style.setProperty("--focus-chart-angle", `${percentage * 3.6}deg`);
 }
