@@ -2180,15 +2180,17 @@ body::after {
   right: 18px;
   bottom: 18px;
   left: auto;
-  width: min(300px, calc(100% - 36px));
+  width: auto;
+  max-width: calc(100% - 36px);
 }
 
 .map-overlay-bottom-right .map-overlay-card {
-  width: 100%;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .legend-card-unified {
-  display: grid;
+  display: inline-grid;
   gap: 10px;
 }
 
