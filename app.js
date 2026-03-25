@@ -46,6 +46,7 @@ const heroOpenRegistroButton = document.getElementById("hero-open-registro");
 const brandMainTitle = document.getElementById("brand-main-title");
 const mapFocusPercent = document.getElementById("map-focus-percent");
 const mapFocusPercentLabel = document.getElementById("map-focus-percent-label");
+const mapFocusModeTitle = document.getElementById("map-focus-mode-title");
 const mapFocusCopy = document.getElementById("map-focus-copy");
 const mapFocusChart = document.getElementById("map-focus-chart");
 const mapFocusDistributionTotal = document.getElementById("map-focus-distribution-total");
@@ -144,6 +145,18 @@ const bienesFallbackPalette = [
   "#0369a1"
 ];
 const defaultBrandTitle = "Catastro y Bienes Municipales";
+
+function getCategoryCountModeTitle(mode) {
+  if (mode === "regularized") {
+    return "Bienes municipales regularizados";
+  }
+
+  if (mode === "nonregularized") {
+    return "Bienes municipales no regularizados";
+  }
+
+  return "Bienes municipales totales";
+}
 
 function setStatus(messages) {
   statusList.innerHTML = messages.map((message) => `<li>${message}</li>`).join("");
@@ -277,6 +290,7 @@ function updateMapFocusPanel() {
   if (
     !mapFocusPercent
     || !mapFocusPercentLabel
+    || !mapFocusModeTitle
     || !mapFocusCopy
     || !mapFocusChart
     || !mapFocusDistributionTotal
@@ -311,6 +325,7 @@ function updateMapFocusPanel() {
         return `${entry.color} ${startAngle.toFixed(2)}deg ${endAngle.toFixed(2)}deg`;
       }).join(", ")})`
     : "conic-gradient(#39d0ff 0deg 360deg)";
+  mapFocusModeTitle.textContent = getCategoryCountModeTitle(categoryCountMode);
   mapFocusDistributionTotal.textContent = `${formatNumber(totalRegularized)} predios municipales`;
   mapFocusChart.style.setProperty("--focus-chart-gradient", chartGradient);
   mapFocusDistributionRows.innerHTML = distributionItems.length
