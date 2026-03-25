@@ -48,7 +48,6 @@ const mapFocusPercent = document.getElementById("map-focus-percent");
 const mapFocusPercentLabel = document.getElementById("map-focus-percent-label");
 const mapFocusCopy = document.getElementById("map-focus-copy");
 const mapFocusChart = document.getElementById("map-focus-chart");
-const mapFocusChartLegend = document.getElementById("map-focus-chart-legend");
 const mapFocusDistributionTotal = document.getElementById("map-focus-distribution-total");
 const mapFocusDistributionRows = document.getElementById("map-focus-distribution-rows");
 const statCatastro = document.getElementById("stat-catastro");
@@ -280,7 +279,6 @@ function updateMapFocusPanel() {
     || !mapFocusPercentLabel
     || !mapFocusCopy
     || !mapFocusChart
-    || !mapFocusChartLegend
     || !mapFocusDistributionTotal
     || !mapFocusDistributionRows
   ) {
@@ -313,23 +311,8 @@ function updateMapFocusPanel() {
         return `${entry.color} ${startAngle.toFixed(2)}deg ${endAngle.toFixed(2)}deg`;
       }).join(", ")})`
     : "conic-gradient(#39d0ff 0deg 360deg)";
-  const legendItems = distributionItems.filter((entry) => entry.regularized > 0);
-
   mapFocusDistributionTotal.textContent = `${formatNumber(totalRegularized)} predios municipales`;
   mapFocusChart.style.setProperty("--focus-chart-gradient", chartGradient);
-  mapFocusChartLegend.innerHTML = legendItems.length
-    ? legendItems.map((entry) => {
-        const percent = totalRegularized ? Math.round((entry.regularized / totalRegularized) * 100) : 0;
-        const isActive = entry.value === focusCategory;
-        return `
-          <div class="map-focus-chart-legend-item${isActive ? " is-active" : ""}">
-            <span class="map-focus-chart-legend-swatch" style="--legend-fill: ${escapeHtml(entry.color)};"></span>
-            <span class="map-focus-chart-legend-label">${escapeHtml(entry.label)}</span>
-            <strong class="map-focus-chart-legend-value">${percent}%</strong>
-          </div>
-        `;
-      }).join("")
-    : '<p class="map-focus-chart-legend-empty">No hay lectura disponible para el grafico pastel.</p>';
   mapFocusDistributionRows.innerHTML = distributionItems.length
     ? distributionItems.map((entry) => {
           const percent = totalRegularized ? Math.round((entry.regularized / totalRegularized) * 100) : 0;
