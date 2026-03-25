@@ -87,10 +87,10 @@ const modalListCon = document.getElementById("modal-list-con");
 const modalListSin = document.getElementById("modal-list-sin");
 const modalViewButtons = Array.from(document.querySelectorAll(".modal-view-button"));
 const bienesCategories = [
-  { value: "Area Verde", label: "Area Verde", countId: "count-area-verde", color: "#15803d", dashKey: "area-verde" },
-  { value: "Propiedades municipales", label: "Propiedades municipales", countId: "count-propiedades-municipales", color: "#0f766e", dashKey: "propiedades-municipales" },
-  { value: "Comodato", label: "Comodato", countId: "count-comodato", color: "#7c3aed", dashKey: "comodato" },
-  { value: "Bienes Mostrencos", label: "Bienes Mostrencos", countId: "count-bienes-mostrencos", color: "#ea580c", dashKey: "bienes-mostrencos" }
+  { value: "Predios Municipales (Habilitacion de suelo)", label: "Predios Municipales (Habilitacion de suelo)", countId: "count-area-verde", color: "#15803d", dashKey: "area-verde" },
+  { value: "Predios Municipales (Equipamientos publicos)", label: "Predios Municipales (Equipamientos publicos)", countId: "count-propiedades-municipales", color: "#0f766e", dashKey: "propiedades-municipales" },
+  { value: "Bienes Municipales en Comodato", label: "Bienes Municipales en Comodato", countId: "count-comodato", color: "#7c3aed", dashKey: "comodato" },
+  { value: "Predios Municipales Mostrencos", label: "Predios Municipales Mostrencos", countId: "count-bienes-mostrencos", color: "#ea580c", dashKey: "bienes-mostrencos" }
 ];
 const bienesCategoryCounters = Object.fromEntries(
   bienesCategories.map((category) => [category.value, document.getElementById(category.countId)])
@@ -183,12 +183,20 @@ function featureMatchesCategoryCountMode(feature) {
 
 function normalizeBienesCategory(value) {
   const category = String(value || "").trim();
+  if (category === "Area Verde") {
+    return "Predios Municipales (Habilitacion de suelo)";
+  }
+
   if (category === "Bienes Municipales Rurale" || category === "Bienes Municipales Urbano") {
-    return "Propiedades municipales";
+    return "Predios Municipales (Equipamientos publicos)";
+  }
+
+  if (category === "Comodato") {
+    return "Bienes Municipales en Comodato";
   }
 
   if (category === "Monstrencos_urbanos" || category === "Mostrencos_Rurales") {
-    return "Bienes Mostrencos";
+    return "Predios Municipales Mostrencos";
   }
 
   return category;
