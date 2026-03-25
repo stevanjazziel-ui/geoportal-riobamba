@@ -284,6 +284,8 @@ body::after {
 .brand-card .stat-card {
   min-height: 108px;
   padding: 14px 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .brand-card .stat-label {
@@ -292,6 +294,15 @@ body::after {
 
 .brand-card .stat-card strong {
   font-size: clamp(1.6rem, 2.15vw, 2rem);
+}
+
+.brand-card .stat-card:hover {
+  transform: translateY(-1px);
+}
+
+.brand-card .stat-card.is-active {
+  border-color: rgba(216, 164, 65, 0.4);
+  box-shadow: 0 0 0 1px rgba(216, 164, 65, 0.12), 0 18px 32px rgba(57, 208, 255, 0.08);
 }
 
 .brand-pulse {

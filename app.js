@@ -69,6 +69,8 @@ const sidebarScrollUp = document.getElementById("sidebar-scroll-up");
 const sidebarScrollDown = document.getElementById("sidebar-scroll-down");
 const sidebarScrollThumb = document.getElementById("sidebar-scroll-thumb");
 const categoryCards = Array.from(document.querySelectorAll(".category-card"));
+const categoryHelper = document.querySelector(".category-helper");
+const brandStatCards = Array.from(document.querySelectorAll(".brand-stat-grid .stat-card"));
 const dashboardGrid = document.getElementById("dashboard-grid");
 const dashboardNote = document.getElementById("dashboard-note");
 const dashboardSummaryList = document.getElementById("dashboard-summary-list");
@@ -102,6 +104,8 @@ const bienesLayerIndex = new Map();
 let dashboardCategorySummary = {};
 let dashboardFocusCategory = null;
 let bienesSupportRecords = [];
+let bienesFeaturesCache = [];
+let categoryCountMode = "all";
 let registroModalView = "both";
 const numberFormatter = new Intl.NumberFormat("es-EC");
 const ignoredTramiteFields = new Set([
@@ -163,6 +167,18 @@ function collectPropertyEntries(properties) {
 
 function formatNumber(value) {
   return numberFormatter.format(value || 0);
+}
+
+function featureMatchesCategoryCountMode(feature) {
+  if (categoryCountMode === "regularized") {
+    return hasCertificadoGravamen(feature?.properties);
+  }
+
+  if (categoryCountMode === "nonregularized") {
+    return !hasCertificadoGravamen(feature?.properties);
+  }
+
+  return true;
 }
 
 function normalizeBienesCategory(value) {
@@ -319,6 +335,36 @@ function updateHeroOverview() {
   heroCatastroCount.textContent = formatNumber(catastroCount);
   heroBienesCount.textContent = formatNumber(bienesCount);
   heroViewMode.textContent = activeFilters > 0 ? "Busqueda y filtro activos" : "Exploracion general";
+}
+
+function updateCategoryCountModeUi() {
+  brandStatCards.forEach((card) => {
+    const isActive = card.dataset.supportMode === categoryCountMode;
+    card.classList.toggle("is-active", isActive);
+    card.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
+
+  if (!categoryHelper) {
+    return;
+  }
+
+  if (categoryCountMode === "regularized") {
+    categoryHelper.textContent = "Mostrando solo bienes que presentan numero de registro o REF. Haz clic en otra tarjeta superior para cambiar la lectura.";
+    return;
+  }
+
+  if (categoryCountMode === "nonregularized") {
+    categoryHelper.textContent = "Mostrando solo bienes que no presentan numero de registro ni REF. Haz clic en otra tarjeta superior para cambiar la lectura.";
+    return;
+  }
+
+  categoryHelper.textContent = "Haz clic en una o varias tarjetas para dejar prendidas esas clasificaciones. Vuelve a hacer clic sobre una tarjeta para apagarla.";
+}
+
+function setCategoryCountMode(mode) {
+  categoryCountMode = ["all", "regularized", "nonregularized"].includes(mode) ? mode : "all";
+  updateCategoryCountModeUi();
+  updateBienesCategoryCounts(bienesFeaturesCache);
 }
 
 function normalizeText(value) {
@@ -984,10 +1030,14 @@ function fitFilteredBienesBounds() {
   map.fitBounds(merged.pad(0.12));
 }
 
-function updateBienesCategoryCounts(features) {
+function updateBienesCategoryCounts(features = bienesFeaturesCache) {
   const counts = Object.fromEntries(bienesCategories.map((category) => [category.value, 0]));
 
   for (const feature of features || []) {
+    if (!featureMatchesCategoryCountMode(feature)) {
+      continue;
+    }
+
     const category = normalizeBienesCategory(feature?.properties?.clase);
     if (Object.hasOwn(counts, category)) {
       counts[category] += 1;
@@ -1008,6 +1058,7 @@ function renderBienesDashboards(features) {
     return;
   }
 
+  bienesFeaturesCache = [...(features || [])];
   bienesSupportRecords = [];
   const summary = Object.fromEntries(
     bienesCategories.map((category) => [
@@ -1178,6 +1229,28 @@ function bindDashboardSummaryActions() {
       await focusBienesCategory(item.dataset.category);
     };
   });
+}
+
+function bindBrandStatCardFilters() {
+  if (!brandStatCards.length) {
+    return;
+  }
+
+  const activateCardMode = (card) => {
+    setCategoryCountMode(card?.dataset?.supportMode || "all");
+  };
+
+  brandStatCards.forEach((card) => {
+    card.addEventListener("click", () => activateCardMode(card));
+    card.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        activateCardMode(card);
+      }
+    });
+  });
+
+  updateCategoryCountModeUi();
 }
 
 function getLayerStyleKind(sourceId, layer, query) {
@@ -1680,6 +1753,7 @@ async function initialize() {
   bindLayerToggles();
   bindSidebarScrollUi();
   bindRegistroModal();
+  bindBrandStatCardFilters();
 
   const initialSourceIds = dataSources
     .filter((source) => {
