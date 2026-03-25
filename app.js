@@ -291,7 +291,6 @@ function updateMapFocusPanel() {
         color: getBienesColor(category.value)
       };
     })
-    .filter((entry) => entry.regularized > 0)
     .sort((left, right) => right.regularized - left.regularized);
   const totalRegularized = distributionItems.reduce((accumulator, entry) => accumulator + entry.regularized, 0);
 
@@ -299,6 +298,7 @@ function updateMapFocusPanel() {
   mapFocusDistributionRows.innerHTML = distributionItems.length
     ? distributionItems.map((entry) => {
       const percent = totalRegularized ? Math.round((entry.regularized / totalRegularized) * 100) : 0;
+      const distributionSize = percent > 0 ? Math.max(percent, 4) : 0;
       return `
         <div class="map-focus-distribution-row">
           <div class="map-focus-distribution-row-head">
@@ -308,7 +308,7 @@ function updateMapFocusPanel() {
           <div class="map-focus-distribution-bar-shell">
             <span
               class="map-focus-distribution-bar"
-              style="--distribution-size: ${Math.max(percent, 4)}%; --distribution-fill: ${escapeHtml(entry.color)};"
+              style="--distribution-size: ${distributionSize}%; --distribution-fill: ${escapeHtml(entry.color)};"
             ></span>
           </div>
         </div>
