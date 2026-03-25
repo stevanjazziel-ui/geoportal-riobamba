@@ -473,7 +473,7 @@ function updateMapFocusPanel() {
           <div class="map-focus-distribution-row">
             <div class="map-focus-distribution-row-head">
               <span class="map-focus-distribution-label">${escapeHtml(entry.label)}</span>
-              <strong class="map-focus-distribution-value">${formatNumber(entry.count)}</strong>
+              <strong class="map-focus-distribution-value">${percent}%</strong>
             </div>
             <div class="map-focus-distribution-bar-shell">
               <span
