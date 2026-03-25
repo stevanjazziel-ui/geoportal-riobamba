@@ -1922,12 +1922,12 @@ body::after {
 
 .map-focus-panel {
   display: grid;
-  grid-template-rows: auto auto;
-  align-content: start;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: stretch;
   gap: 14px;
   min-width: 0;
   width: 100%;
-  min-height: auto;
+  min-height: clamp(560px, calc(100vh - 210px), 720px);
   height: auto;
   padding: 18px 18px 16px;
   border-radius: 22px;
@@ -2061,10 +2061,10 @@ body::after {
 
 .map-focus-distribution {
   display: grid;
-  grid-template-rows: auto auto;
-  align-content: start;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-content: stretch;
   gap: 10px;
-  min-height: auto;
+  min-height: 0;
 }
 
 .map-focus-distribution-head {
@@ -2083,9 +2083,11 @@ body::after {
 }
 
 .map-focus-distribution-rows {
-  display: grid;
-  align-content: start;
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  height: 100%;
   min-height: 0;
 }
 
