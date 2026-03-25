@@ -386,16 +386,6 @@ function updateMapFocusPanel() {
     ? dashboardFocusCategory
     : fallbackCategory;
   const item = focusCategory ? dashboardCategorySummary[focusCategory] : null;
-  const rawSubcategoryItems = item
-    ? Object.values(item.subcategories || {})
-    : [];
-  const pieItems = rawSubcategoryItems
-    .map((entry, index, source) => ({
-      label: entry.label,
-      count: getSummaryCountByMode(entry, categoryCountMode),
-      color: getSubcategoryColor(focusCategory, index, source.length)
-    }))
-    .sort((left, right) => right.count - left.count || left.label.localeCompare(right.label, "es"));
   const distributionItems = bienesCategories
     .map((category) => {
       const summaryItem = dashboardCategorySummary[category.value];
@@ -408,12 +398,12 @@ function updateMapFocusPanel() {
     .sort((left, right) => right.count - left.count || left.label.localeCompare(right.label, "es"));
   const focusTotal = item ? getSummaryCountByMode(item, categoryCountMode) : 0;
   const distributionTotal = distributionItems.reduce((accumulator, entry) => accumulator + entry.count, 0);
-  const chartGradient = pieItems.length && focusTotal
-    ? `conic-gradient(${pieItems.map((entry, index) => {
-        const startAngle = pieItems
+  const chartGradient = distributionItems.length && distributionTotal
+    ? `conic-gradient(${distributionItems.map((entry, index) => {
+        const startAngle = distributionItems
           .slice(0, index)
-          .reduce((accumulator, current) => accumulator + ((current.count / focusTotal) * 360), 0);
-        const endAngle = startAngle + ((entry.count / focusTotal) * 360);
+          .reduce((accumulator, current) => accumulator + ((current.count / distributionTotal) * 360), 0);
+        const endAngle = startAngle + ((entry.count / distributionTotal) * 360);
         return `${entry.color} ${startAngle.toFixed(2)}deg ${endAngle.toFixed(2)}deg`;
       }).join(", ")})`
     : "conic-gradient(rgba(157, 183, 200, 0.22) 0deg 360deg)";
