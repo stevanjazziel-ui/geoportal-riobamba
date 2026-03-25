@@ -47,10 +47,11 @@ const mapFocusTitle = document.getElementById("map-focus-title");
 const mapFocusPercent = document.getElementById("map-focus-percent");
 const mapFocusCopy = document.getElementById("map-focus-copy");
 const mapFocusChart = document.getElementById("map-focus-chart");
-const mapFocusTags = document.getElementById("map-focus-tags");
 const mapFocusTotal = document.getElementById("map-focus-total");
 const mapFocusCon = document.getElementById("map-focus-con");
 const mapFocusSin = document.getElementById("map-focus-sin");
+const mapFocusDistributionTotal = document.getElementById("map-focus-distribution-total");
+const mapFocusDistributionRows = document.getElementById("map-focus-distribution-rows");
 const statCatastro = document.getElementById("stat-catastro");
 const statBienes = document.getElementById("stat-bienes");
 const statRegularized = document.getElementById("stat-regularized");
@@ -274,7 +275,7 @@ function normalizeGeometryForSource(source, geometry) {
 }
 
 function updateMapFocusPanel() {
-  if (!mapFocusTitle || !mapFocusPercent || !mapFocusCopy || !mapFocusChart || !mapFocusTags || !mapFocusTotal || !mapFocusCon || !mapFocusSin) {
+  if (!mapFocusTitle || !mapFocusPercent || !mapFocusCopy || !mapFocusChart || !mapFocusTotal || !mapFocusCon || !mapFocusSin || !mapFocusDistributionTotal || !mapFocusDistributionRows) {
     return;
   }
 
@@ -283,6 +284,40 @@ function updateMapFocusPanel() {
     ? dashboardFocusCategory
     : fallbackCategory;
   const item = focusCategory ? dashboardCategorySummary[focusCategory] : null;
+  const distributionItems = bienesCategories
+    .map((category) => {
+      const summaryItem = dashboardCategorySummary[category.value];
+      return {
+        value: category.value,
+        label: summaryItem?.label || category.label,
+        regularized: summaryItem?.gravamenCon || 0,
+        color: getBienesColor(category.value)
+      };
+    })
+    .filter((entry) => entry.regularized > 0)
+    .sort((left, right) => right.regularized - left.regularized);
+  const totalRegularized = distributionItems.reduce((accumulator, entry) => accumulator + entry.regularized, 0);
+
+  mapFocusDistributionTotal.textContent = `${formatNumber(totalRegularized)} predios municipales`;
+  mapFocusDistributionRows.innerHTML = distributionItems.length
+    ? distributionItems.map((entry) => {
+      const percent = totalRegularized ? Math.round((entry.regularized / totalRegularized) * 100) : 0;
+      return `
+        <div class="map-focus-distribution-row">
+          <div class="map-focus-distribution-row-head">
+            <span class="map-focus-distribution-label">${escapeHtml(entry.label)}</span>
+            <strong class="map-focus-distribution-value">${percent}%</strong>
+          </div>
+          <div class="map-focus-distribution-bar-shell">
+            <span
+              class="map-focus-distribution-bar"
+              style="--distribution-size: ${Math.max(percent, 4)}%; --distribution-fill: ${escapeHtml(entry.color)};"
+            ></span>
+          </div>
+        </div>
+      `;
+    }).join("")
+    : '<p class="map-focus-distribution-empty">No hay predios regularizados en la vista actual.</p>';
 
   if (!item) {
     mapFocusTitle.textContent = "Selecciona una clasificacion";
@@ -293,16 +328,10 @@ function updateMapFocusPanel() {
     mapFocusSin.textContent = "0";
     mapFocusChart.style.setProperty("--focus-chart-fill", "#39d0ff");
     mapFocusChart.style.setProperty("--focus-chart-angle", "0deg");
-    mapFocusTags.innerHTML = '<span class="map-focus-tag is-muted">Sin lectura activa</span>';
     return;
   }
 
   const percentage = item.total ? Math.round((item.con / item.total) * 100) : 0;
-  const topSignals = Object.entries(item.keywordCounts || {})
-    .sort((left, right) => right[1] - left[1])
-    .slice(0, 3)
-    .map(([keyword]) => `<span class="map-focus-tag">${escapeHtml(keyword)}</span>`)
-    .join("");
   mapFocusTitle.textContent = item.label;
   mapFocusPercent.textContent = `${percentage}%`;
   mapFocusCopy.textContent = `${formatNumber(item.gravamenCon)} de ${formatNumber(item.total)} bienes de esta clasificacion cuentan con numero de registro o REF.`;
@@ -311,7 +340,6 @@ function updateMapFocusPanel() {
   mapFocusSin.textContent = formatNumber(item.gravamenSin);
   mapFocusChart.style.setProperty("--focus-chart-fill", getBienesColor(focusCategory));
   mapFocusChart.style.setProperty("--focus-chart-angle", `${percentage * 3.6}deg`);
-  mapFocusTags.innerHTML = topSignals || '<span class="map-focus-tag is-muted">Sin registro o REF</span>';
 }
 
 function updateHeroOverview() {
