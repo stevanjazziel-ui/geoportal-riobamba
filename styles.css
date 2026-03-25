@@ -2124,11 +2124,30 @@ body::after {
 }
 
 .map-focus-distribution-bar {
+  position: relative;
   display: block;
   height: 100%;
   width: var(--distribution-size, 0%);
   border-radius: inherit;
   background: linear-gradient(90deg, color-mix(in srgb, var(--distribution-fill) 72%, white 28%), var(--distribution-fill));
+}
+
+.map-focus-distribution-bar-count {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  font-family: "Space Grotesk", "IBM Plex Sans", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+  color: rgba(4, 16, 26, 0.92);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.map-focus-distribution-bar-count.is-empty {
+  color: var(--muted);
 }
 
 .map-focus-distribution-empty {
@@ -2416,6 +2435,11 @@ body::after {
 
   .map-focus-distribution-value {
     font-size: 1.12rem;
+  }
+
+  .map-focus-distribution-bar-count {
+    left: 8px;
+    font-size: 0.68rem;
   }
 
   .map-overlay-bottom-right {

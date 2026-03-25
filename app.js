@@ -479,7 +479,10 @@ function updateMapFocusPanel() {
               <span
                 class="map-focus-distribution-bar"
                 style="--distribution-size: ${distributionSize}%; --distribution-fill: ${escapeHtml(entry.color)};"
-              ></span>
+              >
+                ${entry.count > 0 ? `<span class="map-focus-distribution-bar-count">${formatNumber(entry.count)}</span>` : ""}
+              </span>
+              ${entry.count === 0 ? '<span class="map-focus-distribution-bar-count is-empty">0</span>' : ""}
             </div>
           </div>
         `;
