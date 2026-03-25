@@ -2366,12 +2366,17 @@ body::after {
   }
 
   .brand-card {
-    padding: 12px;
+    padding: 10px;
   }
 
   .brand-grid {
     grid-template-columns: 1fr;
-    gap: 8px;
+    gap: 6px;
+  }
+
+  .brand-card .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
   }
 
   .brand-pulse {
@@ -2379,9 +2384,9 @@ body::after {
   }
 
   .brand-card h1 {
-    font-size: clamp(1.1rem, 8vw, 1.5rem);
-    line-height: 0.9;
-    max-width: 7ch;
+    font-size: clamp(0.98rem, 7vw, 1.3rem);
+    line-height: 0.86;
+    max-width: none;
   }
 
   .lede {
@@ -2390,21 +2395,23 @@ body::after {
 
   .brand-stat-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 6px;
-    margin-top: 6px;
+    gap: 5px;
+    margin-top: 4px;
   }
 
   .brand-card .stat-card {
-    min-height: 64px;
-    padding: 7px;
+    min-height: 58px;
+    padding: 6px;
   }
 
   .brand-card .stat-label {
-    font-size: 0.52rem;
+    font-size: 0.48rem;
+    line-height: 1.05;
   }
 
   .brand-card .stat-card strong {
-    font-size: 0.9rem;
+    font-size: 0.82rem;
+    line-height: 0.9;
   }
 
   .category-grid {
