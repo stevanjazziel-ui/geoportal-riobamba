@@ -173,14 +173,14 @@ function getCategoryCountModeShortLabel(mode) {
 
 function getCategoryCountModeDistributionTitle(mode) {
   if (mode === "regularized") {
-    return "Subclasificaciones regularizadas";
+    return "Clasificaciones regularizadas";
   }
 
   if (mode === "nonregularized") {
-    return "Subclasificaciones no regularizadas";
+    return "Clasificaciones no regularizadas";
   }
 
-  return "Subclasificaciones de la categoria";
+  return "Clasificaciones generales";
 }
 
 function getSummaryCountByMode(summaryItem, mode) {
@@ -389,17 +389,28 @@ function updateMapFocusPanel() {
   const rawSubcategoryItems = item
     ? Object.values(item.subcategories || {})
     : [];
-  const distributionItems = rawSubcategoryItems
+  const pieItems = rawSubcategoryItems
     .map((entry, index, source) => ({
       label: entry.label,
       count: getSummaryCountByMode(entry, categoryCountMode),
       color: getSubcategoryColor(focusCategory, index, source.length)
     }))
     .sort((left, right) => right.count - left.count || left.label.localeCompare(right.label, "es"));
+  const distributionItems = bienesCategories
+    .map((category) => {
+      const summaryItem = dashboardCategorySummary[category.value];
+      return {
+        label: summaryItem?.label || category.label,
+        count: getSummaryCountByMode(summaryItem, categoryCountMode),
+        color: getBienesColor(category.value)
+      };
+    })
+    .sort((left, right) => right.count - left.count || left.label.localeCompare(right.label, "es"));
   const focusTotal = item ? getSummaryCountByMode(item, categoryCountMode) : 0;
-  const chartGradient = distributionItems.length && focusTotal
-    ? `conic-gradient(${distributionItems.map((entry, index) => {
-        const startAngle = distributionItems
+  const distributionTotal = distributionItems.reduce((accumulator, entry) => accumulator + entry.count, 0);
+  const chartGradient = pieItems.length && focusTotal
+    ? `conic-gradient(${pieItems.map((entry, index) => {
+        const startAngle = pieItems
           .slice(0, index)
           .reduce((accumulator, current) => accumulator + ((current.count / focusTotal) * 360), 0);
         const endAngle = startAngle + ((entry.count / focusTotal) * 360);
@@ -408,11 +419,11 @@ function updateMapFocusPanel() {
     : "conic-gradient(rgba(157, 183, 200, 0.22) 0deg 360deg)";
   mapFocusModeTitle.textContent = getCategoryCountModeTitle(categoryCountMode);
   mapFocusDistributionTitle.textContent = getCategoryCountModeDistributionTitle(categoryCountMode);
-  mapFocusDistributionTotal.textContent = `${formatNumber(focusTotal)} ${getCategoryCountModeShortLabel(categoryCountMode)}`;
+  mapFocusDistributionTotal.textContent = `${formatNumber(distributionTotal)} ${getCategoryCountModeShortLabel(categoryCountMode)}`;
   mapFocusChart.style.setProperty("--focus-chart-gradient", chartGradient);
   mapFocusDistributionRows.innerHTML = distributionItems.length
     ? distributionItems.map((entry) => {
-        const percent = focusTotal ? Math.round((entry.count / focusTotal) * 100) : 0;
+        const percent = distributionTotal ? Math.round((entry.count / distributionTotal) * 100) : 0;
         const distributionSize = percent > 0 ? Math.max(percent, 4) : 0;
         return `
           <div class="map-focus-distribution-row">
@@ -429,7 +440,7 @@ function updateMapFocusPanel() {
           </div>
         `;
       }).join("")
-    : '<p class="map-focus-distribution-empty">No hay predios regularizados en la vista actual.</p>';
+      : '<p class="map-focus-distribution-empty">No hay lectura disponible en la vista actual.</p>';
 
   if (!item) {
     if (brandMainTitle) {
