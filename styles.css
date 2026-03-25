@@ -1673,7 +1673,7 @@ body::after {
 }
 
 .brand-grid {
-  grid-template-columns: minmax(0, 1fr) 46px;
+  grid-template-columns: 1fr;
   gap: 8px;
   align-items: start;
 }
@@ -1697,8 +1697,7 @@ body::after {
 }
 
 .brand-pulse {
-  width: 46px;
-  align-self: start;
+  display: none;
 }
 
 .brand-card h1 {
@@ -2371,43 +2370,41 @@ body::after {
   }
 
   .brand-grid {
-    grid-template-columns: minmax(0, 1fr) 38px;
+    grid-template-columns: 1fr;
     gap: 8px;
   }
 
   .brand-pulse {
-    width: 38px;
+    display: none;
   }
 
   .brand-card h1 {
-    font-size: clamp(1.25rem, 9vw, 1.75rem);
+    font-size: clamp(1.1rem, 8vw, 1.5rem);
     line-height: 0.9;
-    max-width: 8ch;
+    max-width: 7ch;
   }
 
   .lede {
-    max-width: 20ch;
-    font-size: 0.74rem;
-    line-height: 1.26;
+    display: none;
   }
 
   .brand-stat-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    margin-top: 8px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 6px;
   }
 
   .brand-card .stat-card {
-    min-height: 74px;
-    padding: 8px;
+    min-height: 64px;
+    padding: 7px;
   }
 
   .brand-card .stat-label {
-    font-size: 0.62rem;
+    font-size: 0.52rem;
   }
 
   .brand-card .stat-card strong {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 
   .category-grid {
