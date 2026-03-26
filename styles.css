@@ -1219,6 +1219,8 @@ body::after {
 
 .map-overlay-top {
   top: 18px;
+  bottom: 18px;
+  align-items: stretch;
 }
 
 .map-overlay-bottom {
@@ -1883,6 +1885,7 @@ body::after {
   display: grid;
   gap: 14px;
   width: min(760px, calc(78% - 18px));
+  height: 100%;
   pointer-events: none;
 }
 
@@ -1927,8 +1930,8 @@ body::after {
   gap: 14px;
   min-width: 0;
   width: 100%;
-  min-height: clamp(560px, calc(100vh - 210px), 720px);
-  height: auto;
+  min-height: 0;
+  height: 100%;
   padding: 18px 18px 16px;
   border-radius: 22px;
   border: 1px solid rgba(57, 208, 255, 0.14);
@@ -2613,6 +2616,7 @@ body::after {
 
   .map-overlay-top {
     top: 12px;
+    bottom: auto;
   }
 
   .map-overlay-card {
