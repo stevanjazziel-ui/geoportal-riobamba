@@ -28,7 +28,7 @@ Remove-Item $bienesOutput -Force -ErrorAction SilentlyContinue
 & $ogr2ogr `
   -f GeoJSON `
   $bienesOutput `
-  (Join-Path $root "Bienes Municipales 4\BIENES_MUNICIPALES_6.shp") `
+  (Join-Path $root "Bienes Municipales 6\BIENES_MUNICIPALES_6.shp") `
   -t_srs EPSG:4326 `
   -lco RFC7946=YES `
   -lco COORDINATE_PRECISION=6 `
@@ -37,3 +37,4 @@ Remove-Item $bienesOutput -Force -ErrorAction SilentlyContinue
   -skipfailures
 
 Write-Host "GeoJSON actualizados en $dataDir"
+

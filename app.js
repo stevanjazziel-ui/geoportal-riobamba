@@ -30,7 +30,7 @@ const dataSources = [
     name: "Bienes municipales",
     color: "#b45309",
     fillColor: "rgba(180, 83, 9, 0.24)",
-    path: "./data/bienes_municipales.geojson?v=20260326-16"
+    path: "./data/bienes_municipales.geojson?v=20260326-17"
   }
 ];
 
@@ -2062,6 +2062,7 @@ initialize().catch((error) => {
     "Si persiste, revisamos el despliegue publicado."
   ]);
 });
+
 
 
 
