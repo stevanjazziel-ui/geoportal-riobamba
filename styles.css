@@ -1925,14 +1925,14 @@ body::after {
 
 .map-focus-panel {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: minmax(176px, 0.86fr) minmax(0, 1.14fr);
   align-content: stretch;
-  gap: 14px;
+  gap: 18px;
   min-width: 0;
   width: 100%;
   min-height: 0;
   height: 100%;
-  padding: 18px 18px 16px;
+  padding: 22px 22px 20px;
   border-radius: 22px;
   border: 1px solid rgba(57, 208, 255, 0.14);
   background: rgba(6, 20, 31, 0.72);
@@ -1942,9 +1942,9 @@ body::after {
 
 .map-focus-top {
   display: grid;
-  grid-template-columns: 152px minmax(0, 1fr);
-  gap: 18px;
-  align-items: start;
+  grid-template-columns: 168px minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
 }
 
 .map-focus-copy-wrap {
@@ -1958,7 +1958,7 @@ body::after {
   --focus-chart-rest: rgba(157, 183, 200, 0.16);
   --focus-chart-gradient: conic-gradient(#39d0ff 0deg 360deg);
   position: relative;
-  width: 152px;
+  width: 168px;
   aspect-ratio: 1;
   border-radius: 999px;
   background: var(--focus-chart-gradient);
@@ -2067,7 +2067,7 @@ body::after {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   align-content: stretch;
-  gap: 14px;
+  gap: 16px;
   min-height: 0;
 }
 
@@ -2088,7 +2088,7 @@ body::after {
 
 .map-focus-distribution-rows {
   display: grid;
-  grid-auto-rows: minmax(94px, 1fr);
+  grid-template-rows: repeat(var(--distribution-row-count, 4), minmax(0, 1fr));
   align-content: stretch;
   gap: 12px;
   height: 100%;
@@ -2097,9 +2097,9 @@ body::after {
 
 .map-focus-distribution-row {
   display: grid;
-  align-content: start;
+  align-content: center;
   gap: 10px;
-  padding: 10px 12px 12px;
+  padding: 12px 14px;
   border-radius: 18px;
   border: 1px solid rgba(57, 208, 255, 0.08);
   background:
@@ -2124,7 +2124,7 @@ body::after {
 .map-focus-distribution-value {
   color: var(--ink);
   font-family: "Space Grotesk", "IBM Plex Sans", sans-serif;
-  font-size: 1.42rem;
+  font-size: 1.5rem;
   line-height: 0.95;
   white-space: nowrap;
 }
@@ -2132,7 +2132,7 @@ body::after {
 .map-focus-distribution-bar-shell {
   position: relative;
   overflow: hidden;
-  height: 22px;
+  height: 24px;
   border-radius: 999px;
   background: rgba(148, 163, 184, 0.12);
   box-shadow: inset 0 0 0 1px rgba(57, 208, 255, 0.08);
@@ -2153,7 +2153,7 @@ body::after {
   left: 10px;
   transform: translateY(-50%);
   font-family: "Space Grotesk", "IBM Plex Sans", sans-serif;
-  font-size: 0.82rem;
+  font-size: 0.86rem;
   font-weight: 700;
   line-height: 1;
   color: rgba(4, 16, 26, 0.92);
@@ -2422,6 +2422,7 @@ body::after {
   .map-focus-top {
     grid-template-columns: 96px minmax(0, 1fr);
     gap: 14px;
+    align-items: start;
   }
 
   .map-focus-chart {

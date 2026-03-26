@@ -462,6 +462,7 @@ function updateMapFocusPanel() {
   mapFocusDistributionTitle.textContent = getCategoryCountModeDistributionTitle(categoryCountMode);
   mapFocusDistributionTotal.textContent = `${formatNumber(distributionTotal)} ${getCategoryCountModeShortLabel(categoryCountMode)}`;
   mapFocusChart.style.setProperty("--focus-chart-gradient", chartGradient);
+  mapFocusDistributionRows.style.setProperty("--distribution-row-count", String(Math.max(distributionItems.length, 1)));
   buildMapFocusChartLabels(distributionItems, distributionTotal);
   mapFocusPercent.textContent = formatNumber(distributionTotal);
   mapFocusPercentLabel.textContent = getCategoryCountModeShortLabel(categoryCountMode);
