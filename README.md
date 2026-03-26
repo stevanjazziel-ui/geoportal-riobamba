@@ -13,7 +13,6 @@ Geoportal web estatico para visualizar:
 - `data/`: GeoJSON optimizado para publicacion web
 - `catastro municipal/`: fuente original del catastro
 - `Bienes Municipales 4/`: fuente principal actual de bienes
-- `Mostrencos sn/`: complemento puntual para monstrencos urbanos con `REF`
 
 ## Como usar
 
@@ -69,7 +68,7 @@ https://TU-USUARIO.github.io/TU-REPO/
 
 ## Actualizar datos
 
-Si cambias los shapefiles fuente, puedes regenerar los archivos web con el script de conversion. El origen actual de bienes combina `Bienes Municipales 4\BIENES_MUNICIPALES_6.shp` y `Mostrencos sn\Monstrenco_Urbano_SN.shp`:
+Si cambias los shapefiles fuente, puedes regenerar los archivos web con el script de conversion. El origen actual de bienes usa `Bienes Municipales 4\BIENES_MUNICIPALES_6.shp`:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\convert-to-geojson.ps1
