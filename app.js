@@ -603,6 +603,25 @@ function buildExcerpt(value) {
   return `${text.slice(0, 129).trimEnd()}...`;
 }
 
+function getValidNumeroRegistro(properties) {
+  const value = String(properties?.numero_reg || "").trim();
+  if (!value) {
+    return "";
+  }
+
+  const normalizedValue = normalizeText(value);
+  const invalidKeywords = ["resoluci", "ordenanza", "acuerdo", "oficio", "memorando"];
+  if (invalidKeywords.some((keyword) => normalizedValue.includes(keyword))) {
+    return "";
+  }
+
+  return value;
+}
+
+function getValidReferencia(properties) {
+  return String(properties?.ref || "").trim();
+}
+
 function analyzeTramiteSupport(properties) {
   const labels = new Set();
   const fieldMatches = [];
@@ -619,11 +638,16 @@ function analyzeTramiteSupport(properties) {
 
     const normalizedValue = normalizeText(value);
     const fieldLabel = getPropertyLabel(key);
-    if (documentSupportFields.has(key)) {
+    const isValidSupportField = (
+      (key === "numero_reg" && Boolean(getValidNumeroRegistro(properties)))
+      || (key === "ref" && Boolean(getValidReferencia(properties)))
+    );
+
+    if (documentSupportFields.has(key) && isValidSupportField) {
       labels.add(fieldLabel);
     }
 
-    if (documentSupportFields.has(key)) {
+    if (documentSupportFields.has(key) && isValidSupportField) {
       fieldMatches.push({
         field: key,
         fieldLabel,
@@ -686,8 +710,8 @@ function getSupportSummary(tramiteAnalysis) {
 }
 
 function getSupportReferenceDetails(properties) {
-  const numeroRegistro = String(properties?.numero_reg || "").trim();
-  const referencia = String(properties?.ref || "").trim();
+  const numeroRegistro = getValidNumeroRegistro(properties);
+  const referencia = getValidReferencia(properties);
   const details = [];
 
   if (numeroRegistro) {
@@ -702,8 +726,7 @@ function getSupportReferenceDetails(properties) {
 }
 
 function hasCertificadoGravamen(properties) {
-  return [properties?.numero_reg, properties?.ref]
-    .some((value) => value !== null && value !== undefined && String(value).trim() !== "");
+  return Boolean(getValidNumeroRegistro(properties) || getValidReferencia(properties));
 }
 
 function sortRecords(records) {
