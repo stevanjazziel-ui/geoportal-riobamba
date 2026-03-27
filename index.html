@@ -175,22 +175,22 @@
         <div class="map-overlay map-overlay-bottom-right">
           <article class="map-overlay-card legend-card legend-card-unified">
             <span class="map-overlay-label">Lectura del mapa</span>
-            <div class="legend-list">
-              <span class="legend-item"><span class="legend-swatch legend-swatch-catastro"></span>Catastro</span>
-              <span class="legend-item"><span class="legend-swatch legend-swatch-bienes"></span>Bienes</span>
-            </div>
-            <div class="legend-support-list">
-              <span class="legend-support-item">
-                <span class="legend-support-line legend-support-line-solid"></span>
-                Con registro o referencia
-              </span>
-              <span class="legend-support-item">
-                <span class="legend-support-line legend-support-line-dashed"></span>
-                Sin registro o referencia
-              </span>
-            </div>
-          </article>
-        </div>
+             <div class="legend-list">
+                <span class="legend-item"><span class="legend-swatch legend-swatch-catastro"></span>Catastro</span>
+                <span class="legend-item"><span class="legend-swatch legend-swatch-bienes"></span>Bienes</span>
+              </div>
+              <div class="legend-support-list">
+               <span class="legend-support-item" id="legend-support-primary">
+                 <span class="legend-support-line legend-support-line-solid" id="legend-support-primary-line"></span>
+                 <span id="legend-support-primary-label">Con registro o referencia</span>
+               </span>
+               <span class="legend-support-item" id="legend-support-secondary">
+                 <span class="legend-support-line legend-support-line-dashed" id="legend-support-secondary-line"></span>
+                 <span id="legend-support-secondary-label">Sin registro o referencia</span>
+               </span>
+              </div>
+            </article>
+          </div>
         <div id="map" aria-label="Mapa del geoportal"></div>
       </div>
     </main>
@@ -253,7 +253,7 @@
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-  <script src="./app.js?v=20260327-47"></script>
+  <script src="./app.js?v=20260327-48"></script>
 </body>
 </html>
 
