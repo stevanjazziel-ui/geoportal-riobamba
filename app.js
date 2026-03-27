@@ -64,13 +64,7 @@ const heroSupportCount = document.getElementById("hero-support-count");
 const heroCatastroCount = document.getElementById("hero-catastro-count");
 const heroBienesCount = document.getElementById("hero-bienes-count");
 const heroViewMode = document.getElementById("hero-view-mode");
-const legendSupportList = document.querySelector(".legend-support-list");
-const legendSupportPrimary = document.getElementById("legend-support-primary");
-const legendSupportPrimaryLine = document.getElementById("legend-support-primary-line");
-const legendSupportPrimaryLabel = document.getElementById("legend-support-primary-label");
-const legendSupportSecondary = document.getElementById("legend-support-secondary");
-const legendSupportSecondaryLine = document.getElementById("legend-support-secondary-line");
-const legendSupportSecondaryLabel = document.getElementById("legend-support-secondary-label");
+const legendModeNote = document.getElementById("legend-mode-note");
 const toggleCatastro = document.getElementById("toggle-catastro");
 const toggleBienes = document.getElementById("toggle-bienes");
 const sidebar = document.querySelector(".sidebar");
@@ -562,37 +556,14 @@ function updateCategoryCountModeUi() {
     card.setAttribute("aria-pressed", isActive ? "true" : "false");
   });
 
-  if (legendSupportList) {
-    if (categoryCountMode === "all") {
-      legendSupportList.hidden = true;
+  if (legendModeNote) {
+    if (categoryCountMode === "regularized") {
+      legendModeNote.textContent = "Modo visual: solo bienes municipales regularizados.";
+    } else if (categoryCountMode === "nonregularized") {
+      legendModeNote.textContent = "Modo visual: solo bienes municipales no regularizados.";
     } else {
-      legendSupportList.hidden = false;
+      legendModeNote.textContent = "Modo visual: bienes municipales totales, coloreados por clasificacion.";
     }
-  }
-
-  if (legendSupportPrimary && legendSupportPrimaryLabel && legendSupportPrimaryLine) {
-    legendSupportPrimary.hidden = categoryCountMode === "all";
-    legendSupportPrimaryLine.className = "legend-support-line legend-support-line-solid";
-  }
-
-  if (legendSupportSecondary && legendSupportSecondaryLabel && legendSupportSecondaryLine) {
-    legendSupportSecondary.hidden = true;
-  }
-
-  if (categoryCountMode === "regularized") {
-    if (legendSupportPrimaryLabel) {
-      legendSupportPrimaryLabel.textContent = "Solo bienes regularizados";
-    }
-  } else if (categoryCountMode === "nonregularized") {
-    if (legendSupportPrimaryLabel) {
-      legendSupportPrimaryLabel.textContent = "Solo bienes no regularizados";
-    }
-  } else if (legendSupportPrimaryLabel) {
-    legendSupportPrimaryLabel.textContent = "Con registro o referencia";
-  }
-
-  if (categoryCountMode === "all" && legendSupportSecondaryLabel) {
-    legendSupportSecondaryLabel.textContent = "Sin registro o referencia";
   }
 
   if (!categoryHelper) {
