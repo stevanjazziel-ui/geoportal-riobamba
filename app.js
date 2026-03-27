@@ -1691,7 +1691,7 @@ function getFeatureStyle(source, feature) {
   if (hasSupport) {
     return {
       color: supportStroke,
-      weight: 4,
+      weight: 4.6,
       fillColor: supportFill,
       fillOpacity: 0.24,
       opacity: 1
@@ -1700,7 +1700,7 @@ function getFeatureStyle(source, feature) {
 
   return {
     color: noSupportStroke,
-    weight: 3,
+    weight: 3.5,
     fillColor: noSupportFill,
     fillOpacity: 0.12,
     opacity: 0.98,
