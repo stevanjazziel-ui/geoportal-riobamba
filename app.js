@@ -1488,16 +1488,20 @@ function bindBrandStatCardFilters() {
     return;
   }
 
-  const activateCardMode = (card) => {
+  const activateCardMode = async (card) => {
     setCategoryCountMode(card?.dataset?.supportMode || "all");
+    if (!(await ensureBienesLayerVisible())) {
+      return;
+    }
+    refreshBienesFilter();
   };
 
   brandStatCards.forEach((card) => {
-    card.addEventListener("click", () => activateCardMode(card));
-    card.addEventListener("keydown", (event) => {
+    card.addEventListener("click", async () => activateCardMode(card));
+    card.addEventListener("keydown", async (event) => {
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
-        activateCardMode(card);
+        await activateCardMode(card);
       }
     });
   });
@@ -1508,10 +1512,16 @@ function bindBrandStatCardFilters() {
 function getLayerStyleKind(sourceId, layer, query) {
   const matchesQuery = !query || layer.__searchText.includes(query);
 
-  if (sourceId === "bienes" && activeBienesCategories.size > 0) {
-    const category = normalizeBienesCategory(layer.feature?.properties?.clase);
-    if (!activeBienesCategories.has(category)) {
+  if (sourceId === "bienes") {
+    if (!featureMatchesCategoryCountMode(layer.feature)) {
       return "hidden";
+    }
+
+    if (activeBienesCategories.size > 0) {
+      const category = normalizeBienesCategory(layer.feature?.properties?.clase);
+      if (!activeBienesCategories.has(category)) {
+        return "hidden";
+      }
     }
   }
 
@@ -1550,6 +1560,13 @@ function refreshBienesFilter() {
     updateCategoryCardState();
     return;
   }
+
+  source.layer.eachLayer((layer) => {
+    const baseStyle = getFeatureStyle(source, layer.feature);
+    layer.__baseStyle = baseStyle;
+    layer.__dimmedStyle = getDimmedStyle(baseStyle);
+    layer.__hiddenStyle = getHiddenStyle(baseStyle);
+  });
 
   const query = (searchInput?.value || "").trim().toLowerCase();
   source.layer.eachLayer((layer) => {
@@ -1704,7 +1721,7 @@ function getFeatureStyle(source, feature) {
     fillColor: noSupportFill,
     fillOpacity: 0.12,
     opacity: 0.98,
-    dashArray: "8 7"
+    dashArray: categoryCountMode === "all" ? "8 7" : null
   };
 }
 
