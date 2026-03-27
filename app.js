@@ -64,6 +64,7 @@ const heroSupportCount = document.getElementById("hero-support-count");
 const heroCatastroCount = document.getElementById("hero-catastro-count");
 const heroBienesCount = document.getElementById("hero-bienes-count");
 const heroViewMode = document.getElementById("hero-view-mode");
+const legendSupportList = document.querySelector(".legend-support-list");
 const toggleCatastro = document.getElementById("toggle-catastro");
 const toggleBienes = document.getElementById("toggle-bienes");
 const sidebar = document.querySelector(".sidebar");
@@ -554,6 +555,10 @@ function updateCategoryCountModeUi() {
     card.classList.toggle("is-active", isActive);
     card.setAttribute("aria-pressed", isActive ? "true" : "false");
   });
+
+  if (legendSupportList) {
+    legendSupportList.hidden = categoryCountMode === "all";
+  }
 
   if (!categoryHelper) {
     return;
@@ -1678,11 +1683,36 @@ function getFeatureStyle(source, feature) {
 
   const color = getBienesColor(feature?.properties?.clase);
   const hasSupport = hasCertificadoGravamen(feature?.properties);
+  const unifiedStroke = mixHexColors(color, "#ffffff", 0.1);
+  const unifiedFill = mixHexColors(color, "#ffffff", 0.06);
   const supportStroke = mixHexColors(color, "#ffffff", 0.1);
   const supportFill = mixHexColors(color, "#ffffff", 0.06);
   const noSupportStroke = mixHexColors(color, "#ffffff", 0.28);
   const noSupportFill = mixHexColors(color, "#ffffff", 0.18);
   const geometryType = feature?.geometry?.type || "";
+
+  if (categoryCountMode === "all") {
+    if (geometryType === "Point" || geometryType === "MultiPoint") {
+      return {
+        radius: 7.8,
+        color: "#f8fafc",
+        weight: 2.4,
+        fillColor: unifiedStroke,
+        fillOpacity: 0.96,
+        opacity: 1
+      };
+    }
+
+    return {
+      color: unifiedStroke,
+      weight: 4.2,
+      fillColor: unifiedFill,
+      fillOpacity: 0.22,
+      opacity: 1,
+      dashArray: null
+    };
+  }
+
   if (geometryType === "Point" || geometryType === "MultiPoint") {
     if (hasSupport) {
       return {
