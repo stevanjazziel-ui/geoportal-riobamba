@@ -64,7 +64,6 @@ const heroSupportCount = document.getElementById("hero-support-count");
 const heroCatastroCount = document.getElementById("hero-catastro-count");
 const heroBienesCount = document.getElementById("hero-bienes-count");
 const heroViewMode = document.getElementById("hero-view-mode");
-const legendModeNote = document.getElementById("legend-mode-note");
 const toggleCatastro = document.getElementById("toggle-catastro");
 const toggleBienes = document.getElementById("toggle-bienes");
 const sidebar = document.querySelector(".sidebar");
@@ -555,16 +554,6 @@ function updateCategoryCountModeUi() {
     card.classList.toggle("is-active", isActive);
     card.setAttribute("aria-pressed", isActive ? "true" : "false");
   });
-
-  if (legendModeNote) {
-    if (categoryCountMode === "regularized") {
-      legendModeNote.textContent = "Modo visual: solo bienes municipales regularizados.";
-    } else if (categoryCountMode === "nonregularized") {
-      legendModeNote.textContent = "Modo visual: solo bienes municipales no regularizados.";
-    } else {
-      legendModeNote.textContent = "Modo visual: bienes municipales totales, coloreados por clasificacion.";
-    }
-  }
 
   if (!categoryHelper) {
     return;
