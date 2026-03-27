@@ -89,10 +89,10 @@ const modalListCon = document.getElementById("modal-list-con");
 const modalListSin = document.getElementById("modal-list-sin");
 const modalViewButtons = Array.from(document.querySelectorAll(".modal-view-button"));
 const bienesCategories = [
-  { value: "Predios Municipales (Habilitacion de suelo)", label: "Predios Municipales (Habilitacion de suelo)", countId: "count-area-verde", color: "#15803d", dashKey: "area-verde" },
-  { value: "Predios Municipales (Equipamientos publicos)", label: "Predios Municipales (Equipamientos publicos)", countId: "count-propiedades-municipales", color: "#0f766e", dashKey: "propiedades-municipales" },
-  { value: "Bienes Municipales en Comodato", label: "Bienes Municipales en Comodato", countId: "count-comodato", color: "#7c3aed", dashKey: "comodato" },
-  { value: "Predios Municipales Mostrencos", label: "Predios Municipales Mostrencos", countId: "count-bienes-mostrencos", color: "#ea580c", dashKey: "bienes-mostrencos" }
+  { value: "Predios Municipales (Habilitacion de suelo)", label: "Predios Municipales (Habilitacion de suelo)", countId: "count-area-verde", color: "#ffe600", dashKey: "area-verde" },
+  { value: "Predios Municipales (Equipamientos publicos)", label: "Predios Municipales (Equipamientos publicos)", countId: "count-propiedades-municipales", color: "#00d9ff", dashKey: "propiedades-municipales" },
+  { value: "Bienes Municipales en Comodato", label: "Bienes Municipales en Comodato", countId: "count-comodato", color: "#ff4fd8", dashKey: "comodato" },
+  { value: "Predios Municipales Mostrencos", label: "Predios Municipales Mostrencos", countId: "count-bienes-mostrencos", color: "#ff7a00", dashKey: "bienes-mostrencos" }
 ];
 const bienesCategoryCounters = Object.fromEntries(
   bienesCategories.map((category) => [category.value, document.getElementById(category.countId)])
@@ -1661,48 +1661,50 @@ function getFeatureStyle(source, feature) {
 
   const color = getBienesColor(feature?.properties?.clase);
   const hasSupport = hasCertificadoGravamen(feature?.properties);
-  const noSupportStroke = mixHexColors(color, "#94a3b8", 0.42);
-  const noSupportFill = mixHexColors(color, "#cbd5e1", 0.22);
+  const supportStroke = mixHexColors(color, "#ffffff", 0.1);
+  const supportFill = mixHexColors(color, "#ffffff", 0.06);
+  const noSupportStroke = mixHexColors(color, "#ffffff", 0.28);
+  const noSupportFill = mixHexColors(color, "#ffffff", 0.18);
   const geometryType = feature?.geometry?.type || "";
   if (geometryType === "Point" || geometryType === "MultiPoint") {
     if (hasSupport) {
       return {
-        radius: 7.4,
+        radius: 8.4,
         color: "#f8fafc",
-        weight: 2.1,
-        fillColor: color,
-        fillOpacity: 0.9,
+        weight: 2.4,
+        fillColor: supportStroke,
+        fillOpacity: 0.98,
         opacity: 1
       };
     }
 
     return {
-      radius: 5.4,
+      radius: 6.2,
       color: noSupportStroke,
-      weight: 2.1,
+      weight: 2.4,
       fillColor: noSupportFill,
-      fillOpacity: 0.24,
+      fillOpacity: 0.72,
       opacity: 0.98
     };
   }
 
   if (hasSupport) {
     return {
-      color,
-      weight: 3.2,
-      fillColor: color,
-      fillOpacity: 0.16,
+      color: supportStroke,
+      weight: 4,
+      fillColor: supportFill,
+      fillOpacity: 0.24,
       opacity: 1
     };
   }
 
   return {
     color: noSupportStroke,
-    weight: 2.2,
+    weight: 3,
     fillColor: noSupportFill,
-    fillOpacity: 0.04,
+    fillOpacity: 0.12,
     opacity: 0.98,
-    dashArray: "4 8"
+    dashArray: "8 7"
   };
 }
 
