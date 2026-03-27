@@ -53,6 +53,7 @@ const mapFocusChartLabels = document.getElementById("map-focus-chart-labels");
 const mapFocusDistributionTitle = document.getElementById("map-focus-distribution-title");
 const mapFocusDistributionTotal = document.getElementById("map-focus-distribution-total");
 const mapFocusDistributionRows = document.getElementById("map-focus-distribution-rows");
+const mapFocusPanel = document.getElementById("map-focus-panel");
 const statCatastro = document.getElementById("stat-catastro");
 const statBienes = document.getElementById("stat-bienes");
 const statRegularized = document.getElementById("stat-regularized");
@@ -1088,7 +1089,7 @@ function fitAllLayers() {
   }
 
   const merged = bounds.reduce((accumulator, current) => accumulator.extend(current), bounds[0]);
-  map.fitBounds(merged.pad(0.08));
+  fitMapBoundsForPresentation(merged, { padRatio: 0.18, maxZoom: 13 });
 }
 
 function updateSidebarScrollUi() {
@@ -1197,6 +1198,36 @@ function scrollSidebarBy(amount) {
   });
 }
 
+function getPresentationFitOptions(padRatio = 0.18) {
+  const mapSize = map.getSize ? map.getSize() : { x: 0, y: 0 };
+  const isWideViewport = window.innerWidth >= 1180;
+  const panelWidth = isWideViewport && mapFocusPanel ? mapFocusPanel.offsetWidth || 0 : 0;
+  const leftPadding = isWideViewport
+    ? Math.min(panelWidth + 56, Math.round(mapSize.x * 0.54))
+    : 24;
+
+  return {
+    padRatio,
+    paddingTopLeft: [leftPadding, isWideViewport ? 32 : 24],
+    paddingBottomRight: [isWideViewport ? 34 : 24, isWideViewport ? 34 : 24],
+    maxZoom: isWideViewport ? 13 : 14
+  };
+}
+
+function fitMapBoundsForPresentation(bounds, options = {}) {
+  if (!bounds?.isValid()) {
+    return;
+  }
+
+  const fitOptions = getPresentationFitOptions(options.padRatio ?? 0.18);
+  map.fitBounds(bounds.pad(fitOptions.padRatio), {
+    paddingTopLeft: fitOptions.paddingTopLeft,
+    paddingBottomRight: fitOptions.paddingBottomRight,
+    maxZoom: options.maxZoom ?? fitOptions.maxZoom,
+    animate: options.animate ?? false
+  });
+}
+
 function bindSidebarScrollUi() {
   if (!sidebar || !sidebarScrollUp || !sidebarScrollDown || !sidebarScrollThumb) {
     return;
@@ -1262,7 +1293,7 @@ function fitFilteredBienesBounds() {
   }
 
   const merged = bounds.reduce((accumulator, current) => accumulator.extend(current), bounds[0]);
-  map.fitBounds(merged.pad(0.12));
+  fitMapBoundsForPresentation(merged, { padRatio: 0.18, maxZoom: 13 });
 }
 
 function updateBienesCategoryCounts(features = bienesFeaturesCache) {
